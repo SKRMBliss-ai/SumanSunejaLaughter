@@ -1,0 +1,7 @@
+{
+  "name": "SumanSuneja-LaughterHub",
+  "description": "A fun, interactive laughter yoga app featuring AI laughter coaching, daily Zoom sessions, and laughter games.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
