@@ -271,7 +271,7 @@ export const VideoLibrary: React.FC = () => {
 
       {/* Floating Playback Overlay */}
       {playingVideo && createPortal(
-        <div className="fixed bottom-0 left-0 right-0 bg-[#1F2937] text-white p-3 pr-12 rounded-t-2xl shadow-2xl z-50 flex items-center justify-between animate-in slide-in-from-bottom border-t border-gray-700 relative">
+        <div className="fixed bottom-0 left-0 right-0 bg-[#1F2937] text-white p-3 pr-12 rounded-t-2xl shadow-2xl z-[60] flex items-center justify-between animate-in slide-in-from-bottom border-t border-gray-700 relative">
           <div className="flex items-center gap-3 overflow-hidden">
             <div className="w-10 h-10 rounded-lg bg-gray-800 shrink-0 overflow-hidden relative">
               <img
