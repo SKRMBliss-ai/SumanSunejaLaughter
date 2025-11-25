@@ -91,7 +91,7 @@ export const LaughterGames: React.FC = () => {
       try {
         const translated = await Promise.all(selected.map(async (item) => {
           try {
-            let title = await translateText(item.title, language);
+            let title = await translateText(item.title, language, 'concise');
             // Double check strip markdown
             title = title.replace(/\*\*/g, '').replace(/\*/g, '').trim();
             return { ...item, title };

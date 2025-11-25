@@ -149,21 +149,35 @@ const getCachedTranslation = (text: string, targetLang: string): string | null =
   }
 };
 
-const setCachedTranslation = (text: string, targetLang: string, translation: string) => {
+const setCachedTranslation = (text: string, targetLang: string, translation: string, style: string = 'fun') => {
   try {
     const cache = JSON.parse(localStorage.getItem(TRANSLATION_CACHE_KEY) || '{}');
-    cache[`${text}_${targetLang}`] = translation;
+    const cacheKey = `${text}_${targetLang}_${style}`;
+    cache[cacheKey] = translation;
+    // Also cache with old key format for backward compatibility if style is 'fun'
+    if (style === 'fun') {
+      cache[`${text}_${targetLang}`] = translation;
+    }
     localStorage.setItem(TRANSLATION_CACHE_KEY, JSON.stringify(cache));
   } catch (e) {
     console.warn('Failed to cache translation', e);
   }
 };
 
-export const translateText = async (text: string, targetLang: string): Promise<string> => {
-  console.log(`[Translation] Request: "${text.substring(0, 20)}..." to ${targetLang}`);
+export const translateText = async (text: string, targetLang: string, style: 'fun' | 'concise' = 'fun'): Promise<string> => {
+  console.log(`[Translation] Request: "${text.substring(0, 20)}..." to ${targetLang} (${style})`);
   if (targetLang === 'en') return text;
 
-  const cached = getCachedTranslation(text, targetLang);
+  const cacheKey = `${text}_${targetLang}_${style}`;
+
+  const getCached = () => {
+    try {
+      const cache = JSON.parse(localStorage.getItem(TRANSLATION_CACHE_KEY) || '{}');
+      return cache[cacheKey] || (style === 'fun' ? cache[`${text}_${targetLang}`] : null) || null;
+    } catch (e) { return null; }
+  };
+
+  const cached = getCached();
   if (cached) {
     console.log(`[Translation] Cache hit for ${targetLang}`);
     return cached;
@@ -176,12 +190,18 @@ export const translateText = async (text: string, targetLang: string): Promise<s
 
   try {
     console.log(`[Translation] Calling Gemini API for ${targetLang}...`);
+
+    let prompt = "";
+    if (style === 'concise') {
+      prompt = `Translate the following text to ${targetLang}. Be direct and concise. Do not add any extra words, explanations, or laughter. Do NOT use markdown formatting. Return only the plain translated text.\n\nText: "${text}"`;
+    } else {
+      prompt = `Translate the following text to ${targetLang}. Keep the tone energetic, fun, and conversational. Preserve any laughter sounds like 'Ha ha ha' or 'Ho ho ho'. Do NOT use markdown formatting (no bold, no italics). Return only plain text.\n\nText: "${text}"`;
+    }
+
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: [{
-        parts: [{
-          text: `Translate the following text to ${targetLang}. Keep the tone energetic, fun, and conversational. Preserve any laughter sounds like 'Ha ha ha' or 'Ho ho ho'. Do NOT use markdown formatting (no bold, no italics). Return only plain text.\n\nText: "${text}"`
-        }]
+        parts: [{ text: prompt }]
       }]
     });
 
@@ -196,7 +216,7 @@ export const translateText = async (text: string, targetLang: string): Promise<s
     console.log(`[Translation] Success: "${translation?.substring(0, 20)}..."`);
 
     if (translation) {
-      setCachedTranslation(text, targetLang, translation);
+      setCachedTranslation(text, targetLang, translation, style);
       return translation;
     }
     return text;
@@ -219,7 +239,8 @@ export const generateHumor = async (topic: string, type: 'story' | 'joke' = 'sto
   if (language === 'en') return content;
 
   // Translate the text property of the content object
-  const translatedText = await translateText(content.text, language);
+  // Content should be fun!
+  const translatedText = await translateText(content.text, language, 'fun');
   return { ...content, text: translatedText };
 }
 
@@ -262,7 +283,8 @@ export const getGuidedSessionScript = async (language: string = 'en') => {
 
   if (language === 'en') return script;
 
-  const translated = await translateText(script, language);
+  // Scripts should be fun!
+  const translated = await translateText(script, language, 'fun');
   console.log(`[GuidedSession] Translated script length: ${translated.length}`);
   return translated;
 }
