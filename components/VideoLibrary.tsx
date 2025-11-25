@@ -26,6 +26,7 @@ export const VideoLibrary: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
+  const [portalElement, setPortalElement] = useState<HTMLElement | null>(null);
 
   // Persisted State
   const [favorites, setFavorites] = useState<string[]>(() => {
@@ -47,6 +48,16 @@ export const VideoLibrary: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('suman_dl_videos', JSON.stringify(downloads));
   }, [downloads]);
+
+  useEffect(() => {
+    let element = document.getElementById('player-portal');
+    if (!element) {
+      element = document.createElement('div');
+      element.id = 'player-portal';
+      document.body.appendChild(element);
+    }
+    setPortalElement(element);
+  }, []);
 
   // Actions
   const toggleFavorite = (id: string) => {
@@ -270,8 +281,8 @@ export const VideoLibrary: React.FC = () => {
       </div>
 
       {/* Floating Playback Overlay */}
-      {playingVideo && createPortal(
-        <div className="fixed bottom-0 left-0 right-0 bg-[#1F2937] text-white p-3 pr-12 rounded-t-2xl shadow-2xl z-[60] flex items-center justify-between animate-in slide-in-from-bottom border-t border-gray-700 relative">
+      {playingVideo && portalElement && createPortal(
+        <div className="fixed bottom-[4.5rem] left-0 right-0 bg-[#1F2937] text-white p-3 pr-12 rounded-t-2xl shadow-2xl flex items-center justify-between animate-in slide-in-from-bottom border-t border-gray-700" style={{ zIndex: 9999 }}>
           <div className="flex items-center gap-3 overflow-hidden">
             <div className="w-10 h-10 rounded-lg bg-gray-800 shrink-0 overflow-hidden relative">
               <img
@@ -309,7 +320,7 @@ export const VideoLibrary: React.FC = () => {
             <X size={16} />
           </button>
         </div>,
-        document.body
+        portalElement
       )}
 
       {/* Pagination */}
