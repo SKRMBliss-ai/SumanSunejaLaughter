@@ -1,23 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Volume2, Sparkles, Loader2, Music, Wand2, RefreshCw, Zap, Bot, Mic, Smile, AlertCircle, WifiOff } from 'lucide-react';
-import { generateHumor, generateSpeech, createAudioBufferFromPCM } from '../services/geminiService';
+import { generateSpeech, createAudioBufferFromPCM } from '../services/geminiService';
+import { JOKES, STORIES } from '../services/contentRepository';
 import { addPoints } from '../services/rewardService';
 
 export const LaughterGames: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'GENERATOR' | 'MOOD' | 'JOKES'>('GENERATOR');
-  const [topic, setTopic] = useState('');
   const [currentText, setCurrentText] = useState<string | null>(null);
   const [currentAudio, setCurrentAudio] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [usingFallbackVoice, setUsingFallbackVoice] = useState(false);
+  const [displayedItems, setDisplayedItems] = useState<any[]>([]);
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const sourceRef = useRef<AudioBufferSourceNode | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number | null>(null);
+
+  const COLORS = ['bg-[#ABCEC9]', 'bg-[#AABBCC]', 'bg-[#C3B8D5]', 'bg-[#EDE8F8]'];
 
   useEffect(() => {
     // Initialize AudioContext
@@ -40,6 +43,23 @@ export const LaughterGames: React.FC = () => {
       window.dispatchEvent(new CustomEvent('MUSIC_MOOD', { detail: 'CALM' }));
     };
   }, []);
+
+  useEffect(() => {
+    handleShuffle();
+  }, [activeTab]);
+
+  const shuffleAndSlice = (items: any[]) => {
+    const shuffled = [...items].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, 10);
+  };
+
+  const handleShuffle = () => {
+    if (activeTab === 'GENERATOR') {
+      setDisplayedItems(shuffleAndSlice(STORIES));
+    } else if (activeTab === 'JOKES') {
+      setDisplayedItems(shuffleAndSlice(JOKES));
+    }
+  };
 
   const stopAudio = () => {
     if (sourceRef.current) {
@@ -192,46 +212,67 @@ export const LaughterGames: React.FC = () => {
     window.speechSynthesis.speak(utterance);
   };
 
-  const handleGenerate = async (type: 'story' | 'joke' = 'story') => {
-    if (!topic.trim()) return;
+  const playBreathingGuide = () => {
+    const text = "Take a deep breath... and relax in the Laughter Hub. Breathe in slowwwwly and breathe out slowly until we start";
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.9; // Slower, more calming
+    utterance.pitch = 1.0;
+    utterance.volume = 0.8;
 
+    // Try to find a soothing voice if possible
+    const voices = window.speechSynthesis.getVoices();
+    const calmVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Samantha'));
+    if (calmVoice) utterance.voice = calmVoice;
+
+    window.speechSynthesis.speak(utterance);
+    return utterance;
+  };
+
+  const handlePlayContent = async (text: string) => {
     setIsLoading(true);
-    setCurrentText(null);
+    setCurrentText(text);
     setCurrentAudio(null);
     setError(null);
     setUsingFallbackVoice(false);
     stopAudio();
 
-    try {
-      // 1. Text Generation
-      const text = await generateHumor(topic, type);
-      setCurrentText(text);
+    // Start Breathing Guide immediately
+    playBreathingGuide();
 
-      // 2. Audio Generation
+    try {
+      // 1. Audio Generation
       try {
+        // Prepend intro text for the audio
+        const introText = "Here is one joke from Suman's list: ";
+        const fullAudioText = `${introText} ${text}`;
+
         // Use 'Kore' for both stories and jokes to provide a realistic, human-like female voice
-        const audioBase64 = await generateSpeech(text, 'Kore');
+        const audioBase64 = await generateSpeech(fullAudioText, 'Kore');
+
+        // Stop breathing guide before playing real audio
+        window.speechSynthesis.cancel();
+
         setCurrentAudio(audioBase64);
         await playAudio(audioBase64);
       } catch (speechErr: any) {
         console.warn("Gemini TTS failed, using fallback", speechErr);
+        window.speechSynthesis.cancel(); // Stop breathing guide
         fallbackSpeak(text);
       }
 
-      // 4. Reward
+      // 2. Reward
       addPoints(10, "Laughter Lab Experiment", 'GAME');
 
     } catch (e) {
       console.error(e);
+      window.speechSynthesis.cancel(); // Stop breathing guide
       // Fallback for text generation error or network error
       if (e instanceof Error && e.message === "MISSING_GEMINI_KEY") {
         setError("Using offline mode (API Key missing)");
-        const offlineText = "I can't access my comedy brain right now, but I can still laugh! Ha ha ha! Bwahaha!";
-        setCurrentText(offlineText);
-        fallbackSpeak(offlineText);
+        fallbackSpeak(text);
       } else {
         setError("Connection issue. Try again!");
-        setCurrentText("Oops! Something went wrong. But keep smiling!");
+        fallbackSpeak(text);
       }
     } finally {
       setIsLoading(false);
@@ -249,23 +290,37 @@ export const LaughterGames: React.FC = () => {
     // Trigger dynamic music change
     window.dispatchEvent(new CustomEvent('MUSIC_MOOD', { detail: 'ENERGY' }));
 
+    // Start Breathing Guide immediately
+    playBreathingGuide();
+
     try {
-      const text = await generateHumor(`feeling ${mood}`, 'story');
-      setCurrentText(text);
+      // For moods, we still generate dynamic text or we could add mood scripts to repo
+      // For now, let's keep it simple and generate a generic laugh for the mood
+      const moodText = `I am feeling ${mood}! Hahaha!`;
+      const introText = "Here is a mood from Suman's list: ";
+      const fullAudioText = `${introText} ${moodText}`;
+
+      setCurrentText(moodText);
 
       try {
         // Force 'Kore' for all moods to ensure consistent realistic human voice
-        const audioBase64 = await generateSpeech(text, 'Kore');
+        const audioBase64 = await generateSpeech(fullAudioText, 'Kore');
+
+        // Stop breathing guide before playing real audio
+        window.speechSynthesis.cancel();
+
         setCurrentAudio(audioBase64);
         await playAudio(audioBase64);
       } catch (speechErr: any) {
         console.warn("Gemini TTS failed, using fallback", speechErr);
-        fallbackSpeak(text);
+        window.speechSynthesis.cancel();
+        fallbackSpeak(moodText);
       }
 
       addPoints(5, "Mood Lifted!", 'GAME');
     } catch (e) {
       console.error(e);
+      window.speechSynthesis.cancel();
       if (e instanceof Error && e.message === "MISSING_GEMINI_KEY") {
         setError("Using offline mode");
         const offlineText = "Ha ha ha! Hee hee hee! Laughter is the best medicine, even offline!";
@@ -346,8 +401,9 @@ export const LaughterGames: React.FC = () => {
             <div className="flex flex-col items-center gap-2">
               <Loader2 size={32} className={`animate-spin ${activeTab === 'JOKES' ? 'text-red-300' : 'text-[#ABCEC9]'}`} />
               <span className="text-xs font-bold text-gray-400 animate-pulse">
-                {activeTab === 'JOKES' ? "Writing a zinger..." : "Brewing Laughter..."}
+                {activeTab === 'JOKES' ? "Preparing your laugh..." : "Brewing Laughter..."}
               </span>
+              <span className="text-[0.65rem] text-gray-400 italic">Take a deep breath...</span>
             </div>
           ) : currentText ? (
             <div className="animate-pop-in flex flex-col items-center gap-3 w-full">
@@ -362,7 +418,7 @@ export const LaughterGames: React.FC = () => {
                     onClick={() => playAudio(currentAudio)}
                     className="bg-[#ABCEC9] hover:bg-[#9BBDB8] text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-sm transition-transform active:scale-95 animate-pop-in border border-white/20"
                   >
-                    <Play size={10} fill="currentColor" /> Play Real Laughter 🗣️
+                    <Play size={10} fill="currentColor" /> Replay
                   </button>
                 )}
                 {usingFallbackVoice && (
@@ -374,8 +430,8 @@ export const LaughterGames: React.FC = () => {
             </div>
           ) : (
             <p className="text-gray-400 font-medium text-sm px-8">
-              {activeTab === 'GENERATOR' ? "Enter a situation (e.g. 'Traffic Jam') to turn it into a laugh!" :
-                activeTab === 'JOKES' ? "Enter a topic (e.g. 'Pizza') for a funny one-liner + laugh!" :
+              {activeTab === 'GENERATOR' ? "Pick a story topic below to start laughing!" :
+                activeTab === 'JOKES' ? "Choose a joke theme to get a quick laugh!" :
                   "Select a mood to hear different laughter styles."}
             </p>
           )}
@@ -392,28 +448,26 @@ export const LaughterGames: React.FC = () => {
       <div className="mt-6 space-y-4">
 
         {(activeTab === 'GENERATOR' || activeTab === 'JOKES') && (
-          <div className="animate-fade-in-up delay-300">
-            <div className="relative">
-              <input
-                type="text"
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                placeholder={activeTab === 'JOKES' ? "Topic (e.g. Cats, Boss, Coffee)" : "Situation (e.g. Missed Alarm)"}
-                className={`w-full bg-white dark:bg-slate-800 border-2 rounded-2xl py-4 pl-4 pr-14 text-gray-700 dark:text-white font-bold shadow-sm focus:outline-none focus:ring-4 transition-all ${activeTab === 'JOKES' ? 'border-red-50 dark:border-red-900/30 focus:border-red-200 focus:ring-red-100 dark:focus:ring-red-900' : 'border-gray-100 dark:border-slate-700 focus:border-[#C3B8D5] focus:ring-[#C3B8D5]/10'}`}
-                onKeyDown={(e) => e.key === 'Enter' && handleGenerate(activeTab === 'JOKES' ? 'joke' : 'story')}
-              />
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 dark:text-gray-500">
-                <Sparkles size={20} className={activeTab === 'JOKES' ? 'text-red-300' : 'text-[#C3B8D5]'} />
-              </div>
+          <>
+            <div className="grid grid-cols-2 gap-3 animate-fade-in-up delay-300">
+              {displayedItems.map((item, index) => (
+                <button
+                  key={item.id}
+                  onClick={() => handlePlayContent(item.text)}
+                  disabled={isLoading}
+                  className={`${COLORS[index % COLORS.length]} hover:opacity-90 text-gray-800 p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-105 disabled:opacity-50 disabled:scale-100 border-2 border-white`}
+                >
+                  {item.title}
+                </button>
+              ))}
             </div>
             <button
-              onClick={() => handleGenerate(activeTab === 'JOKES' ? 'joke' : 'story')}
-              disabled={isLoading || !topic.trim()}
-              className={`w-full mt-4 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-transform disabled:opacity-50 disabled:scale-100 flex items-center justify-center gap-2 hover:scale-[1.02] ${activeTab === 'JOKES' ? 'bg-gradient-to-r from-red-300 to-pink-300 shadow-red-200 hover:brightness-105' : 'bg-gradient-to-r from-[#C3B8D5] to-[#AABBCC] dark:from-slate-700 dark:to-slate-600 shadow-[#C3B8D5]/30'}`}
+              onClick={handleShuffle}
+              className="mt-4 w-full py-3 rounded-xl bg-white dark:bg-slate-800 border-2 border-[#ABCEC9] text-[#ABCEC9] font-bold flex items-center justify-center gap-2 hover:bg-[#ABCEC9]/10 transition-colors shadow-sm"
             >
-              {activeTab === 'JOKES' ? "Tell Me a Joke & Laugh!" : "Generate Joy Story"}
+              <RefreshCw size={18} /> Shuffle Topics
             </button>
-          </div>
+          </>
         )}
 
         {activeTab === 'MOOD' && (

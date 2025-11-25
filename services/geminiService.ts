@@ -1,4 +1,5 @@
 import { GoogleGenAI, Type, Schema, Modality } from "@google/genai";
+import { JOKES, STORIES } from './contentRepository';
 
 const apiKey = process.env.API_KEY || '';
 // Initialize conditionally to prevent crashes if key is strictly validated on init
@@ -32,17 +33,17 @@ export const createAudioBufferFromPCM = (ctx: AudioContext, base64: string): Aud
   for (let i = 0; i < len; i++) {
     bytes[i] = binaryString.charCodeAt(i);
   }
-  
+
   // Gemini 2.5 Flash TTS returns 24kHz Mono 16-bit PCM
   // We need to interpret the bytes as Int16 and convert to Float32 [-1.0, 1.0]
   const int16Data = new Int16Array(bytes.buffer);
   const buffer = ctx.createBuffer(1, int16Data.length, 24000);
   const channelData = buffer.getChannelData(0);
-  
+
   for (let i = 0; i < int16Data.length; i++) {
     channelData[i] = int16Data[i] / 32768.0;
   }
-  
+
   return buffer;
 };
 
@@ -96,7 +97,7 @@ export const rateLaughter = async (audioBase64: string, mimeType: string) => {
 
 // --- Chat Assistant Service ---
 
-export const getChatResponse = async (history: {role: string, parts: {text: string}[]}[], message: string) => {
+export const getChatResponse = async (history: { role: string, parts: { text: string }[] }[], message: string) => {
   if (!apiKey || !ai) {
     throw new Error("MISSING_GEMINI_KEY");
   }
@@ -131,31 +132,12 @@ export const getChatResponse = async (history: {role: string, parts: {text: stri
 // --- Laughter Joke Generator ---
 
 export const generateHumor = async (topic: string, type: 'story' | 'joke' = 'story') => {
-  if (!apiKey || !ai) throw new Error("MISSING_GEMINI_KEY");
-  
-  // Refined prompts to encourage realistic prosody for TTS
-  const prompt = type === 'story' 
-    ? `Write a very short, high-energy, first-person situational comedy monologue about "${topic}".
-      IMPORTANT INSTRUCTIONS FOR SPEECH GENERATION:
-      - Write as if you are talking to a best friend.
-      - Use punctuation to control timing: use ellipses (...) for pauses, exclamation marks (!) for excitement.
-      - Include phonetic laughter strings NATURALLY in the sentence (e.g., "And then I saw it... Bwahaha!", "Oh my gosh, hee hee hee!").
-      - Make the tone warm, friendly, and slightly dramatic.
-      - Keep it under 60 words.`
-    : `Write one hilarious one-liner joke about "${topic}".
-      - Format it for expressive speech (use ! and ... for timing). 
-      - End the joke with a contagious, realistic laughter string (e.g., "Hahaha! That's too good!", "Oh my gosh, hee hee!").
-      - Keep it punchy and fun.`;
+  // Simulate a short delay for UX (optional, but feels more natural than 0ms)
+  await new Promise(resolve => setTimeout(resolve, 500));
 
-  try {
-     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-    });
-    return response.text;
-  } catch (error) {
-    throw error;
-  }
+  const source = type === 'story' ? STORIES : JOKES;
+  const randomIndex = Math.floor(Math.random() * source.length);
+  return source[randomIndex];
 }
 
 // --- Speech Generation (TTS) ---
@@ -172,16 +154,16 @@ export const generateSpeech = async (text: string, voiceName: string = 'Kore') =
       config: {
         responseModalities: [Modality.AUDIO],
         speechConfig: {
-            voiceConfig: {
-              prebuiltVoiceConfig: { voiceName }
-            },
+          voiceConfig: {
+            prebuiltVoiceConfig: { voiceName }
+          },
         },
       },
     });
 
     const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
     if (!base64Audio) throw new Error("No audio data returned");
-    
+
     return base64Audio;
   } catch (error) {
     console.error("TTS Error:", error);
