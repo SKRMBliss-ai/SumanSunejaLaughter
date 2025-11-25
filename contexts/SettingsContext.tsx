@@ -59,6 +59,8 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Contact
     'contact.header_title': "Let's Make Magic Happen!",
+    'contact.header_title_start': "Let's Make",
+    'contact.header_title_end': "Magic Happen!",
     'contact.header_subtitle': "Booking a session is the first step to a happier, healthier life.",
     'contact.whatsapp_btn': "WhatsApp Us",
     'contact.instant_reply': "Instant Reply",
@@ -216,6 +218,8 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Contact
     'contact.header_title': "चलो जादू करते हैं!",
+    'contact.header_title_start': "चलो",
+    'contact.header_title_end': "जादू करते हैं!",
     'contact.header_subtitle': "एक सत्र बुक करना एक खुशहाल, स्वस्थ जीवन की ओर पहला कदम है।",
     'contact.whatsapp_btn': "व्हाट्सएप करें",
     'contact.instant_reply': "त्वरित उत्तर",
@@ -373,6 +377,8 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Contact
     'contact.header_title': "¡Hagamos Magia!",
+    'contact.header_title_start': "¡Hagamos",
+    'contact.header_title_end': "Magia!",
     'contact.header_subtitle': "Reservar una sesión es el primer paso hacia una vida más feliz.",
     'contact.whatsapp_btn': "WhatsApp",
     'contact.instant_reply': "Respuesta Inmediata",
@@ -530,6 +536,8 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Contact
     'contact.header_title': "لنصنع السحر!",
+    'contact.header_title_start': "لنصنع",
+    'contact.header_title_end': "السحر!",
     'contact.header_subtitle': "حجز جلسة هو الخطوة الأولى لحياة أكثر سعادة.",
     'contact.whatsapp_btn': "واتساب",
     'contact.instant_reply': "رد فوري",
@@ -687,6 +695,8 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Contact
     'contact.header_title': "Faisons de la Magie !",
+    'contact.header_title_start': "Faisons de la",
+    'contact.header_title_end': "Magie !",
     'contact.header_subtitle': "Réserver une séance est la première étape vers une vie plus heureuse.",
     'contact.whatsapp_btn': "WhatsApp",
     'contact.instant_reply': "Réponse Instantanée",
@@ -844,6 +854,8 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Contact
     'contact.header_title': "Lass uns Magie machen!",
+    'contact.header_title_start': "Lass uns",
+    'contact.header_title_end': "Magie machen!",
     'contact.header_subtitle': "Eine Sitzung zu buchen ist der erste Schritt zu einem glücklicheren Leben.",
     'contact.whatsapp_btn': "WhatsApp uns",
     'contact.instant_reply': "Sofortantwort",
@@ -1001,6 +1013,8 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Contact
     'contact.header_title': "魔法を起こそう！",
+    'contact.header_title_start': "魔法を",
+    'contact.header_title_end': "起こしましょう！",
     'contact.header_subtitle': "セッションの予約は、より幸せで健康的な生活への第一歩です。",
     'contact.whatsapp_btn': "WhatsApp",
     'contact.instant_reply': "即時返信",

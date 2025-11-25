@@ -1,7 +1,10 @@
 import React from 'react';
 import { Phone, Mail, Globe, Youtube, MessageCircle, Briefcase, Users, User, MapPin, Smile, Star, Heart, ArrowRight } from 'lucide-react';
+import { useSettings } from '../contexts/SettingsContext';
 
 export const Contact: React.FC = () => {
+  const { t } = useSettings();
+
   const handleWhatsApp = () => {
     const text = encodeURIComponent("Hi Suman! I'm interested in Laughter Yoga and want to know more.");
     window.open(`https://wa.me/918217581238?text=${text}`, '_blank');
@@ -22,12 +25,12 @@ export const Contact: React.FC = () => {
             <Smile className="text-[#ABCEC9] w-10 h-10 fill-[#EDE8F8] dark:fill-slate-700" />
           </div>
           <h2 className="text-4xl font-fredoka font-bold text-gray-700 dark:text-gray-100 leading-tight">
-            Let's Make <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ABCEC9] to-[#C3B8D5]">Magic Happen!</span>
+            {t('contact.header_title_start')} <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ABCEC9] to-[#C3B8D5]">{t('contact.header_title_end')}</span>
           </h2>
         </div>
         <p className="text-[#AABBCC] font-medium text-sm max-w-xs mx-auto">
-          Booking a session is the first step to a happier, healthier life.
+          {t('contact.header_subtitle')}
         </p>
       </div>
 
@@ -44,8 +47,8 @@ export const Contact: React.FC = () => {
               <MessageCircle size={28} fill="currentColor" strokeWidth={1.5} />
             </div>
             <div className="text-left">
-              <span className="block font-black text-xl tracking-tight">WhatsApp Us</span>
-              <span className="text-green-800/80 dark:text-green-400/80 text-xs font-bold uppercase tracking-wider">Instant Reply</span>
+              <span className="block font-black text-xl tracking-tight">{t('contact.whatsapp_btn')}</span>
+              <span className="text-green-800/80 dark:text-green-400/80 text-xs font-bold uppercase tracking-wider">{t('contact.instant_reply')}</span>
             </div>
           </div>
           <div className="z-10 bg-white dark:bg-slate-800 p-2 rounded-full text-green-700 dark:text-green-400 shadow-sm">
@@ -62,8 +65,8 @@ export const Contact: React.FC = () => {
               <Mail size={28} strokeWidth={2} />
             </div>
             <div className="text-left">
-              <span className="block font-black text-xl tracking-tight">Send Email</span>
-              <span className="text-[#AABBCC] text-xs font-bold uppercase tracking-wider">For Enquiries</span>
+              <span className="block font-black text-xl tracking-tight">{t('contact.email_btn')}</span>
+              <span className="text-[#AABBCC] text-xs font-bold uppercase tracking-wider">{t('contact.for_enquiries')}</span>
             </div>
           </div>
         </button>
@@ -73,29 +76,29 @@ export const Contact: React.FC = () => {
       <div>
         <div className="flex items-center gap-2 mb-4 px-2">
           <Star className="text-[#C3B8D5] fill-current animate-spin-slow" size={18} />
-          <h3 className="font-bold text-[#AABBCC] uppercase tracking-widest text-xs">What we offer</h3>
+          <h3 className="font-bold text-[#AABBCC] uppercase tracking-widest text-xs">{t('contact.offerings_title')}</h3>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-[#ABCEC9]/10 dark:bg-slate-800/50 p-4 rounded-2xl border border-[#ABCEC9]/20 dark:border-slate-700">
             <User className="text-[#ABCEC9] mb-2" size={24} />
-            <div className="font-bold text-gray-700 dark:text-gray-200">1-on-1</div>
-            <div className="text-xs text-[#ABCEC9] font-medium">Personal Coaching</div>
+            <div className="font-bold text-gray-700 dark:text-gray-200">{t('contact.offering_1_title')}</div>
+            <div className="text-xs text-[#ABCEC9] font-medium">{t('contact.offering_1_desc')}</div>
           </div>
           <div className="bg-[#C3B8D5]/10 dark:bg-slate-800/50 p-4 rounded-2xl border border-[#C3B8D5]/20 dark:border-slate-700">
             <Briefcase className="text-[#C3B8D5] mb-2" size={24} />
-            <div className="font-bold text-gray-700 dark:text-gray-200">Corporate</div>
-            <div className="text-xs text-[#C3B8D5] font-medium">Stress Relief</div>
+            <div className="font-bold text-gray-700 dark:text-gray-200">{t('contact.offering_2_title')}</div>
+            <div className="text-xs text-[#C3B8D5] font-medium">{t('contact.offering_2_desc')}</div>
           </div>
           <div className="bg-[#AABBCC]/10 dark:bg-slate-800/50 p-4 rounded-2xl border border-[#AABBCC]/20 dark:border-slate-700">
             <Users className="text-[#AABBCC] mb-2" size={24} />
-            <div className="font-bold text-gray-700 dark:text-gray-200">Groups</div>
-            <div className="text-xs text-[#AABBCC] font-medium">Workshops</div>
+            <div className="font-bold text-gray-700 dark:text-gray-200">{t('contact.offering_3_title')}</div>
+            <div className="text-xs text-[#AABBCC] font-medium">{t('contact.offering_3_desc')}</div>
           </div>
           <div className="bg-yellow-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-yellow-100 dark:border-slate-700">
             <Heart className="text-yellow-400 mb-2" size={24} />
-            <div className="font-bold text-gray-700 dark:text-gray-200">Retreats</div>
-            <div className="text-xs text-yellow-500 font-medium">Wellness Days</div>
+            <div className="font-bold text-gray-700 dark:text-gray-200">{t('contact.offering_4_title')}</div>
+            <div className="text-xs text-yellow-500 font-medium">{t('contact.offering_4_desc')}</div>
           </div>
         </div>
       </div>
@@ -113,9 +116,9 @@ export const Contact: React.FC = () => {
             <Youtube size={20} fill="currentColor" />
           </div>
           <div className="flex-1">
-            <div className="text-sm font-bold">Watch on YouTube</div>
+            <div className="text-sm font-bold">{t('contact.youtube_btn')}</div>
           </div>
-          <div className="text-[10px] font-bold bg-white dark:bg-slate-800 text-[#C62828] border border-red-200 dark:border-red-900 px-3 py-1 rounded-md uppercase group-hover:bg-[#EF5350] group-hover:text-white transition-colors">Subscribe</div>
+          <div className="text-[10px] font-bold bg-white dark:bg-slate-800 text-[#C62828] border border-red-200 dark:border-red-900 px-3 py-1 rounded-md uppercase group-hover:bg-[#EF5350] group-hover:text-white transition-colors">{t('contact.subscribe')}</div>
         </a>
 
         <a
@@ -124,7 +127,7 @@ export const Contact: React.FC = () => {
           rel="noopener noreferrer"
           className="flex items-center justify-center gap-2 text-[#AABBCC] text-sm font-bold hover:text-[#ABCEC9] transition-colors py-2"
         >
-          <Globe size={16} /> Visit Official Website
+          <Globe size={16} /> {t('contact.website_btn')}
         </a>
       </div>
 
@@ -138,7 +141,7 @@ export const Contact: React.FC = () => {
           />
         </div>
         <p className="text-[10px] text-[#AABBCC] dark:text-slate-500 font-bold tracking-wide">
-          App Developed by <span className="text-[#ABCEC9]">SKRMBliss.ai Studio</span>
+          {t('app.developed_by')} <span className="text-[#ABCEC9]">SKRMBliss.ai Studio</span>
         </p>
       </div>
     </div>
