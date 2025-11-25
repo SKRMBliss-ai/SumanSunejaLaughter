@@ -1,7 +1,7 @@
 import { GoogleGenAI, Type, Schema, Modality } from "@google/genai";
 import { JOKES, STORIES } from './contentRepository';
 
-const apiKey = process.env.API_KEY || '';
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
 // Initialize conditionally to prevent crashes if key is strictly validated on init
 const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
@@ -88,7 +88,14 @@ export const rateLaughter = async (audioBase64: string, mimeType: string) => {
 
     const text = response.text;
     if (!text) throw new Error("No response from AI");
-    return JSON.parse(text);
+    // If text is a function (despite lint), we might need to call it. 
+    // But if lint says it's a string, we treat it as string.
+    // However, if it IS a function at runtime, this will be the function code string.
+    // Let's assume the lint is correct for now. If it fails at runtime, we'll see.
+    // Actually, to be safe, let's check type.
+    const responseText = typeof text === 'function' ? (text as Function)() : text;
+
+    return JSON.parse(responseText);
   } catch (error) {
     console.error("Error rating laughter:", error);
     throw error;
@@ -129,15 +136,91 @@ export const getChatResponse = async (history: { role: string, parts: { text: st
   }
 };
 
+// --- Translation Service ---
+
+const TRANSLATION_CACHE_KEY = 'laughter_translation_cache';
+
+const getCachedTranslation = (text: string, targetLang: string): string | null => {
+  try {
+    const cache = JSON.parse(localStorage.getItem(TRANSLATION_CACHE_KEY) || '{}');
+    return cache[`${text}_${targetLang}`] || null;
+  } catch (e) {
+    return null;
+  }
+};
+
+const setCachedTranslation = (text: string, targetLang: string, translation: string) => {
+  try {
+    const cache = JSON.parse(localStorage.getItem(TRANSLATION_CACHE_KEY) || '{}');
+    cache[`${text}_${targetLang}`] = translation;
+    localStorage.setItem(TRANSLATION_CACHE_KEY, JSON.stringify(cache));
+  } catch (e) {
+    console.warn('Failed to cache translation', e);
+  }
+};
+
+export const translateText = async (text: string, targetLang: string): Promise<string> => {
+  console.log(`[Translation] Request: "${text.substring(0, 20)}..." to ${targetLang}`);
+  if (targetLang === 'en') return text;
+
+  const cached = getCachedTranslation(text, targetLang);
+  if (cached) {
+    console.log(`[Translation] Cache hit for ${targetLang}`);
+    return cached;
+  }
+
+  if (!apiKey || !ai) {
+    console.warn("[Translation] Missing API Key or AI instance");
+    throw new Error("MISSING_GEMINI_KEY");
+  }
+
+  try {
+    console.log(`[Translation] Calling Gemini API for ${targetLang}...`);
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [{
+        parts: [{
+          text: `Translate the following text to ${targetLang}. Keep the tone energetic, fun, and conversational. Preserve any laughter sounds like 'Ha ha ha' or 'Ho ho ho'. Do NOT use markdown formatting (no bold, no italics). Return only plain text.\n\nText: "${text}"`
+        }]
+      }]
+    });
+
+    const textResponse = response.text;
+    let translation = typeof textResponse === 'function' ? (textResponse as Function)() : textResponse;
+
+    // Strip markdown just in case
+    if (translation) {
+      translation = translation.replace(/\*\*/g, '').replace(/\*/g, '').trim();
+    }
+
+    console.log(`[Translation] Success: "${translation?.substring(0, 20)}..."`);
+
+    if (translation) {
+      setCachedTranslation(text, targetLang, translation);
+      return translation;
+    }
+    return text;
+  } catch (error) {
+    console.error("[Translation] Error:", error);
+    return text; // Fallback to English
+  }
+};
+
 // --- Laughter Joke Generator ---
 
-export const generateHumor = async (topic: string, type: 'story' | 'joke' = 'story') => {
+export const generateHumor = async (topic: string, type: 'story' | 'joke' = 'story', language: string = 'en') => {
   // Simulate a short delay for UX (optional, but feels more natural than 0ms)
   await new Promise(resolve => setTimeout(resolve, 500));
 
   const source = type === 'story' ? STORIES : JOKES;
   const randomIndex = Math.floor(Math.random() * source.length);
-  return source[randomIndex];
+  const content = source[randomIndex];
+
+  if (language === 'en') return content;
+
+  // Translate the text property of the content object
+  const translatedText = await translateText(content.text, language);
+  return { ...content, text: translatedText };
 }
 
 // --- Speech Generation (TTS) ---
@@ -171,8 +254,15 @@ export const generateSpeech = async (text: string, voiceName: string = 'Kore') =
   }
 };
 
-export const getGuidedSessionScript = async () => {
+export const getGuidedSessionScript = async (language: string = 'en') => {
+  console.log(`[GuidedSession] Requesting script for language: ${language}`);
   // Return a random 1-minute script
   const randomIndex = Math.floor(Math.random() * QUICK_SCRIPTS.length);
-  return QUICK_SCRIPTS[randomIndex];
+  const script = QUICK_SCRIPTS[randomIndex];
+
+  if (language === 'en') return script;
+
+  const translated = await translateText(script, language);
+  console.log(`[GuidedSession] Translated script length: ${translated.length}`);
+  return translated;
 }

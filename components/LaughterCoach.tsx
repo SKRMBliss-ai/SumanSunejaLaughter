@@ -4,7 +4,7 @@ import { GoogleGenAI, LiveServerMessage, Modality } from "@google/genai";
 import { rateLaughter, getGuidedSessionScript, generateSpeech, createAudioBufferFromPCM } from '../services/geminiService';
 import { LaughterScore } from '../types';
 import { addPoints } from '../services/rewardService';
-import { useSettings } from '../contexts/SettingsContext';
+import { useSettings, SUPPORTED_LANGUAGES } from '../contexts/SettingsContext';
 
 interface HistoryItem {
   id: number;
@@ -47,7 +47,8 @@ function decode(base64: string) {
 }
 
 export const LaughterCoach: React.FC = () => {
-  const { t } = useSettings();
+  const { t, language } = useSettings();
+
   // Main modes
   const [isRecording, setIsRecording] = useState(false); // For Score Analyzer
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -143,7 +144,7 @@ export const LaughterCoach: React.FC = () => {
 
   // --- Live Conversational Session ---
   const startLiveSession = async () => {
-    const apiKey = process.env.API_KEY;
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
     if (!apiKey) {
       setError(t('coach.live_unavailable'));
       setIsMissingKey(true);
@@ -179,6 +180,7 @@ export const LaughterCoach: React.FC = () => {
           },
           systemInstruction: `You are Suman Suneja, an energetic, warm, and highly interactive Laughter Yoga Coach. 
           Your goal is to lead a "Laughter Session" with the user.
+          IMPORTANT: Speak in ${SUPPORTED_LANGUAGES.find(l => l.code === language)?.label || 'English'}.
           1. Start by welcoming them with a big laugh and ask them to laugh with you.
           2. Listen to their audio. If they are laughing, laugh back harder and encourage them ("Yes! That's it! Loudly!").
           3. If they are quiet, guide them: "Take a deep breath and say Ha Ha Ha!".
@@ -267,7 +269,7 @@ export const LaughterCoach: React.FC = () => {
     setIsMissingKey(false);
 
     try {
-      const script = await getGuidedSessionScript();
+      const script = await getGuidedSessionScript(language);
 
       // Initialize Audio Context
       if (!audioContextRef.current) {
@@ -469,8 +471,8 @@ export const LaughterCoach: React.FC = () => {
           onClick={() => isSessionActive && sessionType === 'LIVE' ? stopSession() : startLiveSession()}
           disabled={isSessionLoading || isRecording || (isSessionActive && sessionType !== 'LIVE')}
           className={`w-full p-4 rounded-2xl shadow-lg flex items-center justify-between transition-all transform active:scale-95 border-2 hover:scale-[1.02] ${isSessionActive && sessionType === 'LIVE'
-              ? 'bg-white dark:bg-slate-800 border-purple-400 ring-4 ring-purple-100 dark:ring-purple-900 text-purple-700 dark:text-purple-400'
-              : 'bg-white dark:bg-slate-800 border-purple-100 dark:border-slate-700 text-purple-600 dark:text-purple-400 hover:border-purple-200 dark:hover:border-purple-800'
+            ? 'bg-white dark:bg-slate-800 border-purple-400 ring-4 ring-purple-100 dark:ring-purple-900 text-purple-700 dark:text-purple-400'
+            : 'bg-white dark:bg-slate-800 border-purple-100 dark:border-slate-700 text-purple-600 dark:text-purple-400 hover:border-purple-200 dark:hover:border-purple-800'
             } ${isSessionActive && sessionType !== 'LIVE' ? 'opacity-50' : ''}`}
         >
           <div className="flex items-center gap-3">
@@ -498,8 +500,8 @@ export const LaughterCoach: React.FC = () => {
           onClick={() => isSessionActive && sessionType === 'QUICK' ? stopSession() : handleQuickSession()}
           disabled={isSessionLoading || isRecording || (isSessionActive && sessionType !== 'QUICK')}
           className={`w-full p-4 rounded-2xl shadow-lg flex items-center justify-between transition-all transform active:scale-95 border-2 hover:scale-[1.02] ${isSessionActive && sessionType === 'QUICK'
-              ? 'bg-white dark:bg-slate-800 border-[#ABCEC9] ring-4 ring-[#ABCEC9]/20 text-[#ABCEC9]'
-              : 'bg-gradient-to-r from-[#ABCEC9] to-[#C3B8D5] dark:from-teal-800 dark:to-purple-800 text-white border-transparent'
+            ? 'bg-white dark:bg-slate-800 border-[#ABCEC9] ring-4 ring-[#ABCEC9]/20 text-[#ABCEC9]'
+            : 'bg-gradient-to-r from-[#ABCEC9] to-[#C3B8D5] dark:from-teal-800 dark:to-purple-800 text-white border-transparent'
             } ${isSessionActive && sessionType !== 'QUICK' ? 'opacity-50' : ''}`}
         >
           <div className="flex items-center gap-3">
