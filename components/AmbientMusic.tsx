@@ -158,6 +158,12 @@ export const AmbientMusic: React.FC = () => {
   const [mood, setMood] = useState<'CALM' | 'ENERGY'>('CALM');
   const engineRef = useRef<GenerativeEngine | null>(null);
 
+  // Ref to track playing state for the event listener
+  const isPlayingRef = useRef(isPlaying);
+  useEffect(() => {
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying]);
+
   useEffect(() => {
     engineRef.current = new GenerativeEngine();
 
@@ -169,10 +175,24 @@ export const AmbientMusic: React.FC = () => {
       }
     };
 
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        engineRef.current?.stop();
+      } else {
+        // Only resume if it was supposed to be playing
+        if (isPlayingRef.current) {
+          engineRef.current?.start();
+        }
+      }
+    };
+
     window.addEventListener('MUSIC_MOOD' as any, handleMoodChange);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
       engineRef.current?.stop();
       window.removeEventListener('MUSIC_MOOD' as any, handleMoodChange);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
 

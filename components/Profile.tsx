@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { User, Camera, Save, Phone, LogOut, Sparkles, Check, X, Flame, Trophy, Zap, Calendar, TrendingUp, Moon, Sun, Globe, Type } from 'lucide-react';
+import { User, Camera, Save, Phone, LogOut, Sparkles, Check, X, Flame, Trophy, Zap, Calendar, TrendingUp, Moon, Sun, Globe, Type, Star, Award, Edit2 } from 'lucide-react';
 import { updateProfile } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import { ViewState, RewardState } from '../types';
@@ -13,13 +13,15 @@ interface ProfileProps {
 export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
   const user = auth.currentUser;
   const { theme, toggleTheme, language, setLanguage, fontSize, setFontSize, t } = useSettings();
-  const [displayName, setDisplayName] = useState(user?.displayName || '');
+  const [displayName, setDisplayName] = useState(user?.displayName || 'Suman Suneja Fan');
   const [photoURL, setPhotoURL] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [rewards, setRewards] = useState<RewardState>(getRewardState());
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [tempName, setTempName] = useState('');
 
   const linkedPhoneNumber = user?.phoneNumber || (user ? localStorage.getItem(`user_phone_${user.uid}`) : null);
 
@@ -79,6 +81,21 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
     if (window.confirm("Are you sure you want to sign out?")) {
       auth.signOut();
     }
+  };
+
+  const handleStartEdit = () => {
+    setTempName(displayName);
+    setIsEditingName(true);
+  };
+
+  const handleSaveName = () => {
+    if (tempName.trim()) {
+      setDisplayName(tempName);
+      if (user) {
+        updateProfile(user, { displayName: tempName }).catch(console.error);
+      }
+    }
+    setIsEditingName(false);
   };
 
   const fontSizes: { id: FontSize; label: string; px: string }[] = [
@@ -176,6 +193,32 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
             </div>
           </div>
 
+          {/* Name Editing */}
+          <div className="text-center mb-6">
+            {isEditingName ? (
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <input
+                  type="text"
+                  value={tempName}
+                  onChange={(e) => setTempName(e.target.value)}
+                  className="text-xl font-bold text-center border-b-2 border-purple-300 focus:outline-none focus:border-purple-600 bg-transparent px-2 py-1 w-48 text-gray-800 dark:text-white"
+                  autoFocus
+                  placeholder={t('profile.enter_name_placeholder')}
+                />
+                <button onClick={handleSaveName} className="p-1 text-green-500 hover:bg-green-50 rounded-full"><Check size={20} /></button>
+                <button onClick={() => setIsEditingName(false)} className="p-1 text-red-500 hover:bg-red-50 rounded-full"><X size={20} /></button>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center gap-2 mb-1 group cursor-pointer" onClick={handleStartEdit}>
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-white">{displayName}</h2>
+                <Edit2 size={16} className="text-gray-300 group-hover:text-purple-500 transition-colors" />
+              </div>
+            )}
+            <div className="text-sm text-gray-500 font-medium bg-gray-100 dark:bg-slate-700 px-3 py-1 rounded-full inline-block">
+              {t('level')} {rewards.level} • {t('points')}: {rewards.points}
+            </div>
+          </div>
+
           <div className="mb-6 bg-gradient-to-r from-orange-50 via-white to-orange-50 dark:from-slate-800 dark:via-slate-700 dark:to-slate-800 border border-orange-200 dark:border-slate-600 rounded-3xl p-4 shadow-sm relative overflow-hidden group">
             <div className="absolute top-0 start-0 w-full h-1 bg-gradient-to-r from-orange-300 to-red-400"></div>
             <div className="flex items-center justify-between relative z-10 flex-wrap gap-2">
@@ -187,9 +230,9 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
                   </div>
                 </div>
                 <div className="text-start">
-                  <h3 className="font-black text-gray-700 dark:text-gray-100 text-xl leading-none italic">STREAK POWER</h3>
+                  <h3 className="font-black text-gray-700 dark:text-gray-100 text-xl leading-none italic">{t('profile.streak_power')}</h3>
                   <p className="text-xs text-orange-500 font-bold mt-1">
-                    {rewards.streak > 0 ? `${rewards.streak} ${t('streak')} 🔥` : "Start today!"}
+                    {rewards.streak > 0 ? `${rewards.streak} ${t('streak')} 🔥` : t('profile.start_today')}
                   </p>
                 </div>
               </div>
@@ -197,7 +240,7 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
                 <div className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500">
                   {rewards.streak * 50}
                 </div>
-                <div className="text-[0.65rem] font-bold text-gray-400 uppercase">Bonus</div>
+                <div className="text-[0.65rem] font-bold text-gray-400 uppercase">{t('profile.bonus')}</div>
               </div>
             </div>
           </div>
@@ -242,21 +285,18 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#AABBCC] uppercase tracking-wider mb-1 ms-2 text-start">Display Name</label>
-              <input
-                type="text"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                placeholder="Enter your name"
-                className="w-full bg-[#F5F3FA] dark:bg-slate-700 border-2 border-transparent focus:border-[#C3B8D5] rounded-xl p-4 text-gray-700 dark:text-white font-bold focus:outline-none transition-all text-start"
-              />
+              <label className="block text-xs font-bold text-[#AABBCC] uppercase tracking-wider mb-1 ms-2 text-start">{t('profile.display_name')}</label>
+              <div className="w-full bg-[#F5F3FA] dark:bg-slate-700 border-2 border-transparent rounded-xl p-4 text-gray-700 dark:text-white font-bold text-start flex justify-between items-center">
+                {displayName}
+                <button onClick={handleStartEdit} className="text-[#ABCEC9] hover:text-[#9BBDB8]"><Edit2 size={16} /></button>
+              </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#AABBCC] uppercase tracking-wider mb-1 ms-2 text-start">Phone Number</label>
+              <label className="block text-xs font-bold text-[#AABBCC] uppercase tracking-wider mb-1 ms-2 text-start">{t('profile.phone_number')}</label>
               <div className="w-full bg-gray-50 dark:bg-slate-700 border border-gray-100 dark:border-slate-600 rounded-xl p-4 text-gray-500 dark:text-gray-300 font-medium flex items-center gap-3">
                 <Phone size={18} className="text-gray-300" />
-                {linkedPhoneNumber || 'No number linked'}
+                {linkedPhoneNumber || t('profile.no_number')}
               </div>
             </div>
 
@@ -290,7 +330,7 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
               </button>
               <div className="mt-6 text-center">
                 <p className="text-[10px] text-[#AABBCC] dark:text-slate-500 font-bold tracking-wide">
-                  App Developed by <a href="https://skrmblissai.systeme.io/homepage" target="_blank" rel="noopener noreferrer" className="text-[#ABCEC9] hover:underline">SKRMBliss.ai Studio</a>
+                  {t('app.developed_by')} <a href="https://skrmblissai.systeme.io/homepage" target="_blank" rel="noopener noreferrer" className="text-[#ABCEC9] hover:underline">SKRMBliss.ai Studio</a>
                 </p>
               </div>
             </div>
