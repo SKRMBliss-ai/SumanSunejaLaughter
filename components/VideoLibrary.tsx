@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Search, Heart, Download, Play, Pause, Filter, WifiOff, Trash2, Check, Loader2, Youtube, ChevronLeft, ChevronRight, ExternalLink, X } from 'lucide-react';
 import { addPoints } from '../services/rewardService';
+import { useSettings } from '../contexts/SettingsContext';
 
 // Updated with specific requested videos
 const SAMPLE_VIDEOS = [
@@ -21,6 +22,7 @@ const SAMPLE_VIDEOS = [
 const ITEMS_PER_PAGE = 5;
 
 export const VideoLibrary: React.FC = () => {
+  const { t } = useSettings();
   const [activeTab, setActiveTab] = useState<'ALL' | 'FAV' | 'OFFLINE'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -71,7 +73,7 @@ export const VideoLibrary: React.FC = () => {
   const handleDownload = (id: string) => {
     if (downloads.includes(id)) {
       // Remove
-      if (window.confirm("Remove from offline library?")) {
+      if (window.confirm(t('video.remove_confirm'))) {
         setDownloads(prev => prev.filter(vidId => vidId !== id));
       }
       return;
@@ -82,13 +84,13 @@ export const VideoLibrary: React.FC = () => {
     setTimeout(() => {
       setDownloads(prev => [...prev, id]);
       setDownloading(null);
-      addPoints(10, "Offline Video Saved", 'VIDEO');
+      addPoints(10, t('video.saved_toast'), 'VIDEO');
     }, 2000);
   };
 
   const handlePlay = (id: string) => {
     setPlayingVideoId(id);
-    addPoints(5, "Video Session Started", 'VIDEO');
+    addPoints(5, t('video.started_toast'), 'VIDEO');
   };
 
   const stopPlayback = () => {
@@ -116,6 +118,14 @@ export const VideoLibrary: React.FC = () => {
 
   const playingVideo = SAMPLE_VIDEOS.find(v => v.id === playingVideoId);
 
+  // Helper to get translated category
+  const getCategoryTranslation = (category: string) => {
+    const key = `video.category_${category.toLowerCase().replace(/ /g, '_')}`;
+    const translated = t(key);
+    // Fallback if translation key doesn't exist (returns key usually, so check if it looks like a key or just return original)
+    return translated !== key ? translated : category;
+  };
+
   return (
     <div className="p-4 pb-28 min-h-screen bg-[#F5F3FA] dark:bg-slate-900 animate-in fade-in duration-500">
 
@@ -124,14 +134,14 @@ export const VideoLibrary: React.FC = () => {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-2xl font-fredoka font-bold text-gray-700 dark:text-gray-100 flex items-center gap-2">
-              <Youtube className="text-red-500" /> Video Library
+              <Youtube className="text-red-500" /> {t('video.title')}
             </h2>
             <a href="https://www.youtube.com/@sumansunejaofficial" target="_blank" rel="noopener noreferrer" className="text-xs text-[#AABBCC] font-bold flex items-center gap-1 hover:text-red-500 transition-colors">
-              Visit Official Channel <ExternalLink size={10} />
+              {t('video.visit_channel')} <ExternalLink size={10} />
             </a>
           </div>
           <div className="text-xs font-bold text-[#AABBCC] bg-white dark:bg-slate-800 px-3 py-1 rounded-full border border-gray-100 dark:border-slate-700 shadow-sm">
-            {filteredVideos.length} Videos
+            {filteredVideos.length} {t('video.count_suffix')}
           </div>
         </div>
 
@@ -141,19 +151,19 @@ export const VideoLibrary: React.FC = () => {
             onClick={() => { setActiveTab('ALL'); setCurrentPage(1); }}
             className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${activeTab === 'ALL' ? 'bg-[#ABCEC9] text-white shadow-md' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'}`}
           >
-            All Videos
+            {t('video.tab_all')}
           </button>
           <button
             onClick={() => { setActiveTab('FAV'); setCurrentPage(1); }}
             className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${activeTab === 'FAV' ? 'bg-[#C3B8D5] text-white shadow-md' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'}`}
           >
-            <Heart size={12} fill={activeTab === 'FAV' ? "currentColor" : "none"} /> Favorites
+            <Heart size={12} fill={activeTab === 'FAV' ? "currentColor" : "none"} /> {t('video.tab_favorites')}
           </button>
           <button
             onClick={() => { setActiveTab('OFFLINE'); setCurrentPage(1); }}
             className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${activeTab === 'OFFLINE' ? 'bg-gray-700 text-white shadow-md' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'}`}
           >
-            {activeTab === 'OFFLINE' ? <WifiOff size={12} /> : <Download size={12} />} Offline
+            {activeTab === 'OFFLINE' ? <WifiOff size={12} /> : <Download size={12} />} {t('video.tab_offline')}
           </button>
         </div>
 
@@ -162,7 +172,7 @@ export const VideoLibrary: React.FC = () => {
           <div className="relative">
             <input
               type="text"
-              placeholder="Search videos..."
+              placeholder={t('video.search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-3 rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-[#ABCEC9] bg-white dark:bg-slate-800 dark:text-white text-sm font-medium placeholder:text-gray-400"
@@ -175,7 +185,7 @@ export const VideoLibrary: React.FC = () => {
               onClick={() => setSelectedCategory(null)}
               className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors border ${!selectedCategory ? 'bg-gray-800 text-white border-gray-800' : 'bg-white dark:bg-slate-800 text-gray-500 dark:text-gray-300 border-gray-200 dark:border-slate-700'}`}
             >
-              All
+              {t('video.filter_all')}
             </button>
             {categories.map(cat => (
               <button
@@ -183,7 +193,7 @@ export const VideoLibrary: React.FC = () => {
                 onClick={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
                 className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors border ${selectedCategory === cat ? 'bg-[#ABCEC9] text-white border-[#ABCEC9]' : 'bg-white dark:bg-slate-800 text-gray-500 dark:text-gray-300 border-gray-200 dark:border-slate-700'}`}
               >
-                {cat}
+                {getCategoryTranslation(cat)}
               </button>
             ))}
           </div>
@@ -195,7 +205,7 @@ export const VideoLibrary: React.FC = () => {
         {displayedVideos.length === 0 ? (
           <div className="text-center py-10 opacity-50">
             <Filter size={48} className="mx-auto mb-2 text-[#C3B8D5]" />
-            <p className="font-bold text-gray-400">No videos found</p>
+            <p className="font-bold text-gray-400">{t('video.no_videos')}</p>
           </div>
         ) : (
           displayedVideos.map(video => (
@@ -236,7 +246,7 @@ export const VideoLibrary: React.FC = () => {
               <div className="p-4">
                 <div className="flex justify-between items-start gap-2 mb-2">
                   <div>
-                    <span className="text-[10px] font-bold text-[#ABCEC9] uppercase tracking-wider">{video.category}</span>
+                    <span className="text-[10px] font-bold text-[#ABCEC9] uppercase tracking-wider">{getCategoryTranslation(video.category)}</span>
                     <h3 className="font-bold text-gray-800 dark:text-gray-100 leading-tight">{video.title}</h3>
                   </div>
                   <button
@@ -254,23 +264,23 @@ export const VideoLibrary: React.FC = () => {
                     rel="noopener noreferrer"
                     className="text-xs font-bold text-gray-400 hover:text-red-500 flex items-center gap-1"
                   >
-                    <Youtube size={14} /> Open in App
+                    <Youtube size={14} /> {t('video.open_app')}
                   </a>
 
                   <button
                     onClick={() => handleDownload(video.id)}
                     disabled={downloading === video.id}
                     className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-all ${downloads.includes(video.id)
-                        ? 'bg-green-50 dark:bg-green-900/30 text-green-600'
-                        : 'bg-[#EDE8F8] dark:bg-slate-700 text-[#AABBCC] dark:text-gray-400 hover:bg-[#C3B8D5] hover:text-white dark:hover:bg-slate-600'
+                      ? 'bg-green-50 dark:bg-green-900/30 text-green-600'
+                      : 'bg-[#EDE8F8] dark:bg-slate-700 text-[#AABBCC] dark:text-gray-400 hover:bg-[#C3B8D5] hover:text-white dark:hover:bg-slate-600'
                       }`}
                   >
                     {downloading === video.id ? (
-                      <><Loader2 size={12} className="animate-spin" /> Saving...</>
+                      <><Loader2 size={12} className="animate-spin" /> {t('video.saving')}</>
                     ) : downloads.includes(video.id) ? (
-                      <><Check size={12} /> Saved</>
+                      <><Check size={12} /> {t('video.saved')}</>
                     ) : (
-                      <><Download size={12} /> Save Offline</>
+                      <><Download size={12} /> {t('video.save_offline')}</>
                     )}
                   </button>
                 </div>
@@ -297,7 +307,7 @@ export const VideoLibrary: React.FC = () => {
               </div>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-bold text-[#ABCEC9] uppercase tracking-wider">Now Playing</p>
+              <p className="text-[10px] font-bold text-[#ABCEC9] uppercase tracking-wider">{t('video.now_playing')}</p>
               <p className="text-sm font-bold truncate">{playingVideo.title}</p>
             </div>
           </div>
@@ -306,7 +316,7 @@ export const VideoLibrary: React.FC = () => {
             <button
               onClick={stopPlayback}
               className="p-2.5 bg-white text-black rounded-full hover:scale-105 active:scale-95 transition-all shadow-md"
-              title="Pause / Stop"
+              title={t('video.now_playing')}
             >
               <Pause size={18} fill="currentColor" />
             </button>
@@ -334,7 +344,7 @@ export const VideoLibrary: React.FC = () => {
             <ChevronLeft size={20} />
           </button>
           <span className="text-sm font-bold text-gray-500 dark:text-gray-400">
-            Page {currentPage} of {totalPages}
+            {t('video.page')} {currentPage} {t('video.of')} {totalPages}
           </span>
           <button
             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
