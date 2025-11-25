@@ -88,13 +88,8 @@ export const rateLaughter = async (audioBase64: string, mimeType: string) => {
 
     const text = response.text;
     if (!text) throw new Error("No response from AI");
-    // If text is a function (despite lint), we might need to call it. 
-    // But if lint says it's a string, we treat it as string.
-    // However, if it IS a function at runtime, this will be the function code string.
-    // Let's assume the lint is correct for now. If it fails at runtime, we'll see.
-    // Actually, to be safe, let's check type.
-    const responseText = typeof text === 'function' ? (text as Function)() : text;
 
+    const responseText = typeof text === 'function' ? (text as Function)() : text;
     return JSON.parse(responseText);
   } catch (error) {
     console.error("Error rating laughter:", error);
@@ -104,7 +99,7 @@ export const rateLaughter = async (audioBase64: string, mimeType: string) => {
 
 // --- Chat Assistant Service ---
 
-export const getChatResponse = async (history: { role: string, parts: { text: string }[] }[], message: string) => {
+export const getChatResponse = async (history: { role: string, parts: { text: string }[] }[], message: string, language: string = 'en') => {
   if (!apiKey || !ai) {
     throw new Error("MISSING_GEMINI_KEY");
   }
@@ -115,16 +110,18 @@ export const getChatResponse = async (history: { role: string, parts: { text: st
       history: history,
       config: {
         systemInstruction: `You are the AI Assistant for Suman Suneja, the Laughter Yoga expert. 
-        Your goal is to spread joy, answer questions about Laughter Yoga, corporate sessions, and stress management.
-        
-        Key Info:
-        - Website: sumansuneja.com
-        - YouTube: @sumansunejaofficial
-        - Daily Zoom: 341 527 2874
-        - Contact: Enquiry@sumansuneja.com
-        
-        Tone: Cheerful, energetic, empathetic.
-        Keep answers concise and helpful.`
+    Your goal is to spread joy, answer questions about Laughter Yoga, corporate sessions, and stress management.
+    
+    Key Info:
+    - Website: sumansuneja.com
+    - YouTube: @sumansunejaofficial
+    - Daily Zoom: 341 527 2874
+    - Contact: Enquiry@sumansuneja.com
+    
+    Tone: Cheerful, energetic, empathetic.
+    Keep answers concise and helpful.
+    
+    IMPORTANT: Respond in the language associated with this code: "${language}".`
       }
     });
 
@@ -195,7 +192,7 @@ export const translateText = async (text: string, targetLang: string, style: 'fu
     if (style === 'concise') {
       prompt = `Translate the following text to ${targetLang}. Be direct and concise. Do not add any extra words, explanations, or laughter. Do NOT use markdown formatting. Return only the plain translated text.\n\nText: "${text}"`;
     } else {
-      prompt = `Translate the following text to ${targetLang}. Keep the tone energetic, fun, and conversational. Preserve any laughter sounds like 'Ha ha ha' or 'Ho ho ho'. Do NOT use markdown formatting (no bold, no italics). Return only plain text.\n\nText: "${text}"`;
+      prompt = `Translate the following text to ${targetLang}. Keep the tone energetic, fun, and conversational. Preserve any laughter sounds like 'Ha ha ha' or 'Ho ho ho'. Do NOT use markdown formatting. Return only plain text.\n\nText: "${text}"`;
     }
 
     const response = await ai.models.generateContent({
@@ -287,4 +284,4 @@ export const getGuidedSessionScript = async (language: string = 'en') => {
   const translated = await translateText(script, language, 'fun');
   console.log(`[GuidedSession] Translated script length: ${translated.length}`);
   return translated;
-}
+};

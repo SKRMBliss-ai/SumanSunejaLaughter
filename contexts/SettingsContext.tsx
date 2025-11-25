@@ -80,6 +80,16 @@ const translations: Record<Language, Record<string, string>> = {
     'contact.website_btn': "Visit Official Website",
     'app.developed_by': "App Developed by",
 
+    // AI Chatbot
+    'ai.greeting': "Namaste! I am your AI assistant trained on Suman Suneja's wisdom. Ask me about Laughter Yoga, corporate sessions, or how to relieve stress!",
+    'ai.placeholder': "Ask about Laughter Yoga...",
+    'ai.thinking': "Thinking happily...",
+    'ai.connection_error': "Connection error. Keep laughing though!",
+    'ai.missing_key': "Oh no! I lost my brain. 🧠\n\n(Deployment Error: Gemini API Key is missing.)",
+    'ai.you': "You",
+    'ai.bot': "Suman AI",
+    'ai.empty_response': "I'm smiling, but I couldn't think of an answer. Try again?",
+
     // Profile
     'profile.display_name': "Display Name",
     'profile.enter_name_placeholder': "Enter your name",
@@ -238,6 +248,16 @@ const translations: Record<Language, Record<string, string>> = {
     'contact.subscribe': "सदस्यता लें",
     'contact.website_btn': "आधिकारिक वेबसाइट पर जाएं",
     'app.developed_by': "ऐप द्वारा विकसित",
+
+    // AI Chatbot
+    'ai.greeting': "नमस्ते! मैं सुमन सुनेजा के ज्ञान पर प्रशिक्षित आपका एआई सहायक हूं। मुझसे हास्य योग, कॉर्पोरेट सत्रों या तनाव दूर करने के तरीकों के बारे में पूछें!",
+    'ai.placeholder': "हास्य योग के बारे में पूछें...",
+    'ai.thinking': "खुशी से सोच रहा हूँ...",
+    'ai.connection_error': "कनेक्शन त्रुटि। हंसते रहें!",
+    'ai.missing_key': "अरे नहीं! मैंने अपना दिमाग खो दिया। 🧠\n\n(परिनियोजन त्रुटि: जेमिनी एपीआई कुंजी गायब है।)",
+    'ai.you': "आप",
+    'ai.bot': "सुमन एआई",
+    'ai.empty_response': "मैं मुस्कुरा रहा हूँ, लेकिन मुझे कोई जवाब नहीं सूझा। पुनः प्रयास करें?",
 
     // Profile
     'profile.display_name': "प्रदर्शन नाम",
@@ -398,6 +418,16 @@ const translations: Record<Language, Record<string, string>> = {
     'contact.website_btn': "Visitar Sitio Web",
     'app.developed_by': "App Desarrollada por",
 
+    // AI Chatbot
+    'ai.greeting': "¡Namaste! Soy tu asistente de IA entrenado en la sabiduría de Suman Suneja. ¡Pregúntame sobre Yoga de la Risa, sesiones corporativas o cómo aliviar el estrés!",
+    'ai.placeholder': "Pregunta sobre Yoga de la Risa...",
+    'ai.thinking': "Pensando felizmente...",
+    'ai.connection_error': "Error de conexión. ¡Sigue riendo!",
+    'ai.missing_key': "¡Oh no! Perdí mi cerebro. 🧠\n\n(Error de despliegue: Falta la clave API de Gemini.)",
+    'ai.you': "Tú",
+    'ai.bot': "Suman IA",
+    'ai.empty_response': "Estoy sonriendo, pero no se me ocurrió una respuesta. ¿Inténtalo de nuevo?",
+
     // Profile
     'profile.display_name': "Nombre",
     'profile.enter_name_placeholder': "Ingresa tu nombre",
@@ -556,6 +586,16 @@ const translations: Record<Language, Record<string, string>> = {
     'contact.subscribe': "اشترك",
     'contact.website_btn': "زيارة الموقع الرسمي",
     'app.developed_by': "تم تطوير التطبيق بواسطة",
+
+    // AI Chatbot
+    'ai.greeting': "ناماستي! أنا مساعد الذكاء الاصطناعي الخاص بك المدرب على حكمة سومان سونيجا. اسألني عن يوغا الضحك، أو جلسات الشركات، أو كيفية تخفيف التوتر!",
+    'ai.placeholder': "اسأل عن يوغا الضحك...",
+    'ai.thinking': "أفكر بسعادة...",
+    'ai.connection_error': "خطأ في الاتصال. استمر في الضحك!",
+    'ai.missing_key': "أوه لا! لقد فقدت عقلي. 🧠\n\n(خطأ في النشر: مفتاح Gemini API مفقود.)",
+    'ai.you': "أنت",
+    'ai.bot': "سومان AI",
+    'ai.empty_response': "أنا أبتسم، لكنني لم أستطع التفكير في إجابة. حاول مرة أخرى؟",
 
     // Profile
     'profile.display_name': "الاسم المعروض",
@@ -716,6 +756,16 @@ const translations: Record<Language, Record<string, string>> = {
     'contact.website_btn': "Visiter Site Officiel",
     'app.developed_by': "App Développée par",
 
+    // AI Chatbot
+    'ai.greeting': "Namaste ! Je suis votre assistant IA formé à la sagesse de Suman Suneja. Posez-moi des questions sur le Yoga du Rire, les séances en entreprise ou comment soulager le stress !",
+    'ai.placeholder': "Demandez sur le Yoga du Rire...",
+    'ai.thinking': "Je réfléchis joyeusement...",
+    'ai.connection_error': "Erreur de connexion. Continuez à rire !",
+    'ai.missing_key': "Oh non ! J'ai perdu mon cerveau. 🧠\n\n(Erreur de déploiement : Clé API Gemini manquante.)",
+    'ai.you': "Vous",
+    'ai.bot': "Suman IA",
+    'ai.empty_response': "Je souris, mais je n'ai pas trouvé de réponse. Réessayez ?",
+
     // Profile
     'profile.display_name': "Nom d'affichage",
     'profile.enter_name_placeholder': "Entrez votre nom",
@@ -875,6 +925,16 @@ const translations: Record<Language, Record<string, string>> = {
     'contact.website_btn': "Offizielle Website",
     'app.developed_by': "App entwickelt von",
 
+    // AI Chatbot
+    'ai.greeting': "Namaste! Ich bin dein KI-Assistent, trainiert auf der Weisheit von Suman Suneja. Frag mich nach Lachyoga, Firmensitzungen oder Stressabbau!",
+    'ai.placeholder': "Frag nach Lachyoga...",
+    'ai.thinking': "Denke glücklich nach...",
+    'ai.connection_error': "Verbindungsfehler. Lach weiter!",
+    'ai.missing_key': "Oh nein! Ich habe mein Gehirn verloren. 🧠\n\n(Bereitstellungsfehler: Gemini API-Schlüssel fehlt.)",
+    'ai.you': "Du",
+    'ai.bot': "Suman KI",
+    'ai.empty_response': "Ich lächle, aber mir ist keine Antwort eingefallen. Versuch es nochmal?",
+
     // Profile
     'profile.display_name': "Anzeigename",
     'profile.enter_name_placeholder': "Name eingeben",
@@ -1033,6 +1093,16 @@ const translations: Record<Language, Record<string, string>> = {
     'contact.subscribe': "登録する",
     'contact.website_btn': "公式サイトへ",
     'app.developed_by': "アプリ開発",
+
+    // AI Chatbot
+    'ai.greeting': "ナマステ！私はSuman Sunejaの知恵でトレーニングされたAIアシスタントです。ラフターヨガ、企業向けセッション、ストレス解消法について聞いてください！",
+    'ai.placeholder': "ラフターヨガについて聞く...",
+    'ai.thinking': "楽しく考えています...",
+    'ai.connection_error': "接続エラー。でも笑い続けて！",
+    'ai.missing_key': "あらいやだ！脳みそをなくしちゃった。🧠\n\n（デプロイエラー：Gemini APIキーがありません。）",
+    'ai.you': "あなた",
+    'ai.bot': "Suman AI",
+    'ai.empty_response': "笑顔ですが、答えが思いつきませんでした。もう一度試して？",
 
     // Profile
     'profile.display_name': "表示名",
