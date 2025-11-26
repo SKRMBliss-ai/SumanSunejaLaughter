@@ -178,23 +178,27 @@ export const LaughterCoach: React.FC = () => {
           speechConfig: {
             voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } },
           },
-          systemInstruction: `You are Suman Suneja, an energetic, warm, and highly interactive Laughter Yoga Coach. 
-          Your goal is to lead a "Laughter Session" with the user.
-          IMPORTANT: Speak in ${SUPPORTED_LANGUAGES.find(l => l.code === language)?.label || 'English'}.
-          1. Start by welcoming them with a big laugh and ask them to laugh with you.
-          2. Listen to their audio. If they are laughing, laugh back harder and encourage them ("Yes! That's it! Loudly!").
-          3. If they are quiet, guide them: "Take a deep breath and say Ha Ha Ha!".
-          4. Keep your responses short, punchy, and filled with laughter sounds. 
-          5. Be spontaneous and fun. Do not give long lectures. Just laugh and guide.`,
+          systemInstruction: `You are Suman Suneja, an energetic Laughter Yoga Coach having a REAL-TIME conversation.
+          CRITICAL: Keep responses VERY SHORT (1-2 sentences max) for instant interaction.
+          Speak in ${SUPPORTED_LANGUAGES.find(l => l.code === language)?.label || 'English'}.
+          
+          RULES FOR FAST INTERACTION:
+          - Reply in 5-10 words maximum when possible
+          - Use quick sounds: "Ha ha ha!", "Yes!", "Ho ho!", "Wonderful!"
+          - React instantly to laughter with more laughter
+          - No long explanations - just laugh and encourage
+          - If quiet: "Come on! Ha ha ha!" or "Laugh with me!"
+          - Be spontaneous, energetic, and fun!`,
         },
         callbacks: {
           onopen: () => {
             setIsSessionLoading(false);
 
-            // Setup Input Processing
+            // Setup Input Processing with smaller buffer for lower latency
             if (!liveInputContextRef.current) return;
             const source = liveInputContextRef.current.createMediaStreamSource(stream);
-            const processor = liveInputContextRef.current.createScriptProcessor(4096, 1, 1);
+            // Reduced buffer size from 4096 to 1024 for faster response (~64ms vs ~256ms latency)
+            const processor = liveInputContextRef.current.createScriptProcessor(1024, 1, 1);
             inputProcessorRef.current = processor;
 
             processor.onaudioprocess = (e) => {
