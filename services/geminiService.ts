@@ -1,7 +1,11 @@
 import { GoogleGenAI, Type, Schema, Modality } from "@google/genai";
 import { JOKES, STORIES } from './contentRepository';
 
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
+// Try to get API key from Vite env first, then fallback to window object (set from Cloud Run)
+let apiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
+if (!apiKey && typeof window !== 'undefined' && (window as any).__GEMINI_API_KEY__) {
+  apiKey = (window as any).__GEMINI_API_KEY__;
+}
 // Initialize conditionally to prevent crashes if key is strictly validated on init
 const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
