@@ -50,18 +50,19 @@ const AppContent: React.FC = () => {
     );
   }
 
-  if (!user) {
-    return <Login />;
-  }
+  // TEMPORARILY COMMENTED OUT - Login requirement disabled
+  // if (!user) {
+  //   return <Login />;
+  // }
 
-  // Mandatory Phone Linking for Gmail users
-  const hasLinkedPhone = user.phoneNumber || localStorage.getItem(`user_phone_${user.uid}`);
+  // // Mandatory Phone Linking for Gmail users
+  // const hasLinkedPhone = user.phoneNumber || localStorage.getItem(`user_phone_${user.uid}`);
   
-  if (!hasLinkedPhone) {
-    return <PhoneLinker user={user} onLinkSuccess={() => {
-        window.location.reload();
-    }} />;
-  }
+  // if (!hasLinkedPhone) {
+  //   return <PhoneLinker user={user} onLinkSuccess={() => {
+  //       window.location.reload();
+  //   }} />;
+  // }
 
   const renderView = () => {
     switch (currentView) {
