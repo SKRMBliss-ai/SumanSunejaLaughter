@@ -10,6 +10,12 @@ This is a Laughter Yoga web application built with React, TypeScript, and Vite. 
 - Added TypeScript environment definitions for Vite (vite-env.d.ts)
 - Updated .gitignore for Replit environment
 - Configured workflow for development server
+- Login temporarily disabled for testing
+- **Latency Optimizations for Live AI Voice:**
+  - Reduced audio buffer size from 4096 to 1024 samples (~64ms vs ~256ms latency)
+  - Updated AI system instruction for shorter, quicker responses (5-10 words)
+  - Added instant greeting that plays immediately while AI connects (browser TTS filler)
+  - Greetings support multiple languages: English, Hindi, Arabic, Japanese
 
 ## Project Architecture
 

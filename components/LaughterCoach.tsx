@@ -142,6 +142,48 @@ export const LaughterCoach: React.FC = () => {
     setShowFeedback(false);
   };
 
+  // --- Instant Greeting (plays immediately while AI loads) ---
+  const playInstantGreeting = (type: 'LIVE' | 'QUICK') => {
+    const greetings = {
+      LIVE: {
+        en: "Welcome! I'm connecting you to Suman Suneja now. Take a deep breath... smile... and get ready to laugh together!",
+        hi: "स्वागत है! मैं आपको सुमन सुनेजा से जोड़ रहा हूं। गहरी सांस लें... मुस्कुराएं... और साथ में हंसने के लिए तैयार हो जाइए!",
+        ar: "مرحباً! أنا أوصلك بسومان سونيجا الآن. خذ نفساً عميقاً... ابتسم... واستعد للضحك معاً!",
+        ja: "ようこそ！スマン・スネジャにつなげています。深呼吸して...笑顔で...一緒に笑う準備をしてください！"
+      },
+      QUICK: {
+        en: "Get ready for your laughter boost! Take a deep breath... relax your shoulders... and prepare to laugh! Your guided session is loading...",
+        hi: "अपने हंसी की खुराक के लिए तैयार हो जाइए! गहरी सांस लें... कंधों को आराम दें... और हंसने के लिए तैयार हो जाइए!",
+        ar: "استعد لجرعة الضحك! خذ نفساً عميقاً... أرخِ كتفيك... واستعد للضحك!",
+        ja: "笑いのブーストの準備をしましょう！深呼吸して...肩の力を抜いて...笑う準備をしてください！"
+      }
+    };
+
+    const langCode = language as keyof typeof greetings.LIVE;
+    const text = greetings[type][langCode] || greetings[type].en;
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voices = window.speechSynthesis.getVoices();
+    
+    // Try to find a voice matching the user's language
+    let preferredVoice = voices.find(v => v.lang.startsWith(language));
+    if (!preferredVoice) {
+      preferredVoice = voices.find(v => 
+        v.name.includes('Google UK English Female') || 
+        v.name.includes('Samantha') || 
+        v.name.includes('Female')
+      );
+    }
+    
+    if (preferredVoice) utterance.voice = preferredVoice;
+    utterance.rate = 0.95;
+    utterance.pitch = 1.1;
+    utterance.volume = 0.9;
+
+    window.speechSynthesis.speak(utterance);
+    return utterance;
+  };
+
   // --- Live Conversational Session ---
   const startLiveSession = async () => {
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
@@ -157,6 +199,9 @@ export const LaughterCoach: React.FC = () => {
     setSessionType('LIVE');
     setError(null);
     setUsingOfflineVoice(false);
+
+    // Play instant greeting while AI connects
+    playInstantGreeting('LIVE');
 
     try {
       // 1. Setup Audio Contexts
@@ -193,6 +238,8 @@ export const LaughterCoach: React.FC = () => {
         callbacks: {
           onopen: () => {
             setIsSessionLoading(false);
+            // Stop the instant greeting when AI is ready
+            window.speechSynthesis.cancel();
 
             // Setup Input Processing with smaller buffer for lower latency
             if (!liveInputContextRef.current) return;
@@ -272,6 +319,9 @@ export const LaughterCoach: React.FC = () => {
     setUsingOfflineVoice(false);
     setIsMissingKey(false);
 
+    // Play instant greeting while AI voice loads
+    playInstantGreeting('QUICK');
+
     try {
       const script = await getGuidedSessionScript(language);
 
@@ -287,6 +337,9 @@ export const LaughterCoach: React.FC = () => {
         const audioBase64 = await generateSpeech(script, 'Kore');
 
         if (!audioContextRef.current) return;
+
+        // Stop the instant greeting before playing real AI voice
+        window.speechSynthesis.cancel();
 
         // Decode raw PCM from Gemini TTS
         const audioBuffer = createAudioBufferFromPCM(audioContextRef.current, audioBase64);
