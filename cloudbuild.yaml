@@ -1,5 +1,5 @@
 steps:
-  # Build the Docker image
+  # Build the Docker image with the Gemini API key as a build argument
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
@@ -7,6 +7,8 @@ steps:
       - 'gcr.io/$PROJECT_ID/sumansuneja-laughterhub:$SHORT_SHA'
       - '-t'
       - 'gcr.io/$PROJECT_ID/sumansuneja-laughterhub:latest'
+      - '--build-arg'
+      - 'VITE_GEMINI_API_KEY=${_VITE_GEMINI_API_KEY}'
       - '.'
 
   # Push the image to Google Container Registry
@@ -15,7 +17,7 @@ steps:
       - 'push'
       - 'gcr.io/$PROJECT_ID/sumansuneja-laughterhub:$SHORT_SHA'
 
-  # Deploy to Cloud Run with the API key from Cloud Build substitution
+  # Deploy to Cloud Run with the API key as an environment variable
   - name: 'gcr.io/cloud-builders/run'
     args:
       - 'deploy'
@@ -27,7 +29,7 @@ steps:
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
-      - '--update-env-vars=VITE_GEMINI_API_KEY=${_VITE_GEMINI_API_KEY}'
+      - '--set-env-vars=VITE_GEMINI_API_KEY=${_VITE_GEMINI_API_KEY}'
 
 images:
   - 'gcr.io/$PROJECT_ID/sumansuneja-laughterhub:$SHORT_SHA'

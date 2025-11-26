@@ -1,0 +1,288 @@
+Already have image (with digest): gcr.io/cloud-builders/docker
+Sending build context to Docker daemon  2.704MB
+Step 1/13 : FROM node:18-alpine as build
+18-alpine: Pulling from library/node
+f18232174bc9: Pulling fs layer
+dd71dde834b5: Pulling fs layer
+1e5a4c89cee5: Pulling fs layer
+25ff2da83641: Pulling fs layer
+25ff2da83641: Verifying Checksum
+25ff2da83641: Download complete
+1e5a4c89cee5: Verifying Checksum
+1e5a4c89cee5: Download complete
+f18232174bc9: Verifying Checksum
+f18232174bc9: Download complete
+f18232174bc9: Pull complete
+dd71dde834b5: Verifying Checksum
+dd71dde834b5: Download complete
+dd71dde834b5: Pull complete
+1e5a4c89cee5: Pull complete
+25ff2da83641: Pull complete
+Digest: sha256:8d6421d663b4c28fd3ebc498332f249011d118945588d0a35cb9bc4b8ca09d9e
+Status: Downloaded newer image for node:18-alpine
+ ---> ee77c6cd7c18
+Step 2/13 : WORKDIR /app
+ ---> Running in ebadb761b618
+Removing intermediate container ebadb761b618
+ ---> ee312ab2c8ad
+Step 3/13 : COPY package*.json ./
+ ---> 6f319396e69b
+Step 4/13 : RUN npm install
+ ---> Running in c6e8fb53c9f4
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@firebase/ai@2.6.0',
+npm warn EBADENGINE   required: { node: '>=20.0.0' },
+npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+npm warn EBADENGINE }
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@firebase/app@0.14.6',
+npm warn EBADENGINE   required: { node: '>=20.0.0' },
+npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+npm warn EBADENGINE }
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@firebase/app-check@0.11.0',
+npm warn EBADENGINE   required: { node: '>=20.0.0' },
+npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+npm warn EBADENGINE }
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@firebase/app-check-compat@0.4.0',
+npm warn EBADENGINE   required: { node: '>=20.0.0' },
+npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+npm warn EBADENGINE }
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@firebase/app-compat@0.5.6',
+npm warn EBADENGINE   required: { node: '>=20.0.0' },
+npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+npm warn EBADENGINE }
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@firebase/auth@1.11.1',
+npm warn EBADENGINE   required: { node: '>=20.0.0' },
+npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+npm warn EBADENGINE }
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@firebase/auth-compat@0.6.1',
+npm warn EBADENGINE   required: { node: '>=20.0.0' },
+npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+npm warn EBADENGINE }
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@firebase/component@0.7.0',
+npm warn EBADENGINE   required: { node: '>=20.0.0' },
+npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+npm warn EBADENGINE }
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@firebase/database@1.1.0',
+npm warn EBADENGINE   required: { node: '>=20.0.0' },
+npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+npm warn EBADENGINE }
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@firebase/database-compat@2.1.0',
+npm warn EBADENGINE   required: { node: '>=20.0.0' },
+npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+npm warn EBADENGINE }
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@firebase/firestore@4.9.2',
+npm warn EBADENGINE   required: { node: '>=20.0.0' },
+npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+npm warn EBADENGINE }
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@firebase/firestore-compat@0.4.2',
+npm warn EBADENGINE   required: { node: '>=20.0.0' },
+npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+npm warn EBADENGINE }
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@firebase/functions@0.13.1',
+npm warn EBADENGINE   required: { node: '>=20.0.0' },
+npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+npm warn EBADENGINE }
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@firebase/functions-compat@0.4.1',
+npm warn EBADENGINE   required: { node: '>=20.0.0' },
+npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+npm warn EBADENGINE }
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@firebase/logger@0.5.0',
+npm warn EBADENGINE   required: { node: '>=20.0.0' },
+npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+npm warn EBADENGINE }
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@firebase/storage@0.14.0',
+npm warn EBADENGINE   required: { node: '>=20.0.0' },
+npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+npm warn EBADENGINE }
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@firebase/storage-compat@0.4.0',
+npm warn EBADENGINE   required: { node: '>=20.0.0' },
+npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+npm warn EBADENGINE }
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@firebase/util@1.13.0',
+npm warn EBADENGINE   required: { node: '>=20.0.0' },
+npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+npm warn EBADENGINE }
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@google/genai@1.30.0',
+npm warn EBADENGINE   required: { node: '>=20.0.0' },
+npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+npm warn EBADENGINE }
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@vitejs/plugin-react@5.1.1',
+npm warn EBADENGINE   required: { node: '^20.19.0 || >=22.12.0' },
+npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+npm warn EBADENGINE }
+npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+added 218 packages, and audited 219 packages in 12s
+28 packages are looking for funding
+  run `npm fund` for details
+found 0 vulnerabilities
+npm notice
+npm notice New major version of npm available! 10.8.2 -> 11.6.4
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.4
+npm notice To update run: npm install -g npm@11.6.4
+npm notice
+Removing intermediate container c6e8fb53c9f4
+ ---> d070bec66c1c
+Step 5/13 : COPY . .
+ ---> c51186b510d8
+Step 6/13 : ARG VITE_GEMINI_API_KEY
+ ---> Running in dd7febe6c760
+Removing intermediate container dd7febe6c760
+ ---> 4c28b1e8d509
+Step 7/13 : ENV VITE_GEMINI_API_KEY=$VITE_GEMINI_API_KEY
+ ---> Running in d28a9e07825b
+Removing intermediate container d28a9e07825b
+ ---> 4d74fd0acfae
+Step 8/13 : RUN npm run build
+ ---> Running in 2d55f5874f00
+> sumansuneja-laughterhub@0.0.0 build
+> vite build
+vite v6.4.1 building for production...
+/index.css doesn't exist at build time, it will remain unchanged to be resolved at runtime
+transforming...
+✓ 1713 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                  4.15 kB │ gzip:   1.33 kB
+dist/assets/index-CbGngTls.js  784.84 kB │ gzip: 193.48 kB
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 7.78s
+Removing intermediate container 2d55f5874f00
+ ---> d42d4bdfaeaa
+Step 9/13 : FROM nginx:alpine
+alpine: Pulling from library/nginx
+2d35ebdb57d9: Already exists
+8f6a6833e95d: Pulling fs layer
+194fa24e147d: Pulling fs layer
+3eaba6cd10a3: Pulling fs layer
+df413d6ebdc8: Pulling fs layer
+d9a55dab5954: Pulling fs layer
+ff8a36d5502a: Pulling fs layer
+bdabb0d44271: Pulling fs layer
+bdabb0d44271: Waiting
+ff8a36d5502a: Verifying Checksum
+ff8a36d5502a: Download complete
+194fa24e147d: Verifying Checksum
+194fa24e147d: Download complete
+d9a55dab5954: Download complete
+df413d6ebdc8: Verifying Checksum
+df413d6ebdc8: Download complete
+3eaba6cd10a3: Verifying Checksum
+3eaba6cd10a3: Download complete
+8f6a6833e95d: Download complete
+8f6a6833e95d: Pull complete
+194fa24e147d: Pull complete
+3eaba6cd10a3: Pull complete
+df413d6ebdc8: Pull complete
+bdabb0d44271: Verifying Checksum
+bdabb0d44271: Download complete
+d9a55dab5954: Pull complete
+ff8a36d5502a: Pull complete
+bdabb0d44271: Pull complete
+Digest: sha256:b3c656d55d7ad751196f21b7fd2e8d4da9cb430e32f646adcf92441b72f82b14
+Status: Downloaded newer image for nginx:alpine
+ ---> d4918ca78576
+Step 10/13 : COPY --from=build /app/dist /usr/share/nginx/html
+ ---> 7d3fc04a1bb0
+Step 11/13 : COPY nginx.conf /etc/nginx/conf.d/default.conf
+ ---> 259628fdb546
+Step 12/13 : EXPOSE 8080
+ ---> Running in 854174787dd8
+Removing intermediate container 854174787dd8
+ ---> 37fa6e86d4d9
+Step 13/13 : CMD ["nginx", "-g", "daemon off;"]
+ ---> Running in 594fe419cf5b
+Removing intermediate container 594fe419cf5b
+ ---> 2a4eeab79d4f
+Successfully built 2a4eeab79d4f
+Successfully tagged me-central1-docker.pkg.dev/sumansunejalaughter-178eb/cloud-run-source-deploy/sumansunejalaughter/sumansuneja-laughterhub1:9adbc29be8ba2de790489b3658198729efbe4f10
+Finished Step #0 - "Build"
+Starting Step #1 - "Push"
+Already have image (with digest): gcr.io/cloud-builders/docker
+The push refers to repository [me-central1-docker.pkg.dev/sumansunejalaughter-178eb/cloud-run-source-deploy/sumansunejalaughter/sumansuneja-laughterhub1]
+042df05a72c6: Preparing
+e80e2d42fedf: Preparing
+25906c27b84d: Preparing
+99ea4bde418d: Preparing
+3297b9628ff3: Preparing
+b74d92be8225: Preparing
+2c79d5d895bb: Preparing
+2660a7d4b906: Preparing
+50b58ca2a3f5: Preparing
+256f393e029f: Preparing
+50b58ca2a3f5: Layer already exists
+2c79d5d895bb: Layer already exists
+3297b9628ff3: Layer already exists
+99ea4bde418d: Layer already exists
+b74d92be8225: Layer already exists
+25906c27b84d: Layer already exists
+2660a7d4b906: Layer already exists
+256f393e029f: Layer already exists
+e80e2d42fedf: Pushed
+042df05a72c6: Pushed
+9adbc29be8ba2de790489b3658198729efbe4f10: digest: sha256:c837aa149385a530096853462e45e6921bea66d2aaaa358ccf335b5e824eb14b size: 2406
+Finished Step #1 - "Push"
+Starting Step #2 - "Deploy"
+Pulling image: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+slim: Pulling from google.com/cloudsdktool/cloud-sdk
+bfecd07633a3: Pulling fs layer
+fed15a2cd901: Pulling fs layer
+c569e73b6675: Pulling fs layer
+99269c27417b: Pulling fs layer
+99269c27417b: Verifying Checksum
+99269c27417b: Download complete
+fed15a2cd901: Verifying Checksum
+fed15a2cd901: Download complete
+bfecd07633a3: Verifying Checksum
+bfecd07633a3: Download complete
+bfecd07633a3: Pull complete
+fed15a2cd901: Pull complete
+c569e73b6675: Verifying Checksum
+c569e73b6675: Download complete
+c569e73b6675: Pull complete
+99269c27417b: Pull complete
+Digest: sha256:17a274eee28444fbdc1ce7410a064943c0dead47042cac07944a9020bd93cbc6
+Status: Downloaded newer image for gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+Deploying...
+Creating Revision.............................................................done
+Routing traffic.....done
+Done.
+Service [sumansuneja-laughterhub1] revision [sumansuneja-laughterhub1-00018-zsq] has been deployed and is serving 100 percent of traffic.
+Service URL: https://sumansuneja-laughterhub1-498377085294.me-central1.run.app
+Finished Step #2 - "Deploy"
+PUSH
+Pushing me-central1-docker.pkg.dev/sumansunejalaughter-178eb/cloud-run-source-deploy/sumansunejalaughter/sumansuneja-laughterhub1:9adbc29be8ba2de790489b3658198729efbe4f10
+The push refers to repository [me-central1-docker.pkg.dev/sumansunejalaughter-178eb/cloud-run-source-deploy/sumansunejalaughter/sumansuneja-laughterhub1]
+042df05a72c6: Preparing
+e80e2d42fedf: Preparing
+25906c27b84d: Preparing
+99ea4bde418d: Preparing
+3297b9628ff3: Preparing
+b74d92be8225: Preparing
+2c79d5d895bb: Preparing
+2660a7d4b906: Preparing
+50b58ca2a3f5: Preparing
+256f393e029f: Preparing
+3297b9628ff3: Layer already exists
