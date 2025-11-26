@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Youtube, User } from 'lucide-react';
 import { auth } from '../services/firebase';
 import { ViewState } from '../types';
+import { useSettings } from '../contexts/SettingsContext';
 
 interface HeaderProps {
   onNavigate?: (view: ViewState) => void;
@@ -9,6 +10,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
   const [photoURL, setPhotoURL] = useState<string | null>(null);
+  const { t } = useSettings();
 
   useEffect(() => {
     const loadPhoto = () => {
