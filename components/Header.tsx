@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Youtube, User } from 'lucide-react';
 import { auth } from '../services/firebase';
 import { ViewState } from '../types';
-import { useSettings } from '../contexts/SettingsContext';
 
 interface HeaderProps {
   onNavigate?: (view: ViewState) => void;
@@ -10,7 +9,6 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
   const [photoURL, setPhotoURL] = useState<string | null>(null);
-  const { t } = useSettings();
 
   useEffect(() => {
     const loadPhoto = () => {
@@ -45,7 +43,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
              />
           </div>
           <div className="flex flex-col justify-center">
-            <h1 className="text-xl font-fredoka font-bold leading-none drop-shadow-md text-white">Suman Suneja</h1>
+            <h1 className="text-xl font-fredoka font-bold leading-none drop-shadow-md text-white" title="Suman Suneja">Suman Suneja</h1>
             <p className="text-[0.65rem] text-[#EDE8F8] dark:text-slate-300 font-bold uppercase tracking-wider opacity-90">Laughter Yoga Hub</p>
           </div>
         </div>
@@ -57,7 +55,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
             rel="noopener noreferrer"
             className="hidden sm:flex bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 text-[0.65rem] px-3 py-1.5 rounded-full font-bold transition-all hover:scale-105 items-center gap-1 shadow-md border border-red-100 dark:border-red-900/50"
           >
-            <Youtube size={14} fill="currentColor" className="text-red-500" /> Subscribe
+            <Youtube size={14} fill="currentColor" className="text-red-500" /> Subscribe to Youtube
           </a>
           
           <button 

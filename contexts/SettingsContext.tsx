@@ -57,6 +57,10 @@ const translations: Record<Language, Record<string, string>> = {
     'book_session': 'Book Session',
     'contact': 'Contact',
 
+    // Header
+    'header.subscribe_youtube': 'Subscribe to Youtube',
+    'header.suman_name': 'Suman Suneja',
+
     // Contact
     'contact.header_title': "Let's Make Magic Happen!",
     'contact.header_title_start': "Let's Make",
@@ -226,6 +230,10 @@ const translations: Record<Language, Record<string, string>> = {
     'book_session': 'सत्र बुक करें',
     'contact': 'संपर्क',
 
+    // Header
+    'header.subscribe_youtube': 'Youtube को सदस्यता लें',
+    'header.suman_name': 'सुमन सुनेजा',
+
     // Contact
     'contact.header_title': "चलो जादू करते हैं!",
     'contact.header_title_start': "चलो",
@@ -394,6 +402,10 @@ const translations: Record<Language, Record<string, string>> = {
     'fun_games': 'Juegos',
     'book_session': 'Reservar',
     'contact': 'Contacto',
+
+    // Header
+    'header.subscribe_youtube': 'Suscribirse a Youtube',
+    'header.suman_name': 'Suman Suneja',
 
     // Contact
     'contact.header_title': "¡Hagamos Magia!",
