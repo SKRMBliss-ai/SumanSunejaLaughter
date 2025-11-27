@@ -1,11 +1,13 @@
 steps:
-  - name: 'gcr.io/cloud-builders/npm'
-    args: ['install']
-
-  - name: 'gcr.io/cloud-builders/npm'
-    args: ['run', 'build']
-    env:
-      - 'GEMINI_API_KEY=${_GEMINI_API_KEY}'
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build',
+      '--build-arg',
+      'GEMINI_API_KEY=${_GEMINI_API_KEY}',
+      '-t',
+      'gcr.io/$PROJECT_ID/sumansunejalaughter',
+      '.'
+    ]
 
 images:
   - 'gcr.io/$PROJECT_ID/sumansunejalaughter'
