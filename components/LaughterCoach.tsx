@@ -5,6 +5,7 @@ import { rateLaughter, getGuidedSessionScript, generateSpeech, createAudioBuffer
 import { LaughterScore } from '../types';
 import { addPoints } from '../services/rewardService';
 import { useSettings } from '../contexts/SettingsContext';
+import { useLiveSession } from '../hooks/useLiveSession';
 
 interface HistoryItem {
   id: number;
@@ -141,7 +142,23 @@ export const LaughterCoach: React.FC = () => {
     setShowFeedback(false);
   };
 
-  // --- Live Conversational Session ---
+  // --- Live Conversational Session (Refactored for Low Latency) ---
+  const {
+    startSession: startLiveSessionLowLatency,
+    stopSession: stopLiveSessionLowLatency,
+    isSessionActive: isLiveSessionActive,
+    isLoading: isLiveSessionLoading,
+    volumeLevel
+  } = useLiveSession({
+    onSessionEnd: () => {
+      stopSession(); // Call main stopSession to handle UI/Points
+    },
+    onError: (err) => {
+      setError(err);
+    }
+  });
+
+  // Wrapper to start session using the new hook
   const startLiveSession = async () => {
     const apiKey = process.env.API_KEY;
     if (!apiKey) {
@@ -150,110 +167,9 @@ export const LaughterCoach: React.FC = () => {
       return;
     }
 
-    cleanupAudio();
-    setIsSessionLoading(true);
-    setIsSessionActive(true);
     setSessionType('LIVE');
-    setError(null);
-    setUsingOfflineVoice(false);
-
-    try {
-      // 1. Setup Audio Contexts
-      liveInputContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
-      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
-      nextStartTimeRef.current = 0;
-
-      // 2. Get Microphone Stream
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaStreamRef.current = stream;
-
-      // 3. Connect to Gemini Live
-      const ai = new GoogleGenAI({ apiKey });
-
-      const sessionPromise = ai.live.connect({
-        model: 'gemini-2.5-flash-native-audio-preview-09-2025',
-        config: {
-          responseModalities: [Modality.AUDIO],
-          speechConfig: {
-            voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } },
-          },
-          systemInstruction: `You are Suman Suneja, an energetic, warm, and highly interactive Laughter Yoga Coach. 
-          Your goal is to lead a "Laughter Session" with the user.
-          1. Start by welcoming them with a big laugh and ask them to laugh with you.
-          2. Listen to their audio. If they are laughing, laugh back harder and encourage them ("Yes! That's it! Loudly!").
-          3. If they are quiet, guide them: "Take a deep breath and say Ha Ha Ha!".
-          4. Keep your responses short, punchy, and filled with laughter sounds. 
-          5. Be spontaneous and fun. Do not give long lectures. Just laugh and guide.`,
-        },
-        callbacks: {
-          onopen: () => {
-            setIsSessionLoading(false);
-
-            // Setup Input Processing
-            if (!liveInputContextRef.current) return;
-            const source = liveInputContextRef.current.createMediaStreamSource(stream);
-            const processor = liveInputContextRef.current.createScriptProcessor(4096, 1, 1);
-            inputProcessorRef.current = processor;
-
-            processor.onaudioprocess = (e) => {
-              const inputData = e.inputBuffer.getChannelData(0);
-              const pcmBlob = createBlob(inputData);
-              sessionPromise.then((session) => {
-                session.sendRealtimeInput({ media: pcmBlob });
-              });
-            };
-
-            source.connect(processor);
-            processor.connect(liveInputContextRef.current.destination);
-          },
-          onmessage: async (message: LiveServerMessage) => {
-            const base64Audio = message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
-
-            if (base64Audio && audioContextRef.current) {
-              const ctx = audioContextRef.current;
-              const binary = decode(base64Audio);
-
-              const dataInt16 = new Int16Array(binary.buffer);
-              const float32 = new Float32Array(dataInt16.length);
-              for (let i = 0; i < dataInt16.length; i++) {
-                float32[i] = dataInt16[i] / 32768.0;
-              }
-
-              const buffer = ctx.createBuffer(1, float32.length, 24000);
-              buffer.getChannelData(0).set(float32);
-
-              const source = ctx.createBufferSource();
-              source.buffer = buffer;
-              source.connect(ctx.destination);
-
-              const currentTime = ctx.currentTime;
-              if (nextStartTimeRef.current < currentTime) {
-                nextStartTimeRef.current = currentTime;
-              }
-
-              source.start(nextStartTimeRef.current);
-              nextStartTimeRef.current += buffer.duration;
-            }
-          },
-          onclose: () => {
-            stopSession();
-          },
-          onerror: (err) => {
-            console.error("Live session error", err);
-            setError(t('coach.connection_lost'));
-            stopSession();
-          }
-        }
-      });
-
-      liveSessionRef.current = sessionPromise;
-
-    } catch (err) {
-      console.error(err);
-      setIsSessionLoading(false);
-      setIsSessionActive(false);
-      setError(t('coach.session_error'));
-    }
+    setIsSessionActive(true); // Set local UI state
+    startLiveSessionLowLatency(apiKey);
   };
 
   // --- Quick 1-Min Guided Session (TTS) ---
@@ -269,6 +185,10 @@ export const LaughterCoach: React.FC = () => {
     try {
       const script = await getGuidedSessionScript();
 
+      // Split script into sentences for chunked streaming
+      // Matches periods, exclamation marks, question marks followed by space or end of string
+      const sentences = script.match(/[^.!?]+[.!?]+(\s|$)/g) || [script];
+
       // Initialize Audio Context
       if (!audioContextRef.current) {
         audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -277,46 +197,74 @@ export const LaughterCoach: React.FC = () => {
         await audioContextRef.current.resume();
       }
 
-      try {
-        const audioBase64 = await generateSpeech(script, 'Kore');
+      let currentSentenceIndex = 0;
+      let isPlaying = false;
+      const audioQueue: AudioBuffer[] = [];
 
-        if (!audioContextRef.current) return;
+      // Function to process the queue
+      const playNextInQueue = () => {
+        if (audioQueue.length > 0 && audioContextRef.current) {
+          isPlaying = true;
+          const buffer = audioQueue.shift()!;
+          const source = audioContextRef.current.createBufferSource();
+          source.buffer = buffer;
+          source.connect(audioContextRef.current.destination);
 
-        // Decode raw PCM from Gemini TTS
-        const audioBuffer = createAudioBufferFromPCM(audioContextRef.current, audioBase64);
+          source.onended = () => {
+            playNextInQueue();
+          };
 
-        const source = audioContextRef.current.createBufferSource();
-        source.buffer = audioBuffer;
-        source.connect(audioContextRef.current.destination);
-        source.onended = () => {
-          stopSession();
-        };
+          sourceRef.current = source;
+          source.start(0);
+        } else {
+          isPlaying = false;
+          // If queue is empty but we haven't finished all sentences, we are buffering.
+          // If we finished all sentences, stop session.
+          if (currentSentenceIndex >= sentences.length) {
+            stopSession();
+          }
+        }
+      };
 
-        sourceRef.current = source;
-        source.start(0);
-        setIsSessionLoading(false);
+      // Function to fetch and queue audio
+      const fetchAndQueueAudio = async (index: number) => {
+        if (index >= sentences.length) return;
 
-      } catch (geminiError: any) {
-        console.warn("Gemini TTS failed:", geminiError);
-        // Do NOT set a blocking error. Just inform user and use fallback.
-        setUsingOfflineVoice(true);
-        setError(null);
+        try {
+          const text = sentences[index].trim();
+          if (!text) {
+            fetchAndQueueAudio(index + 1); // Skip empty
+            return;
+          }
 
-        // Fallback to browser TTS so it's not silent
-        const utterance = new SpeechSynthesisUtterance(script);
-        const voices = window.speechSynthesis.getVoices();
-        // Try to find a good female voice
-        const preferredVoice = voices.find(v => v.name.includes('Google UK English Female') || v.name.includes('Samantha') || v.name.includes('Female'));
-        if (preferredVoice) utterance.voice = preferredVoice;
-        utterance.rate = 1.05; // Slightly faster for energy
-        utterance.pitch = 1.1; // Slightly higher for cheerfulness
+          const audioBase64 = await generateSpeech(text, 'Kore');
 
-        utterance.onend = () => stopSession();
-        utterance.onerror = () => stopSession();
+          if (!audioContextRef.current) return;
+          const audioBuffer = createAudioBufferFromPCM(audioContextRef.current, audioBase64);
 
-        setIsSessionLoading(false);
-        window.speechSynthesis.speak(utterance);
-      }
+          audioQueue.push(audioBuffer);
+
+          // If nothing is playing, start playing immediately
+          if (!isPlaying) {
+            // First chunk loaded! Stop loading spinner.
+            setIsSessionLoading(false);
+            playNextInQueue();
+          }
+
+          // Fetch next chunk
+          currentSentenceIndex++;
+          fetchAndQueueAudio(currentSentenceIndex);
+
+        } catch (err) {
+          console.warn("Error fetching chunk:", err);
+          // If error, just try next chunk or stop if critical
+          currentSentenceIndex++;
+          fetchAndQueueAudio(currentSentenceIndex);
+        }
+      };
+
+      // Start fetching the first chunk
+      fetchAndQueueAudio(0);
 
     } catch (e: any) {
       console.error(e);
@@ -326,6 +274,11 @@ export const LaughterCoach: React.FC = () => {
   };
 
   const stopSession = () => {
+    // If live session is active, stop it via hook
+    if (sessionTypeRef.current === 'LIVE') {
+      stopLiveSessionLowLatency();
+    }
+
     cleanupAudio();
     const wasActive = isSessionActive;
 
@@ -671,3 +624,120 @@ export const LaughterCoach: React.FC = () => {
     </div>
   );
 };
+
+/*
+// LEGACY LIVE SESSION LOGIC (For Rollback)
+// const startLiveSessionLegacy = async () => {
+//   const apiKey = process.env.API_KEY;
+//   if (!apiKey) {
+//     setError(t('coach.live_unavailable'));
+//     setIsMissingKey(true);
+//     return;
+//   }
+
+//   cleanupAudio();
+//   setIsSessionLoading(true);
+//   setIsSessionActive(true);
+//   setSessionType('LIVE');
+//   setError(null);
+//   setUsingOfflineVoice(false);
+
+//   try {
+//     // 1. Setup Audio Contexts
+//     liveInputContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
+//     audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+//     nextStartTimeRef.current = 0;
+
+//     // 2. Get Microphone Stream
+//     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+//     mediaStreamRef.current = stream;
+
+//     // 3. Connect to Gemini Live
+//     const ai = new GoogleGenAI({ apiKey });
+
+//     const sessionPromise = ai.live.connect({
+//       model: 'gemini-2.5-flash-native-audio-preview-09-2025',
+//       config: {
+//         responseModalities: [Modality.AUDIO],
+//         speechConfig: {
+//           voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } },
+//         },
+//         systemInstruction: `You are Suman Suneja, an energetic, warm, and highly interactive Laughter Yoga Coach. 
+//         Your goal is to lead a "Laughter Session" with the user.
+//         1. Start by welcoming them with a big laugh and ask them to laugh with you.
+//         2. Listen to their audio. If they are laughing, laugh back harder and encourage them ("Yes! That's it! Loudly!").
+//         3. If they are quiet, guide them: "Take a deep breath and say Ha Ha Ha!".
+//         4. Keep your responses short, punchy, and filled with laughter sounds. 
+//         5. Be spontaneous and fun. Do not give long lectures. Just laugh and guide.`,
+//       },
+//       callbacks: {
+//         onopen: () => {
+//           setIsSessionLoading(false);
+
+//           // Setup Input Processing
+//           if (!liveInputContextRef.current) return;
+//           const source = liveInputContextRef.current.createMediaStreamSource(stream);
+//           const processor = liveInputContextRef.current.createScriptProcessor(4096, 1, 1);
+//           inputProcessorRef.current = processor;
+
+//           processor.onaudioprocess = (e) => {
+//             const inputData = e.inputBuffer.getChannelData(0);
+//             const pcmBlob = createBlob(inputData);
+//             sessionPromise.then((session) => {
+//               session.sendRealtimeInput({ media: pcmBlob });
+//             });
+//           };
+
+//           source.connect(processor);
+//           processor.connect(liveInputContextRef.current.destination);
+//         },
+//         onmessage: async (message: LiveServerMessage) => {
+//           const base64Audio = message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
+
+//           if (base64Audio && audioContextRef.current) {
+//             const ctx = audioContextRef.current;
+//             const binary = decode(base64Audio);
+
+//             const dataInt16 = new Int16Array(binary.buffer);
+//             const float32 = new Float32Array(dataInt16.length);
+//             for (let i = 0; i < dataInt16.length; i++) {
+//               float32[i] = dataInt16[i] / 32768.0;
+//             }
+
+//             const buffer = ctx.createBuffer(1, float32.length, 24000);
+//             buffer.getChannelData(0).set(float32);
+
+//             const source = ctx.createBufferSource();
+//             source.buffer = buffer;
+//             source.connect(ctx.destination);
+
+//             const currentTime = ctx.currentTime;
+//             if (nextStartTimeRef.current < currentTime) {
+//               nextStartTimeRef.current = currentTime;
+//             }
+
+//             source.start(nextStartTimeRef.current);
+//             nextStartTimeRef.current += buffer.duration;
+//           }
+//         },
+//         onclose: () => {
+//           stopSession();
+//         },
+//         onerror: (err) => {
+//           console.error("Live session error", err);
+//           setError(t('coach.connection_lost'));
+//           stopSession();
+//         }
+//       }
+//     });
+
+//     liveSessionRef.current = sessionPromise;
+
+//   } catch (err) {
+//     console.error(err);
+//     setIsSessionLoading(false);
+//     setIsSessionActive(false);
+//     setError(t('coach.session_error'));
+//   }
+// };
+*/
