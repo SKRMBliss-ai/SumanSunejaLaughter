@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Mic, X, Loader2, StopCircle } from 'lucide-react';
+import { Mic, Loader2, Square } from 'lucide-react';
 import { useLiveSession } from '../hooks/useLiveSession';
 import { useSettings } from '../contexts/SettingsContext';
 
@@ -9,7 +9,6 @@ interface HomeLiveWidgetProps {
 
 export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
     const { t } = useSettings();
-    const [showModal, setShowModal] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const {
@@ -20,9 +19,7 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
         volumeLevel
     } = useLiveSession({
         onSessionEnd: () => {
-            // Don't close modal immediately, maybe show feedback? 
-            // For now, just close it after a delay or let user close it.
-            setTimeout(() => setShowModal(false), 1000);
+            // Session ended
         },
         onError: (err) => setError(err),
         onAudioStart: () => {
@@ -44,8 +41,7 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
 
     const handleStart = async () => {
         setError(null);
-        setShowModal(true);
-        playImmediateGreeting("Starting live session");
+        playImmediateGreeting("Let's talk to Suman Suneja");
 
         const apiKey = process.env.API_KEY;
         if (!apiKey) {
@@ -82,12 +78,13 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
         stopSession();
     };
 
-    // If not visible and not active, don't render button (but keep modal if active?)
-    // User said "widget on home screen". If I navigate away, should the call end?
-    // Usually yes.
-    // So if !visible, we should probably return null, but if session is active, maybe we want to keep it?
-    // For simplicity, if !visible, we hide the widget. If session is active, it might continue in background or we should stop it.
-    // Let's stop it if we leave Home.
+    const toggleSession = () => {
+        if (isSessionActive) {
+            handleStop();
+        } else {
+            handleStart();
+        }
+    };
 
     useEffect(() => {
         if (!visible && isSessionActive) {
@@ -121,75 +118,41 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
     if (!visible && !isSessionActive) return null;
 
     return (
-        <>
-            {/* Floating Widget Button */}
-            <div className={`fixed bottom-48 left-4 z-40 flex flex-col items-start gap-2 transition-all duration-500 ${visible ? 'translate-x-0' : '-translate-x-20'}`}>
+        <div className={`fixed bottom-48 left-4 z-40 flex flex-col items-start gap-2 transition-all duration-500 ${visible ? 'translate-x-0' : '-translate-x-20'}`}>
+            <div className="relative">
+                {/* Ripples when active */}
+                {isSessionActive && (
+                    <>
+                        <div className="absolute inset-0 rounded-full bg-purple-500/30 animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
+                        <div className="absolute inset-0 rounded-full bg-purple-500/20 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite] delay-150"></div>
+                    </>
+                )}
+
                 <button
-                    onClick={handleStart}
-                    className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg border-2 border-white bg-gradient-to-br from-purple-500 to-indigo-600 text-white hover:scale-110 transition-transform active:scale-90 animate-bounce-gentle"
-                    title="Start Voice Chat"
+                    onClick={toggleSession}
+                    disabled={isLoading}
+                    className={`relative w-14 h-14 rounded-full flex items-center justify-center shadow-lg border-2 border-white transition-all duration-300 ${isSessionActive
+                            ? 'bg-red-500 hover:bg-red-600 text-white scale-110'
+                            : 'bg-gradient-to-br from-purple-500 to-indigo-600 text-white hover:scale-110 active:scale-90 animate-bounce-gentle'
+                        }`}
+                    title={isSessionActive ? "End Conversation" : "Start Voice Chat"}
                 >
-                    <Mic size={20} />
+                    {isLoading ? (
+                        <Loader2 size={24} className="animate-spin" />
+                    ) : isSessionActive ? (
+                        <Square size={20} fill="currentColor" />
+                    ) : (
+                        <Mic size={24} />
+                    )}
                 </button>
-            </div>
 
-            {/* Full Screen Overlay / Modal when Active */}
-            {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-white dark:bg-slate-800 rounded-[2rem] p-8 w-full max-w-sm shadow-2xl relative border-4 border-purple-100 dark:border-slate-700 flex flex-col items-center">
-
-                        <button
-                            onClick={() => { handleStop(); setShowModal(false); }}
-                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
-                        >
-                            <X size={24} />
-                        </button>
-
-                        <h3 className="text-2xl font-fredoka font-bold text-gray-800 dark:text-gray-100 mb-2">Voice Chat</h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-8 text-center">
-                            {isLoading ? "Connecting..." : isSessionActive ? "Listening..." : "Session Ended"}
-                        </p>
-
-                        {/* Visualizer */}
-                        <div className="relative w-64 h-64 flex items-center justify-center mb-8">
-                            {/* Ripples */}
-                            {isSessionActive && (
-                                <>
-                                    <div className="absolute w-full h-full rounded-full bg-purple-500/20 animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
-                                    <div className="absolute w-3/4 h-3/4 rounded-full bg-purple-500/30 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
-                                </>
-                            )}
-
-                            {/* Main Circle */}
-                            <div
-                                className={`relative w-48 h-48 rounded-full bg-gradient-to-br from-purple-100 to-white dark:from-slate-700 dark:to-slate-600 flex items-center justify-center shadow-inner border-4 border-white dark:border-slate-500 transition-all duration-100`}
-                                style={{ transform: `scale(${1 + Math.min(volumeLevel * 2, 0.5)})` }}
-                            >
-                                <div className="absolute w-36 h-36 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center shadow-lg overflow-hidden p-4">
-                                    {isLoading ? (
-                                        <Loader2 className="w-12 h-12 text-purple-500 animate-spin" />
-                                    ) : (
-                                        <Mic className={`w-12 h-12 text-purple-500 ${isSessionActive ? 'animate-pulse' : ''}`} />
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Controls */}
-                        <button
-                            onClick={handleStop}
-                            className="bg-red-50 hover:bg-red-100 text-red-500 font-bold py-4 px-8 rounded-2xl flex items-center gap-2 transition-colors w-full justify-center"
-                        >
-                            <StopCircle size={24} /> End Session
-                        </button>
-
-                        {error && (
-                            <p className="text-red-400 text-xs mt-4 text-center">{error}</p>
-                        )}
-
+                {/* Error Tooltip */}
+                {error && (
+                    <div className="absolute left-16 top-2 bg-red-100 text-red-600 text-xs px-2 py-1 rounded whitespace-nowrap animate-fade-in">
+                        {error}
                     </div>
-                </div>
-            )}
-        </>
+                )}
+            </div>
+        </div>
     );
 };
