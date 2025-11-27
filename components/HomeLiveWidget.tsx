@@ -22,8 +22,6 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
         onSessionEnd: () => {
             // Don't close modal immediately, maybe show feedback? 
             // For now, just close it after a delay or let user close it.
-            // Actually, LaughterCoach closes session state but keeps component mounted.
-            // Here, if session ends, we probably want to reset.
             setTimeout(() => setShowModal(false), 1000);
         },
         onError: (err) => setError(err)
@@ -60,7 +58,7 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
         4. Be a "Joy Catalyst". Your goal is to make the user feel good and smile, no matter what.
         
         CONVERSATION STYLE:
-        - Talk like a real person, not a bot. Use "Hahaha", "Oh my goodness!", "That is wonderful!" naturally.
+        - Talk like a real person, not a bot. Use "Very Good Very Good Yeah!", "Laugh  Double When in Trouble", "That is wonderful!" naturally.
         - Keep responses concise and conversational (1-3 sentences usually).
         - Interruptions are okay! If the user laughs, laugh with them immediately.
         - STRICTLY NO LECTURING. Do not give long medical advice. Keep it light and wellness-focused.

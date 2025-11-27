@@ -144,8 +144,8 @@ export const useLiveSession = ({ onSessionEnd, onError }: UseLiveSessionProps = 
                         if (!liveInputContextRef.current) return;
                         const source = liveInputContextRef.current.createMediaStreamSource(stream);
 
-                        // OPTIMIZATION 1: Reduced buffer size to 2048 for lower latency
-                        const processor = liveInputContextRef.current.createScriptProcessor(2048, 1, 1);
+                        // OPTIMIZATION 1: Reduced buffer size to 1024 for lower latency
+                        const processor = liveInputContextRef.current.createScriptProcessor(1024, 1, 1);
                         inputProcessorRef.current = processor;
 
                         processor.onaudioprocess = (e) => {
@@ -155,7 +155,7 @@ export const useLiveSession = ({ onSessionEnd, onError }: UseLiveSessionProps = 
                             const rms = calculateRMS(inputData);
                             setVolumeLevel(rms); // Expose volume for UI visualization
 
-                            if (rms > 0.1) { // Threshold for "loud laughter"
+                            if (rms > 0.01) { // Lower threshold for speech barge-in (was 0.1)
                                 if (currentSourceRef.current) {
                                     // Stop AI immediately if user is laughing loudly
                                     try {
