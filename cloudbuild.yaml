@@ -1,0 +1,11 @@
+steps:
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['install']
+
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['run', 'build']
+    env:
+      - 'GEMINI_API_KEY=${_GEMINI_API_KEY}'
+
+images:
+  - 'gcr.io/$PROJECT_ID/sumansunejalaughter'

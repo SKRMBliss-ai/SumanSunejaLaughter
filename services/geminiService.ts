@@ -32,17 +32,17 @@ export const createAudioBufferFromPCM = (ctx: AudioContext, base64: string): Aud
   for (let i = 0; i < len; i++) {
     bytes[i] = binaryString.charCodeAt(i);
   }
-  
+
   // Gemini 2.5 Flash TTS returns 24kHz Mono 16-bit PCM
   // We need to interpret the bytes as Int16 and convert to Float32 [-1.0, 1.0]
   const int16Data = new Int16Array(bytes.buffer);
   const buffer = ctx.createBuffer(1, int16Data.length, 24000);
   const channelData = buffer.getChannelData(0);
-  
+
   for (let i = 0; i < int16Data.length; i++) {
     channelData[i] = int16Data[i] / 32768.0;
   }
-  
+
   return buffer;
 };
 
@@ -96,7 +96,7 @@ export const rateLaughter = async (audioBase64: string, mimeType: string) => {
 
 // --- Chat Assistant Service ---
 
-export const getChatResponse = async (history: {role: string, parts: {text: string}[]}[], message: string) => {
+export const getChatResponse = async (history: { role: string, parts: { text: string }[] }[], message: string) => {
   if (!apiKey || !ai) {
     throw new Error("MISSING_GEMINI_KEY");
   }
@@ -132,9 +132,9 @@ export const getChatResponse = async (history: {role: string, parts: {text: stri
 
 export const generateHumor = async (topic: string, type: 'story' | 'joke' = 'story') => {
   if (!apiKey || !ai) throw new Error("MISSING_GEMINI_KEY");
-  
+
   // Refined prompts to encourage realistic prosody for TTS
-  const prompt = type === 'story' 
+  const prompt = type === 'story'
     ? `Write a very short, high-energy, first-person situational comedy monologue about "${topic}".
       IMPORTANT INSTRUCTIONS FOR SPEECH GENERATION:
       - Write as if you are talking to a best friend.
@@ -148,7 +148,7 @@ export const generateHumor = async (topic: string, type: 'story' | 'joke' = 'sto
       - Keep it punchy and fun.`;
 
   try {
-     const response = await ai.models.generateContent({
+    const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: prompt,
     });
@@ -172,16 +172,16 @@ export const generateSpeech = async (text: string, voiceName: string = 'Kore') =
       config: {
         responseModalities: [Modality.AUDIO],
         speechConfig: {
-            voiceConfig: {
-              prebuiltVoiceConfig: { voiceName }
-            },
+          voiceConfig: {
+            prebuiltVoiceConfig: { voiceName }
+          },
         },
       },
     });
 
     const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
     if (!base64Audio) throw new Error("No audio data returned");
-    
+
     return base64Audio;
   } catch (error) {
     console.error("TTS Error:", error);

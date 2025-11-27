@@ -469,8 +469,8 @@ export const LaughterCoach: React.FC = () => {
           onClick={() => isSessionActive && sessionType === 'LIVE' ? stopSession() : startLiveSession()}
           disabled={isSessionLoading || isRecording || (isSessionActive && sessionType !== 'LIVE')}
           className={`w-full p-4 rounded-2xl shadow-lg flex items-center justify-between transition-all transform active:scale-95 border-2 hover:scale-[1.02] ${isSessionActive && sessionType === 'LIVE'
-              ? 'bg-white dark:bg-slate-800 border-purple-400 ring-4 ring-purple-100 dark:ring-purple-900 text-purple-700 dark:text-purple-400'
-              : 'bg-white dark:bg-slate-800 border-purple-100 dark:border-slate-700 text-purple-600 dark:text-purple-400 hover:border-purple-200 dark:hover:border-purple-800'
+            ? 'bg-white dark:bg-slate-800 border-purple-400 ring-4 ring-purple-100 dark:ring-purple-900 text-purple-700 dark:text-purple-400'
+            : 'bg-white dark:bg-slate-800 border-purple-100 dark:border-slate-700 text-purple-600 dark:text-purple-400 hover:border-purple-200 dark:hover:border-purple-800'
             } ${isSessionActive && sessionType !== 'LIVE' ? 'opacity-50' : ''}`}
         >
           <div className="flex items-center gap-3">
@@ -498,8 +498,8 @@ export const LaughterCoach: React.FC = () => {
           onClick={() => isSessionActive && sessionType === 'QUICK' ? stopSession() : handleQuickSession()}
           disabled={isSessionLoading || isRecording || (isSessionActive && sessionType !== 'QUICK')}
           className={`w-full p-4 rounded-2xl shadow-lg flex items-center justify-between transition-all transform active:scale-95 border-2 hover:scale-[1.02] ${isSessionActive && sessionType === 'QUICK'
-              ? 'bg-white dark:bg-slate-800 border-[#ABCEC9] ring-4 ring-[#ABCEC9]/20 text-[#ABCEC9]'
-              : 'bg-gradient-to-r from-[#ABCEC9] to-[#C3B8D5] dark:from-teal-800 dark:to-purple-800 text-white border-transparent'
+            ? 'bg-white dark:bg-slate-800 border-[#ABCEC9] ring-4 ring-[#ABCEC9]/20 text-[#ABCEC9]'
+            : 'bg-gradient-to-r from-[#ABCEC9] to-[#C3B8D5] dark:from-teal-800 dark:to-purple-800 text-white border-transparent'
             } ${isSessionActive && sessionType !== 'QUICK' ? 'opacity-50' : ''}`}
         >
           <div className="flex items-center gap-3">
