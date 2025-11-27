@@ -192,8 +192,8 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                       key={mins}
                       onClick={() => setReminderMinutes(mins)}
                       className={`p-3 rounded-xl border-2 font-bold text-sm transition-all flex items-center justify-center gap-2 ${reminderMinutes === mins
-                          ? 'border-gray-400 bg-gray-100 dark:bg-slate-600 text-gray-600 dark:text-white transform scale-105'
-                          : 'border-transparent bg-gray-50 dark:bg-slate-700 text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-600 hover:scale-105'
+                        ? 'border-gray-400 bg-gray-100 dark:bg-slate-600 text-gray-600 dark:text-white transform scale-105'
+                        : 'border-transparent bg-gray-50 dark:bg-slate-700 text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-600 hover:scale-105'
                         }`}
                     >
                       {reminderMinutes === mins && <Check size={14} />} {mins} Mins
@@ -330,28 +330,27 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           </div>
         </div>
       </div>
+
+      {/* Fun Games & Book Session - Pill Style */}
       <div className="grid grid-cols-2 gap-4 animate-fade-in-up delay-300">
         <button
           onClick={() => onNavigate(ViewState.GAMES)}
-          className="bg-[#EDE8F8] dark:bg-slate-800 p-5 rounded-3xl flex flex-col items-center text-center gap-3 hover:bg-[#E0DAF0] dark:hover:bg-slate-700 transition-all border border-white dark:border-slate-700 group hover:scale-[1.02] h-full justify-center"
+          className="bg-[#C3B8D5] dark:bg-slate-800 p-4 rounded-full flex flex-col items-center justify-center text-center gap-2 hover:bg-[#b0a5c4] dark:hover:bg-slate-700 transition-all border-[4px] border-white dark:border-slate-600 shadow-lg group hover:scale-[1.02] h-full min-h-[120px]"
         >
-          <div className="w-12 h-12 bg-[#C3B8D5] dark:bg-slate-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-[#C3B8D5]/40 group-hover:rotate-12 transition-transform shrink-0">
-            <Star size={24} fill="currentColor" />
-          </div>
-          <span className="font-bold text-gray-700 dark:text-gray-200 leading-tight">{t('fun_games')}</span>
+          <Star size={28} fill="currentColor" className="text-white group-hover:rotate-12 transition-transform" />
+          <span className="font-bold text-white text-lg leading-tight">{t('fun_games')}</span>
         </button>
 
         <button
           onClick={() => onNavigate(ViewState.CONTACT)}
-          className="bg-[#ABCEC9]/10 dark:bg-slate-800 p-5 rounded-3xl flex flex-col items-center text-center gap-3 hover:bg-[#ABCEC9]/20 dark:hover:bg-slate-700 transition-all border border-white dark:border-slate-700 group hover:scale-[1.02] h-full justify-center"
+          className="bg-[#ABCEC9] dark:bg-slate-800 p-4 rounded-full flex flex-col items-center justify-center text-center gap-2 hover:bg-[#9BBDB8] dark:hover:bg-slate-700 transition-all border-[4px] border-white dark:border-slate-600 shadow-lg group hover:scale-[1.02] h-full min-h-[120px]"
         >
-          <div className="w-12 h-12 bg-[#ABCEC9] dark:bg-slate-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-[#ABCEC9]/40 group-hover:-rotate-12 transition-transform shrink-0">
-            <Calendar size={24} />
-          </div>
-          <span className="font-bold text-gray-700 dark:text-gray-200 leading-tight">{t('book_session')}</span>
+          <Calendar size={28} className="text-white group-hover:-rotate-12 transition-transform" />
+          <span className="font-bold text-white text-lg leading-tight">{t('book_session')}</span>
         </button>
       </div>
 
+      {/* Live Sessions */}
       <div className="space-y-4 animate-fade-in-up delay-400">
         <div className="flex items-center gap-2 px-2">
           <div className="p-1.5 bg-[#ABCEC9]/20 rounded-lg">
@@ -361,7 +360,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
+          {/* Daily Session Card */}
           <div className="bg-white dark:bg-slate-800 rounded-3xl p-5 shadow-lg shadow-[#ABCEC9]/10 dark:shadow-none border-2 border-[#ABCEC9]/20 dark:border-slate-700 relative overflow-hidden group hover:shadow-xl transition-all">
             <div className="absolute top-0 end-0 w-24 h-24 bg-[#ABCEC9]/10 rounded-es-[4rem] -me-4 -mt-4 transition-all group-hover:bg-[#ABCEC9]/20 group-hover:scale-110"></div>
 
@@ -417,6 +416,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             </div>
           </div>
 
+          {/* Traditional Yoga Card */}
           <div className="bg-white dark:bg-slate-800 rounded-3xl p-5 shadow-lg shadow-[#C3B8D5]/10 dark:shadow-none border-2 border-[#C3B8D5]/20 dark:border-slate-700 relative overflow-hidden group hover:shadow-xl transition-all">
             <div className="absolute top-0 end-0 w-24 h-24 bg-[#C3B8D5]/10 rounded-es-[4rem] -me-4 -mt-4 transition-all group-hover:bg-[#C3B8D5]/20 group-hover:scale-110"></div>
 
