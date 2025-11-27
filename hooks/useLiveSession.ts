@@ -4,6 +4,7 @@ import { GoogleGenAI, LiveServerMessage, Modality } from "@google/genai";
 interface UseLiveSessionProps {
     onSessionEnd?: () => void;
     onError?: (error: string) => void;
+    onAudioStart?: () => void;
 }
 
 // Helper to create PCM blob
@@ -48,7 +49,7 @@ function calculateRMS(data: Float32Array): number {
     return Math.sqrt(sum / data.length);
 }
 
-export const useLiveSession = ({ onSessionEnd, onError }: UseLiveSessionProps = {}) => {
+export const useLiveSession = ({ onSessionEnd, onError, onAudioStart }: UseLiveSessionProps = {}) => {
     const [isSessionActive, setIsSessionActive] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [volumeLevel, setVolumeLevel] = useState(0);
@@ -209,6 +210,8 @@ export const useLiveSession = ({ onSessionEnd, onError }: UseLiveSessionProps = 
 
                             source.start(nextStartTimeRef.current);
                             nextStartTimeRef.current += buffer.duration;
+
+                            if (onAudioStart) onAudioStart();
                         }
                     },
                     onclose: () => {

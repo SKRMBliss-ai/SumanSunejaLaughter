@@ -24,7 +24,12 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
             // For now, just close it after a delay or let user close it.
             setTimeout(() => setShowModal(false), 1000);
         },
-        onError: (err) => setError(err)
+        onError: (err) => setError(err),
+        onAudioStart: () => {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+        }
     });
 
     // Helper for immediate feedback
@@ -89,6 +94,29 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
             handleStop();
         }
     }, [visible]);
+
+    // Stop session if user switches tabs or windows
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.hidden && isSessionActive) {
+                handleStop();
+            }
+        };
+
+        const handleWindowBlur = () => {
+            if (isSessionActive) {
+                handleStop();
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('blur', handleWindowBlur);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('blur', handleWindowBlur);
+        };
+    }, [isSessionActive]);
 
     if (!visible && !isSessionActive) return null;
 
