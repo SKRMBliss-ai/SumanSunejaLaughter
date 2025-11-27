@@ -8,7 +8,7 @@ steps:
         if [ -z "${_GEMINI_API_KEY}" ]; then
           echo "Error: _GEMINI_API_KEY is empty"
         else
-          echo "Success: _GEMINI_API_KEY is set. First 4 chars: ${_GEMINI_API_KEY:0:4}..."
+          echo "Success: _GEMINI_API_KEY is set. First 4 chars: ${_GEMINI_API_KEY:0:3}..."
         fi
     id: Debug
   - name: gcr.io/cloud-builders/docker
