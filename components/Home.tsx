@@ -300,9 +300,9 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
       </div>
 
       {/* Live AI Interaction Card - The Main Attraction */}
-      <div className="bg-white dark:bg-slate-800 rounded-[2rem] p-1 shadow-xl shadow-purple-500/10 dark:shadow-none relative overflow-hidden group animate-fade-in-up delay-250 my-4 transform transition-all hover:scale-[1.01]">
+      <div className="bg-white dark:bg-slate-800 rounded-[2rem] p-1 shadow-xl shadow-purple-500/10 dark:shadow-none relative overflow-hidden group animate-fade-in-up delay-250 my-4 transform transition-all hover:scale-[1.01] border-[4px] border-white dark:border-slate-600">
         <div className="absolute inset-0 bg-gradient-to-r from-[#C3B8D5] via-[#ABCEC9] to-[#C3B8D5] opacity-20 animate-gradient-x"></div>
-        <div className="bg-white/80 dark:bg-slate-800/90 backdrop-blur-xl rounded-[1.8rem] p-6 relative z-10 flex flex-col md:flex-row items-center gap-6 text-center md:text-start border border-white/50 dark:border-slate-600">
+        <div className="bg-white/80 dark:bg-slate-800/90 backdrop-blur-xl rounded-[1.8rem] p-6 relative z-10 flex flex-col md:flex-row items-center gap-6 text-center md:text-start">
 
           <div className="relative shrink-0">
             <div className="w-20 h-20 bg-gradient-to-br from-[#ABCEC9] to-[#C3B8D5] rounded-full flex items-center justify-center shadow-lg animate-pulse-slow">
