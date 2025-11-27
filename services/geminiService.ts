@@ -199,3 +199,39 @@ export const getGuidedSessionScript = async () => {
   const randomIndex = Math.floor(Math.random() * QUICK_SCRIPTS.length);
   return QUICK_SCRIPTS[randomIndex];
 }
+
+// --- Voice Chat Query ---
+export const processVoiceQuery = async (audioBase64: string, mimeType: string) => {
+  if (!apiKey || !ai) throw new Error("MISSING_GEMINI_KEY");
+
+  try {
+    // Step 1: Send Audio to Gemini to get a text response
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: {
+        parts: [
+          {
+            inlineData: {
+              data: audioBase64,
+              mimeType: mimeType
+            }
+          },
+          {
+            text: "You are Suman Suneja, a Laughter Yoga expert. Listen to the user and reply in a cheerful, short, and encouraging way. Keep it under 2 sentences."
+          }
+        ]
+      }
+    });
+
+    const replyText = response.text;
+    if (!replyText) throw new Error("No response text");
+
+    // Step 2: Convert Text to Audio
+    const audioData = await generateSpeech(replyText, 'Kore');
+
+    return { text: replyText, audio: audioData };
+  } catch (error) {
+    console.error("Voice Query Error:", error);
+    throw error;
+  }
+};

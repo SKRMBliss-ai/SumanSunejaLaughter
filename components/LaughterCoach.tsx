@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Mic, Square, Sparkles, Loader2, RotateCcw, Trophy, Key, Calendar, Clock, Trash2, StopCircle, Volume2, Zap, ThumbsUp, ThumbsDown, WifiOff } from 'lucide-react';
+import { Mic, Square, Sparkles, Loader2, RotateCcw, Trophy, Key, Calendar, Clock, Trash2, StopCircle, Volume2, Zap, ThumbsUp, ThumbsDown, WifiOff, X, MessageCircle } from 'lucide-react';
 import { GoogleGenAI, LiveServerMessage, Modality } from "@google/genai";
 import { rateLaughter, getGuidedSessionScript, generateSpeech, createAudioBufferFromPCM } from '../services/geminiService';
 import { LaughterScore } from '../types';
 import { addPoints } from '../services/rewardService';
 import { useSettings } from '../contexts/SettingsContext';
 import { useLiveSession } from '../hooks/useLiveSession';
+import { VoiceChatWidget } from './VoiceChatWidget';
 
 interface HistoryItem {
   id: number;
@@ -56,6 +57,7 @@ export const LaughterCoach: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isMissingKey, setIsMissingKey] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [showVoiceChat, setShowVoiceChat] = useState(false);
   const [usingOfflineVoice, setUsingOfflineVoice] = useState(false);
 
   // Session States
@@ -481,6 +483,21 @@ export const LaughterCoach: React.FC = () => {
         </div>
       )}
 
+      {/* Voice Chat Modal */}
+      {showVoiceChat && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-pop-in">
+          <div className="relative w-full max-w-sm">
+            <button
+              onClick={() => setShowVoiceChat(false)}
+              className="absolute -top-3 -right-3 z-10 bg-white dark:bg-slate-700 rounded-full p-2 shadow-md text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white border border-gray-100 dark:border-slate-600"
+            >
+              <X size={20} />
+            </button>
+            <VoiceChatWidget />
+          </div>
+        </div>
+      )}
+
       {/* Session Controls */}
       <div className="w-full max-w-sm space-y-3 animate-fade-in-up">
         {/* Live Session Button */}
@@ -540,6 +557,23 @@ export const LaughterCoach: React.FC = () => {
               <div className="w-1 bg-[#ABCEC9] h-3 animate-[bounce_0.8s_infinite]"></div>
             </div>
           )}
+        </button>
+
+        {/* Voice Chat Button */}
+        <button
+          onClick={() => setShowVoiceChat(true)}
+          disabled={isSessionActive}
+          className={`w-full p-4 rounded-2xl shadow-lg flex items-center justify-between transition-all transform active:scale-95 border-2 hover:scale-[1.02] bg-white dark:bg-slate-800 border-blue-100 dark:border-slate-700 text-blue-600 dark:text-blue-400 hover:border-blue-200 dark:hover:border-blue-800 ${isSessionActive ? 'opacity-50' : ''}`}
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300">
+              <MessageCircle size={24} />
+            </div>
+            <div className="text-left">
+              <h3 className="font-bold text-gray-800 dark:text-gray-100">Voice Chat</h3>
+              <p className="text-xs opacity-70 text-gray-600 dark:text-gray-400">Ask Suman anything</p>
+            </div>
+          </div>
         </button>
       </div>
 
