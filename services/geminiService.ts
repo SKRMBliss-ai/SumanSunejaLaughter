@@ -1,13 +1,32 @@
 import { GoogleGenAI, Type, Schema, Modality } from "@google/genai";
 import { JOKES, STORIES } from './contentRepository';
 
-// Try to get API key from Vite env first, then fallback to window object (set from Cloud Run)
-let apiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
-if (!apiKey && typeof window !== 'undefined' && (window as any).__GEMINI_API_KEY__) {
-  apiKey = (window as any).__GEMINI_API_KEY__;
-}
-// Initialize conditionally to prevent crashes if key is strictly validated on init
-const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
+// Helper function to get API key from multiple sources (for Cloud Run compatibility)
+const getApiKey = (): string => {
+  if (typeof window !== 'undefined') {
+    // 1. Check RUNTIME_CONFIG (new format from config.js)
+    let key = (window as any).RUNTIME_CONFIG?.VITE_GEMINI_API_KEY || '';
+    // 2. Check __GEMINI_API_KEY__ (legacy format from config.js)
+    if (!key) {
+      key = (window as any).__GEMINI_API_KEY__ || '';
+    }
+    if (key) return key;
+  }
+  // 3. Fallback to build-time env variable (for local dev)
+  return import.meta.env.VITE_GEMINI_API_KEY || '';
+};
+
+// Helper function to get or create GoogleGenAI instance
+const getAiInstance = (): GoogleGenAI | null => {
+  const apiKey = getApiKey();
+  if (!apiKey) return null;
+  try {
+    return new GoogleGenAI({ apiKey });
+  } catch (error) {
+    console.error('Failed to initialize GoogleGenAI:', error);
+    return null;
+  }
+};
 
 // --- Pre-defined Scripts for Instant Start (1 Minute Duration) ---
 const QUICK_SCRIPTS = [
@@ -64,6 +83,8 @@ const ratingSchema: Schema = {
 };
 
 export const rateLaughter = async (audioBase64: string, mimeType: string) => {
+  const apiKey = getApiKey();
+  const ai = getAiInstance();
   if (!apiKey || !ai) {
     throw new Error("MISSING_GEMINI_KEY");
   }
@@ -104,6 +125,8 @@ export const rateLaughter = async (audioBase64: string, mimeType: string) => {
 // --- Chat Assistant Service ---
 
 export const getChatResponse = async (history: { role: string, parts: { text: string }[] }[], message: string, language: string = 'en') => {
+  const apiKey = getApiKey();
+  const ai = getAiInstance();
   if (!apiKey || !ai) {
     throw new Error("MISSING_GEMINI_KEY");
   }
@@ -184,6 +207,8 @@ export const translateText = async (text: string, targetLang: string, style: 'fu
     return cached;
   }
 
+  const apiKey = getApiKey();
+  const ai = getAiInstance();
   if (!apiKey || !ai) {
     console.warn("[Translation] Missing API Key or AI instance");
     throw new Error("MISSING_GEMINI_KEY");
@@ -248,6 +273,8 @@ export const generateHumor = async (topic: string, type: 'story' | 'joke' = 'sto
 // --- Speech Generation (TTS) ---
 
 export const generateSpeech = async (text: string, voiceName: string = 'Kore') => {
+  const apiKey = getApiKey();
+  const ai = getAiInstance();
   if (!apiKey || !ai) {
     throw new Error("MISSING_GEMINI_KEY");
   }

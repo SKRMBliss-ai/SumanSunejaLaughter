@@ -50,9 +50,15 @@ export const LaughterCoach: React.FC = () => {
   const getDebugKeyInfo = () => {
     // 1. Try Runtime Config (Server-Side Injection)
     let key = (window as any).RUNTIME_CONFIG?.VITE_GEMINI_API_KEY;
-    let source = "Runtime Config (config.js)";
+    let source = "Runtime Config (RUNTIME_CONFIG)";
 
-    // 2. Fallback to Build Time (Local Dev)
+    // 2. Try legacy format
+    if (!key) {
+      key = (window as any).__GEMINI_API_KEY__;
+      source = "Runtime Config (__GEMINI_API_KEY__)";
+    }
+
+    // 3. Fallback to Build Time (Local Dev)
     if (!key) {
       key = import.meta.env.VITE_GEMINI_API_KEY;
       source = "Build Env (.env)";
@@ -130,10 +136,15 @@ export const LaughterCoach: React.FC = () => {
 
   // --- LIVE SESSION START ---
   const startLiveSession = async () => {
-    // 1. Get Key with new robust method
-    let apiKey = (window as any).RUNTIME_CONFIG?.VITE_GEMINI_API_KEY;
+    // 1. Get Key from multiple sources (for Cloud Run compatibility)
+    let apiKey = (window as any).RUNTIME_CONFIG?.VITE_GEMINI_API_KEY || '';
+    // 2. Check legacy format
     if (!apiKey) {
-      apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+      apiKey = (window as any).__GEMINI_API_KEY__ || '';
+    }
+    // 3. Fallback to build-time env variable
+    if (!apiKey) {
+      apiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
     }
 
     if (!apiKey) {
