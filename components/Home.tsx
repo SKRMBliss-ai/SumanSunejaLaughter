@@ -331,24 +331,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* Fun Games & Book Session - Pill Style */}
-      <div className="grid grid-cols-2 gap-4 animate-fade-in-up delay-300">
-        <button
-          onClick={() => onNavigate(ViewState.GAMES)}
-          className="bg-[#C3B8D5] dark:bg-slate-800 p-4 rounded-full flex flex-col items-center justify-center text-center gap-2 hover:bg-[#b0a5c4] dark:hover:bg-slate-700 transition-all border-[4px] border-white dark:border-slate-600 shadow-lg group hover:scale-[1.02] h-full min-h-[120px]"
-        >
-          <Star size={28} fill="currentColor" className="text-white group-hover:rotate-12 transition-transform" />
-          <span className="font-bold text-white text-lg leading-tight">{t('fun_games')}</span>
-        </button>
 
-        <button
-          onClick={() => onNavigate(ViewState.CONTACT)}
-          className="bg-[#ABCEC9] dark:bg-slate-800 p-4 rounded-full flex flex-col items-center justify-center text-center gap-2 hover:bg-[#9BBDB8] dark:hover:bg-slate-700 transition-all border-[4px] border-white dark:border-slate-600 shadow-lg group hover:scale-[1.02] h-full min-h-[120px]"
-        >
-          <Calendar size={28} className="text-white group-hover:-rotate-12 transition-transform" />
-          <span className="font-bold text-white text-lg leading-tight">{t('book_session')}</span>
-        </button>
-      </div>
 
       {/* Live Sessions */}
       <div className="space-y-4 animate-fade-in-up delay-400">
@@ -469,6 +452,25 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           </div>
 
         </div>
+      </div>
+
+      {/* Fun Games & Book Session - Pill Style */}
+      <div className="grid grid-cols-2 gap-4 animate-fade-in-up delay-300">
+        <button
+          onClick={() => onNavigate(ViewState.GAMES)}
+          className="bg-[#C3B8D5] dark:bg-slate-800 p-4 rounded-full flex flex-col items-center justify-center text-center gap-2 hover:bg-[#b0a5c4] dark:hover:bg-slate-700 transition-all border-[4px] border-white dark:border-slate-600 shadow-lg group hover:scale-[1.02] h-full min-h-[120px]"
+        >
+          <Star size={28} fill="currentColor" className="text-white group-hover:rotate-12 transition-transform" />
+          <span className="font-bold text-white text-lg leading-tight">{t('fun_games')}</span>
+        </button>
+
+        <button
+          onClick={() => onNavigate(ViewState.CONTACT)}
+          className="bg-[#ABCEC9] dark:bg-slate-800 p-4 rounded-full flex flex-col items-center justify-center text-center gap-2 hover:bg-[#9BBDB8] dark:hover:bg-slate-700 transition-all border-[4px] border-white dark:border-slate-600 shadow-lg group hover:scale-[1.02] h-full min-h-[120px]"
+        >
+          <Calendar size={28} className="text-white group-hover:-rotate-12 transition-transform" />
+          <span className="font-bold text-white text-lg leading-tight">{t('book_session')}</span>
+        </button>
       </div>
 
     </div>
