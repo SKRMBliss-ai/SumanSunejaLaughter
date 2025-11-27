@@ -34,14 +34,23 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.rate = 1.1;
+            utterance.rate = 1.0; // Slightly slower for clarity
+            utterance.lang = 'en-US'; // Force English to avoid wrong language selection
+
+            // Try to select a female voice (e.g., Google US English, Microsoft Zira)
+            const voices = window.speechSynthesis.getVoices();
+            const femaleVoice = voices.find(v =>
+                (v.lang === 'en-US' && (v.name.includes('Female') || v.name.includes('Google') || v.name.includes('Zira')))
+            );
+            if (femaleVoice) utterance.voice = femaleVoice;
+
             window.speechSynthesis.speak(utterance);
         }
     };
 
     const handleStart = async () => {
         setError(null);
-        playImmediateGreeting("Let's talk to Suman Suneja");
+        playImmediateGreeting("Connecting...");
 
         const apiKey = process.env.API_KEY;
         if (!apiKey) {
