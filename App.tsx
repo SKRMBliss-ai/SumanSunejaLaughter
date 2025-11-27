@@ -39,13 +39,13 @@ const AppContent: React.FC = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#EDE8F8] dark:bg-slate-900 text-[#AABBCC] transition-colors duration-500">
         <div className="w-40 h-40 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center shadow-xl mb-6 animate-bounce p-4 border-8 border-white dark:border-slate-700 overflow-hidden relative">
-           <img 
-             src="https://sumansuneja.com/wp-content/uploads/2025/03/icon-mascot-suman-suneja.svg" 
-             alt="Loading..." 
-             className="w-full h-full object-contain relative z-10"
-           />
+          <img
+            src="https://sumansuneja.com/wp-content/uploads/2025/03/icon-mascot-suman-suneja.svg"
+            alt="Loading..."
+            className="w-full h-full object-contain relative z-10"
+          />
         </div>
-        <p className="font-fredoka font-bold text-2xl animate-pulse text-[#ABCEC9]">Loading Joy...</p>
+        <p className="-fredoka font-bold text-2xl animate-pulse text-[#ABCEC9]">Loading Joy...</p>
       </div>
     );
   }
@@ -56,10 +56,10 @@ const AppContent: React.FC = () => {
 
   // Mandatory Phone Linking for Gmail users
   const hasLinkedPhone = user.phoneNumber || localStorage.getItem(`user_phone_${user.uid}`);
-  
+
   if (!hasLinkedPhone) {
     return <PhoneLinker user={user} onLinkSuccess={() => {
-        window.location.reload();
+      window.location.reload();
     }} />;
   }
 
@@ -87,7 +87,7 @@ const AppContent: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#EDE8F8] dark:bg-slate-900 font-sans text-gray-800 dark:text-gray-100 flex flex-col transition-colors duration-500">
       <Header onNavigate={setView} />
-      
+
       <main className="flex-1 max-w-2xl mx-auto w-full bg-white/50 dark:bg-slate-800/50 min-h-screen shadow-2xl transition-colors duration-500">
         {renderView()}
       </main>
