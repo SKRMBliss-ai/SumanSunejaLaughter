@@ -7,8 +7,7 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
-
-# Accept build argument for Gemini API key (optional, for fallback)
+# Build arg is optional now, but good to keep
 ARG VITE_GEMINI_API_KEY=""
 ENV VITE_GEMINI_API_KEY=$VITE_GEMINI_API_KEY
 
@@ -17,15 +16,21 @@ RUN npm run build
 # Production stage
 FROM nginx:alpine
 
+# Install basic tools for debugging (optional but helpful)
+RUN apk add --no-cache bash
+
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy the entrypoint script to docker-entrypoint.d
-# Official Nginx image runs all scripts in this directory at startup
+# Copy the entrypoint script
 COPY entrypoint.sh /docker-entrypoint.d/40-inject-env.sh
+
+# CRITICAL FIX: Remove Windows line endings (\r) just in case
+RUN sed -i 's/\r$//' /docker-entrypoint.d/40-inject-env.sh
+
+# Make it executable
 RUN chmod +x /docker-entrypoint.d/40-inject-env.sh
 
 EXPOSE 8080
 
-# The official Nginx image will automatically run scripts in /docker-entrypoint.d/
-# No need for custom ENTRYPOINT
+CMD ["nginx", "-g", "daemon off;"]
