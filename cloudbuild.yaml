@@ -29,7 +29,6 @@ steps:
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
-      - '--set-env-vars=VITE_GEMINI_API_KEY=${_VITE_GEMINI_API_KEY}'
 
 images:
   - 'gcr.io/$PROJECT_ID/sumansuneja-laughterhub:$SHORT_SHA'
