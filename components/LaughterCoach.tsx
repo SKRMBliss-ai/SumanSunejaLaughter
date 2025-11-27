@@ -145,6 +145,16 @@ export const LaughterCoach: React.FC = () => {
     setShowFeedback(false);
   };
 
+  // Helper for immediate feedback
+  const playImmediateGreeting = (text: string) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1.1;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
   // --- Pre-fetch Intro for Quick Session ---
   const prefetchIntro = async () => {
     if (hasPrefetchedRef.current) return;
@@ -186,6 +196,7 @@ export const LaughterCoach: React.FC = () => {
 
   // Wrapper to start session using the new hook
   const startLiveSession = async () => {
+    playImmediateGreeting("Starting live session");
     const apiKey = process.env.API_KEY;
     if (!apiKey) {
       setError(t('coach.live_unavailable'));
@@ -200,6 +211,9 @@ export const LaughterCoach: React.FC = () => {
 
   // --- Quick 1-Min Guided Session (TTS) ---
   const handleQuickSession = async () => {
+    if (!introBufferRef.current) {
+      playImmediateGreeting("Starting quick session");
+    }
     cleanupAudio();
     setIsSessionLoading(true);
     setIsSessionActive(true);
@@ -323,6 +337,9 @@ export const LaughterCoach: React.FC = () => {
   };
 
   const stopSession = () => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
     // If live session is active, stop it via hook
     if (sessionTypeRef.current === 'LIVE') {
       stopLiveSessionLowLatency();
@@ -601,189 +618,70 @@ export const LaughterCoach: React.FC = () => {
         )}
 
         {scoreData && (
-          <div className="space-y-4 animate-fade-in-up">
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-xl border-2 border-[#EDE8F8] dark:border-slate-700 relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#ABCEC9] via-[#C3B8D5] to-[#AABBCC]"></div>
-              <div className="inline-block px-4 py-1.5 bg-[#EDE8F8] dark:bg-slate-700 text-[#AABBCC] rounded-full text-xs font-black uppercase tracking-wider mb-3">
-                {scoreData.energyLevel} {t('coach.energy')}
-              </div>
-              <p className="text-gray-700 dark:text-gray-200 text-lg font-medium leading-relaxed">"{scoreData.feedback}"</p>
+          <div className="animate-fade-in-up">
+            <p className="text-sm text-gray-600 dark:text-gray-300 italic mb-4 px-4">"{scoreData.feedback}"</p>
+            <div className="flex gap-2 justify-center">
+              <button
+                onClick={() => setScoreData(null)}
+                className="bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-gray-300 font-bold py-3 px-6 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+              >
+                {t('coach.close')}
+              </button>
+              <button
+                onClick={startRecording}
+                className="bg-[#ABCEC9] text-white font-bold py-3 px-6 rounded-xl hover:bg-[#9BBDB8] transition-colors shadow-md"
+              >
+                {t('coach.try_again')}
+              </button>
             </div>
-            <button
-              onClick={() => setScoreData(null)}
-              className="w-full bg-white dark:bg-slate-800 text-gray-500 dark:text-gray-300 hover:text-[#ABCEC9] font-bold py-3 rounded-xl hover:bg-[#EDE8F8] dark:hover:bg-slate-700 flex items-center justify-center gap-2 transition-all hover:scale-105"
-            >
-              <RotateCcw size={18} /> {t('coach.play_again')}
-            </button>
-          </div>
-        )}
-
-        {usingOfflineVoice && !error && (
-          <div className="text-orange-500 text-xs font-bold bg-orange-50 dark:bg-orange-900/20 p-2 rounded-xl border border-orange-100 dark:border-orange-900/50 flex items-center justify-center gap-2 animate-in fade-in">
-            <WifiOff size={12} /> {t('coach.offline_voice')}
-          </div>
-        )}
-
-        {error && (
-          <div className="text-red-500 text-sm font-bold bg-red-50 dark:bg-red-900/20 p-3 rounded-xl border border-red-100 dark:border-red-900/50 flex items-center justify-center gap-2 animate-shake">
-            <Key size={16} /> {error}
           </div>
         )}
       </div>
 
-      {/* Laughter Log History */}
-      {history.length > 0 && !isRecording && (
-        <div className="w-full max-w-md mt-8 animate-fade-in-up delay-500">
-          <div className="flex items-center justify-between mb-4 px-2">
-            <h3 className="text-lg font-fredoka font-bold text-gray-600 dark:text-gray-300 flex items-center gap-2">
-              <Calendar size={18} className="text-[#C3B8D5]" /> {t('coach.laughter_log')}
-            </h3>
+      {/* History List */}
+      <div className="w-full max-w-md mt-8 animate-fade-in-up delay-500">
+        <div className="flex justify-between items-center mb-4 px-2">
+          <h3 className="font-bold text-gray-500 dark:text-gray-400 uppercase text-xs tracking-widest flex items-center gap-2">
+            <Calendar size={14} /> {t('coach.history')}
+          </h3>
+          {history.length > 0 && (
             <button
               onClick={clearHistory}
-              className="text-xs text-red-300 hover:text-red-500 font-bold flex items-center gap-1 hover:bg-red-50 dark:hover:bg-red-900/20 px-2 py-1 rounded-md transition-colors"
+              className="text-red-300 hover:text-red-500 transition-colors p-1"
+              title={t('coach.clear_history')}
             >
-              <Trash2 size={12} /> {t('coach.clear')}
+              <Trash2 size={14} />
             </button>
-          </div>
+          )}
+        </div>
 
-          <div className="bg-white/50 dark:bg-slate-800/50 rounded-2xl p-2 max-h-60 overflow-y-auto space-y-2 hide-scrollbar">
-            {history.map((item) => (
-              <div key={item.id} className="bg-white dark:bg-slate-800 p-3 rounded-xl flex items-center justify-between shadow-sm border border-transparent hover:border-[#ABCEC9]/30 transition-all hover:scale-[1.01]">
+        <div className="space-y-3">
+          {history.length === 0 ? (
+            <div className="text-center p-8 border-2 border-dashed border-gray-200 dark:border-slate-700 rounded-2xl text-gray-400">
+              <p className="text-sm">{t('coach.no_history')}</p>
+            </div>
+          ) : (
+            history.slice(0, 5).map((item) => (
+              <div key={item.id} className="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm flex items-center justify-between border border-gray-100 dark:border-slate-700 hover:scale-[1.02] transition-transform">
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md ${item.score >= 80 ? 'bg-[#ABCEC9]' : item.score >= 50 ? 'bg-[#C3B8D5]' : 'bg-[#AABBCC]'
-                    }`}>
-                    {item.score}
+                  <div className={`p-2 rounded-xl ${item.score >= 80 ? 'bg-green-100 text-green-500' : item.score >= 50 ? 'bg-yellow-100 text-yellow-500' : 'bg-gray-100 text-gray-400'}`}>
+                    <Trophy size={18} />
                   </div>
                   <div>
-                    <div className="text-xs font-bold text-gray-600 dark:text-gray-300 flex items-center gap-1">
-                      {new Date(item.timestamp).toLocaleDateString()}
-                    </div>
-                    <div className="text-[10px] text-gray-400 font-medium flex items-center gap-1">
-                      <Clock size={10} /> {new Date(item.timestamp).toLocaleTimeString()}
+                    <div className="font-bold text-gray-700 dark:text-gray-200">{item.score} {t('points')}</div>
+                    <div className="text-[10px] text-gray-400 flex items-center gap-1">
+                      <Clock size={10} /> {new Date(item.timestamp).toLocaleDateString()} • {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </div>
                   </div>
                 </div>
-                <div className="text-xs font-bold text-[#AABBCC] bg-[#EDE8F8] dark:bg-slate-700 px-2 py-1 rounded-lg">
+                <div className="text-xs font-bold text-[#ABCEC9] px-2 py-1 bg-[#ABCEC9]/10 rounded-lg">
                   {item.energyLevel}
                 </div>
               </div>
-            ))}
-          </div>
+            ))
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };
-//   const apiKey = process.env.API_KEY;
-//   if (!apiKey) {
-//     setError(t('coach.live_unavailable'));
-//     setIsMissingKey(true);
-//     return;
-//   }
-
-//   cleanupAudio();
-//   setIsSessionLoading(true);
-//   setIsSessionActive(true);
-//   setSessionType('LIVE');
-//   setError(null);
-//   setUsingOfflineVoice(false);
-
-//   try {
-//     // 1. Setup Audio Contexts
-//     liveInputContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
-//     audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
-//     nextStartTimeRef.current = 0;
-
-//     // 2. Get Microphone Stream
-//     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-//     mediaStreamRef.current = stream;
-
-//     // 3. Connect to Gemini Live
-//     const ai = new GoogleGenAI({ apiKey });
-
-//     const sessionPromise = ai.live.connect({
-//       model: 'gemini-2.5-flash-native-audio-preview-09-2025',
-//       config: {
-//         responseModalities: [Modality.AUDIO],
-//         speechConfig: {
-//           voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } },
-//         },
-//         systemInstruction: `You are Suman Suneja, an energetic, warm, and highly interactive Laughter Yoga Coach.
-//         Your goal is to lead a "Laughter Session" with the user.
-//         1. Start by welcoming them with a big laugh and ask them to laugh with you.
-//         2. Listen to their audio. If they are laughing, laugh back harder and encourage them ("Yes! That's it! Loudly!").
-//         3. If they are quiet, guide them: "Take a deep breath and say Ha Ha Ha!".
-//         4. Keep your responses short, punchy, and filled with laughter sounds.
-//         5. Be spontaneous and fun. Do not give long lectures. Just laugh and guide.`,
-//       },
-//       callbacks: {
-//         onopen: () => {
-//           setIsSessionLoading(false);
-
-//           // Setup Input Processing
-//           if (!liveInputContextRef.current) return;
-//           const source = liveInputContextRef.current.createMediaStreamSource(stream);
-//           const processor = liveInputContextRef.current.createScriptProcessor(4096, 1, 1);
-//           inputProcessorRef.current = processor;
-
-//           processor.onaudioprocess = (e) => {
-//             const inputData = e.inputBuffer.getChannelData(0);
-//             const pcmBlob = createBlob(inputData);
-//             sessionPromise.then((session) => {
-//               session.sendRealtimeInput({ media: pcmBlob });
-//             });
-//           };
-
-//           source.connect(processor);
-//           processor.connect(liveInputContextRef.current.destination);
-//         },
-//         onmessage: async (message: LiveServerMessage) => {
-//           const base64Audio = message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
-
-//           if (base64Audio && audioContextRef.current) {
-//             const ctx = audioContextRef.current;
-//             const binary = decode(base64Audio);
-
-//             const dataInt16 = new Int16Array(binary.buffer);
-//             const float32 = new Float32Array(dataInt16.length);
-//             for (let i = 0; i < dataInt16.length; i++) {
-//               float32[i] = dataInt16[i] / 32768.0;
-//             }
-
-//             const buffer = ctx.createBuffer(1, float32.length, 24000);
-//             buffer.getChannelData(0).set(float32);
-
-//             const source = ctx.createBufferSource();
-//             source.buffer = buffer;
-//             source.connect(ctx.destination);
-
-//             const currentTime = ctx.currentTime;
-//             if (nextStartTimeRef.current < currentTime) {
-//               nextStartTimeRef.current = currentTime;
-//             }
-
-//             source.start(nextStartTimeRef.current);
-//             nextStartTimeRef.current += buffer.duration;
-//           }
-//         },
-//         onclose: () => {
-//           stopSession();
-//         },
-//         onerror: (err) => {
-//           console.error("Live session error", err);
-//           setError(t('coach.connection_lost'));
-//           stopSession();
-//         }
-//       }
-//     });
-
-//     liveSessionRef.current = sessionPromise;
-
-//   } catch (err) {
-//     console.error(err);
-//     setIsSessionLoading(false);
-//     setIsSessionActive(false);
-//     setError(t('coach.session_error'));
-//   }
-// };
-// };
