@@ -1,3 +1,4 @@
+
 steps:
   # Build the Docker image with the Gemini API key as a build argument
   - name: 'gcr.io/cloud-builders/docker'
