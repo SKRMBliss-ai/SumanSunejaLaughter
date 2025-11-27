@@ -74,6 +74,12 @@ export const LaughterCoach: React.FC = () => {
   const nextStartTimeRef = useRef<number>(0); // For scheduling live audio chunks
   const inputProcessorRef = useRef<ScriptProcessorNode | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+
+  // Pre-fetch Ref
+  const introBufferRef = useRef<AudioBuffer | null>(null);
+  const hasPrefetchedRef = useRef(false);
 
   // History State
   const [history, setHistory] = useState<HistoryItem[]>(() => {
@@ -84,9 +90,6 @@ export const LaughterCoach: React.FC = () => {
       return [];
     }
   });
-
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
 
   // Init Audio Context for Playback
   useEffect(() => {
@@ -140,6 +143,29 @@ export const LaughterCoach: React.FC = () => {
     console.log(`User rated session: ${rating}`);
     addPoints(5, t('coach.thanks_feedback'), 'COACH');
     setShowFeedback(false);
+  };
+
+  // --- Pre-fetch Intro for Quick Session ---
+  const prefetchIntro = async () => {
+    if (hasPrefetchedRef.current) return;
+    hasPrefetchedRef.current = true;
+
+    try {
+      // Initialize Audio Context if needed
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+
+      const introText = "Hello! Ready to laugh?";
+      const audioBase64 = await generateSpeech(introText, 'Kore');
+
+      if (audioContextRef.current) {
+        const audioBuffer = createAudioBufferFromPCM(audioContextRef.current, audioBase64);
+        introBufferRef.current = audioBuffer;
+      }
+    } catch (e) {
+      console.warn("Prefetch failed", e);
+    }
   };
 
   // --- Live Conversational Session (Refactored for Low Latency) ---
@@ -200,6 +226,22 @@ export const LaughterCoach: React.FC = () => {
       let currentSentenceIndex = 0;
       let isPlaying = false;
       const audioQueue: AudioBuffer[] = [];
+
+      // Play intro first if available
+      if (introBufferRef.current) {
+        const introSource = audioContextRef.current.createBufferSource();
+        introSource.buffer = introBufferRef.current;
+        introSource.connect(audioContextRef.current.destination);
+
+        // We treat it as the "current" source but we need to know when it ends
+        isPlaying = true;
+        sourceRef.current = introSource;
+
+        introSource.onended = () => {
+          playNextInQueue();
+        };
+        introSource.start(0);
+      }
 
       // Function to process the queue
       const playNextInQueue = () => {
@@ -264,7 +306,14 @@ export const LaughterCoach: React.FC = () => {
       };
 
       // Start fetching the first chunk
+      // If we played intro, we are already "playing", so fetchAndQueueAudio will just queue.
+      // If we didn't play intro (no prefetch), it will start playing first chunk immediately.
       fetchAndQueueAudio(0);
+
+      // If we have intro, we stop loading immediately
+      if (introBufferRef.current) {
+        setIsSessionLoading(false);
+      }
 
     } catch (e: any) {
       console.error(e);
@@ -448,6 +497,7 @@ export const LaughterCoach: React.FC = () => {
 
         {/* Quick Laugh Button */}
         <button
+          onMouseEnter={prefetchIntro}
           onClick={() => isSessionActive && sessionType === 'QUICK' ? stopSession() : handleQuickSession()}
           disabled={isSessionLoading || isRecording || (isSessionActive && sessionType !== 'QUICK')}
           className={`w-full p-4 rounded-2xl shadow-lg flex items-center justify-between transition-all transform active:scale-95 border-2 hover:scale-[1.02] ${isSessionActive && sessionType === 'QUICK'
@@ -624,10 +674,6 @@ export const LaughterCoach: React.FC = () => {
     </div>
   );
 };
-
-/*
-// LEGACY LIVE SESSION LOGIC (For Rollback)
-// const startLiveSessionLegacy = async () => {
 //   const apiKey = process.env.API_KEY;
 //   if (!apiKey) {
 //     setError(t('coach.live_unavailable'));
@@ -662,12 +708,12 @@ export const LaughterCoach: React.FC = () => {
 //         speechConfig: {
 //           voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } },
 //         },
-//         systemInstruction: `You are Suman Suneja, an energetic, warm, and highly interactive Laughter Yoga Coach. 
+//         systemInstruction: `You are Suman Suneja, an energetic, warm, and highly interactive Laughter Yoga Coach.
 //         Your goal is to lead a "Laughter Session" with the user.
 //         1. Start by welcoming them with a big laugh and ask them to laugh with you.
 //         2. Listen to their audio. If they are laughing, laugh back harder and encourage them ("Yes! That's it! Loudly!").
 //         3. If they are quiet, guide them: "Take a deep breath and say Ha Ha Ha!".
-//         4. Keep your responses short, punchy, and filled with laughter sounds. 
+//         4. Keep your responses short, punchy, and filled with laughter sounds.
 //         5. Be spontaneous and fun. Do not give long lectures. Just laugh and guide.`,
 //       },
 //       callbacks: {
@@ -740,4 +786,4 @@ export const LaughterCoach: React.FC = () => {
 //     setError(t('coach.session_error'));
 //   }
 // };
-*/
+// };
