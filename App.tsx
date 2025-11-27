@@ -14,6 +14,7 @@ import { Profile } from './components/Profile';
 import { PhoneLinker } from './components/PhoneLinker';
 import { RewardPopup } from './components/RewardPopup';
 import { AmbientMusic } from './components/AmbientMusic';
+import { HomeLiveWidget } from './components/HomeLiveWidget';
 import { checkDailyStreak } from './services/rewardService';
 import { ViewState } from './types';
 import { Loader2 } from 'lucide-react';
@@ -93,6 +94,7 @@ const AppContent: React.FC = () => {
       </main>
 
       <AmbientMusic />
+      <HomeLiveWidget visible={currentView === ViewState.HOME} />
       <Navigation currentView={currentView} setView={setView} />
       <RewardPopup />
     </div>
