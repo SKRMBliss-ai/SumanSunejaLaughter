@@ -49,6 +49,24 @@ function decode(base64: string) {
 export const LaughterCoach: React.FC = () => {
   const { t, language } = useSettings();
 
+  // --- NEW DEBUG HELPER ---
+  const getDebugKeyInfo = () => {
+    // 1. Try Build Time
+    let key = import.meta.env.VITE_GEMINI_API_KEY;
+    let source = "Build Env";
+
+    // 2. Try Runtime Injection
+    if (!key && typeof window !== 'undefined' && (window as any).__GEMINI_API_KEY__) {
+      key = (window as any).__GEMINI_API_KEY__;
+      source = "Window Object (Injected)";
+    }
+
+    if (!key) return "❌ KEY NOT FOUND";
+    
+    // Show source and last 4 chars
+    return `✅ ${source} | Ends with: ...${key.slice(-4)}`;
+  };
+  
   // Main modes
   const [isRecording, setIsRecording] = useState(false); // For Score Analyzer
   const [isAnalyzing, setIsAnalyzing] = useState(false);
