@@ -101,7 +101,7 @@ export const useLiveSession = ({ onSessionEnd, onError }: UseLiveSessionProps = 
         if (onSessionEnd) onSessionEnd();
     }, [cleanupAudio, onSessionEnd]);
 
-    const startSession = useCallback(async (apiKey: string) => {
+    const startSession = useCallback(async (apiKey: string, customSystemInstruction?: string) => {
         cleanupAudio();
         setIsLoading(true);
         setIsSessionActive(true);
@@ -119,6 +119,14 @@ export const useLiveSession = ({ onSessionEnd, onError }: UseLiveSessionProps = 
             // 3. Connect to Gemini Live
             const ai = new GoogleGenAI({ apiKey });
 
+            const defaultInstruction = `You are Suman Suneja, an energetic, warm, and highly interactive Laughter Yoga Coach. 
+          Your goal is to lead a "Laughter Session" with the user.
+          1. Start by welcoming them with a big laugh and ask them to laugh with you.
+          2. Listen to their audio. If they are laughing, laugh back harder and encourage them ("Yes! That's it! Loudly!").
+          3. If they are quiet, guide them: "Take a deep breath and say Ha Ha Ha!".
+          4. Keep your responses short, punchy, and filled with laughter sounds. 
+          5. Be spontaneous and fun. Do not give long lectures. Just laugh and guide.`;
+
             const sessionPromise = ai.live.connect({
                 model: 'gemini-2.5-flash-native-audio-preview-09-2025',
                 config: {
@@ -126,13 +134,7 @@ export const useLiveSession = ({ onSessionEnd, onError }: UseLiveSessionProps = 
                     speechConfig: {
                         voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } },
                     },
-                    systemInstruction: `You are Suman Suneja, an energetic, warm, and highly interactive Laughter Yoga Coach. 
-          Your goal is to lead a "Laughter Session" with the user.
-          1. Start by welcoming them with a big laugh and ask them to laugh with you.
-          2. Listen to their audio. If they are laughing, laugh back harder and encourage them ("Yes! That's it! Loudly!").
-          3. If they are quiet, guide them: "Take a deep breath and say Ha Ha Ha!".
-          4. Keep your responses short, punchy, and filled with laughter sounds. 
-          5. Be spontaneous and fun. Do not give long lectures. Just laugh and guide.`,
+                    systemInstruction: customSystemInstruction || defaultInstruction,
                 },
                 callbacks: {
                     onopen: () => {
