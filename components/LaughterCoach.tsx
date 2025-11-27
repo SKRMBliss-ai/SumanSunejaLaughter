@@ -49,24 +49,6 @@ function decode(base64: string) {
 export const LaughterCoach: React.FC = () => {
   const { t, language } = useSettings();
 
-  // --- NEW DEBUG HELPER ---
-  const getDebugKeyInfo = () => {
-    // 1. Try Build Time
-    let key = import.meta.env.VITE_GEMINI_API_KEY;
-    let source = "Build Env";
-
-    // 2. Try Runtime Injection
-    if (!key && typeof window !== 'undefined' && (window as any).__GEMINI_API_KEY__) {
-      key = (window as any).__GEMINI_API_KEY__;
-      source = "Window Object (Injected)";
-    }
-
-    if (!key) return "❌ KEY NOT FOUND";
-    
-    // Show source and last 4 chars
-    return `✅ ${source} | Ends with: ...${key.slice(-4)}`;
-  };
-  
   // Main modes
   const [isRecording, setIsRecording] = useState(false); // For Score Analyzer
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -105,6 +87,23 @@ export const LaughterCoach: React.FC = () => {
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+
+  // --- DEBUG HELPER (To verify key injection) ---
+  const getDebugKeyInfo = () => {
+    let key = import.meta.env.VITE_GEMINI_API_KEY;
+    let source = "Build Env";
+
+    // Check runtime injection
+    if (!key && typeof window !== 'undefined' && (window as any).__GEMINI_API_KEY__) {
+      key = (window as any).__GEMINI_API_KEY__;
+      source = "Window Object (Injected)";
+    }
+
+    if (!key) return "❌ KEY NOT FOUND";
+    if (key.length < 10) return "❌ KEY INVALID";
+    
+    return `✅ ${source} | Ends with: ...${key.slice(-4)}`;
+  };
 
   // Init Audio Context for Playback
   useEffect(() => {
@@ -154,57 +153,27 @@ export const LaughterCoach: React.FC = () => {
   };
 
   const handleFeedback = (rating: 'up' | 'down') => {
-    // In a real app, send this rating to backend
     console.log(`User rated session: ${rating}`);
     addPoints(5, t('coach.thanks_feedback'), 'COACH');
     setShowFeedback(false);
   };
 
-  // --- Instant Greeting (plays immediately while AI loads) ---
+  // --- Instant Greeting ---
   const playInstantGreeting = (type: 'LIVE' | 'QUICK') => {
-    const greetings = {
-      LIVE: {
-        en: "Welcome! I'm connecting you to Suman Suneja now. Take a deep breath... smile... and get ready to laugh together!",
-        hi: "स्वागत है! मैं आपको सुमन सुनेजा से जोड़ रहा हूं। गहरी सांस लें... मुस्कुराएं... और साथ में हंसने के लिए तैयार हो जाइए!",
-        ar: "مرحباً! أنا أوصلك بسومان سونيجا الآن. خذ نفساً عميقاً... ابتسم... واستعد للضحك معاً!",
-        ja: "ようこそ！スマン・スネジャにつなげています。深呼吸して...笑顔で...一緒に笑う準備をしてください！"
-      },
-      QUICK: {
-        en: "Get ready for your laughter boost! Take a deep breath... relax your shoulders... and prepare to laugh! Your guided session is loading...",
-        hi: "अपने हंसी की खुराक के लिए तैयार हो जाइए! गहरी सांस लें... कंधों को आराम दें... और हंसने के लिए तैयार हो जाइए!",
-        ar: "استعد لجرعة الضحك! خذ نفساً عميقاً... أرخِ كتفيك... واستعد للضحك!",
-        ja: "笑いのブーストの準備をしましょう！深呼吸して...肩の力を抜いて...笑う準備をしてください！"
-      }
-    };
-
-    const langCode = language as keyof typeof greetings.LIVE;
-    const text = greetings[type][langCode] || greetings[type].en;
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    const voices = window.speechSynthesis.getVoices();
-    
-    // Try to find a voice matching the user's language
-    let preferredVoice = voices.find(v => v.lang.startsWith(language));
-    if (!preferredVoice) {
-      preferredVoice = voices.find(v => 
-        v.name.includes('Google UK English Female') || 
-        v.name.includes('Samantha') || 
-        v.name.includes('Female')
-      );
-    }
-    
-    if (preferredVoice) utterance.voice = preferredVoice;
-    utterance.rate = 0.95;
-    utterance.pitch = 1.1;
-    utterance.volume = 0.9;
-
-    window.speechSynthesis.speak(utterance);
-    return utterance;
+    // Removed greeting to improve perceived latency
+    return null;
   };
 
   // --- Live Conversational Session ---
   const startLiveSession = async () => {
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    // 1. Try build-time key first
+    let apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    
+    // 2. If missing, try runtime-injected key (from entrypoint.sh)
+    if (!apiKey && typeof window !== 'undefined' && (window as any).__GEMINI_API_KEY__) {
+      apiKey = (window as any).__GEMINI_API_KEY__;
+    }
+
     if (!apiKey) {
       setError(t('coach.live_unavailable'));
       setIsMissingKey(true);
@@ -217,9 +186,6 @@ export const LaughterCoach: React.FC = () => {
     setSessionType('LIVE');
     setError(null);
     setUsingOfflineVoice(false);
-
-    // Play instant greeting while AI connects
-    playInstantGreeting('LIVE');
 
     try {
       // 1. Setup Audio Contexts
@@ -256,14 +222,12 @@ export const LaughterCoach: React.FC = () => {
         callbacks: {
           onopen: () => {
             setIsSessionLoading(false);
-            // Stop the instant greeting when AI is ready
-            window.speechSynthesis.cancel();
-
-            // Setup Input Processing with smaller buffer for lower latency
+            
             if (!liveInputContextRef.current) return;
             const source = liveInputContextRef.current.createMediaStreamSource(stream);
-            // Reduced buffer size from 4096 to 1024 for faster response (~64ms vs ~256ms latency)
-            const processor = liveInputContextRef.current.createScriptProcessor(1024, 1, 1);
+            
+            // --- LATENCY FIX: Reduced buffer from 1024 to 512 ---
+            const processor = liveInputContextRef.current.createScriptProcessor(512, 1, 1);
             inputProcessorRef.current = processor;
 
             processor.onaudioprocess = (e) => {
@@ -337,13 +301,9 @@ export const LaughterCoach: React.FC = () => {
     setUsingOfflineVoice(false);
     setIsMissingKey(false);
 
-    // Play instant greeting while AI voice loads
-    playInstantGreeting('QUICK');
-
     try {
       const script = await getGuidedSessionScript(language);
 
-      // Initialize Audio Context
       if (!audioContextRef.current) {
         audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
       }
@@ -356,12 +316,7 @@ export const LaughterCoach: React.FC = () => {
 
         if (!audioContextRef.current) return;
 
-        // Stop the instant greeting before playing real AI voice
-        window.speechSynthesis.cancel();
-
-        // Decode raw PCM from Gemini TTS
         const audioBuffer = createAudioBufferFromPCM(audioContextRef.current, audioBase64);
-
         const source = audioContextRef.current.createBufferSource();
         source.buffer = audioBuffer;
         source.connect(audioContextRef.current.destination);
@@ -375,18 +330,15 @@ export const LaughterCoach: React.FC = () => {
 
       } catch (geminiError: any) {
         console.warn("Gemini TTS failed:", geminiError);
-        // Do NOT set a blocking error. Just inform user and use fallback.
         setUsingOfflineVoice(true);
         setError(null);
 
-        // Fallback to browser TTS so it's not silent
         const utterance = new SpeechSynthesisUtterance(script);
         const voices = window.speechSynthesis.getVoices();
-        // Try to find a good female voice
         const preferredVoice = voices.find(v => v.name.includes('Google UK English Female') || v.name.includes('Samantha') || v.name.includes('Female'));
         if (preferredVoice) utterance.voice = preferredVoice;
-        utterance.rate = 1.05; // Slightly faster for energy
-        utterance.pitch = 1.1; // Slightly higher for cheerfulness
+        utterance.rate = 1.05;
+        utterance.pitch = 1.1;
 
         utterance.onend = () => stopSession();
         utterance.onerror = () => stopSession();
@@ -409,13 +361,11 @@ export const LaughterCoach: React.FC = () => {
     setIsSessionActive(false);
     setIsSessionLoading(false);
 
-    // Check which session was active using ref to ensure we capture state correctly in callbacks
     const completedSessionType = sessionTypeRef.current;
     setSessionType(null);
 
     if (completedSessionType && wasActive) {
       addPoints(completedSessionType === 'LIVE' ? 30 : 20, t('coach.session_completed'), 'COACH');
-      // Show feedback modal with a slight delay
       setTimeout(() => setShowFeedback(true), 500);
     }
   };
@@ -481,9 +431,9 @@ export const LaughterCoach: React.FC = () => {
         addPoints(15, t('coach.laughter_analyzed'), 'COACH');
       }
     } catch (err: any) {
+      // Handle missing key in offline analyzer too
       if (err.message === "MISSING_GEMINI_KEY") {
-        // Just show a fake score for fun if key is missing, instead of blocking
-        setScoreData({
+         setScoreData({
           score: 85,
           feedback: "Even without my AI brain, I can tell that was joyful! (AI Offline Mode)",
           energyLevel: "High"
@@ -691,6 +641,14 @@ export const LaughterCoach: React.FC = () => {
             </button>
           </div>
         )}
+
+        {/* --- DEBUG DISPLAY START --- */}
+        <div className="mt-4 p-2 bg-gray-100 dark:bg-slate-900 rounded-lg border border-gray-300 dark:border-slate-600">
+            <p className="text-[10px] text-gray-500 dark:text-gray-400 font-mono text-center break-all">
+                {getDebugKeyInfo()}
+            </p>
+        </div>
+        {/* --- DEBUG DISPLAY END --- */}
 
         {usingOfflineVoice && !error && (
           <div className="text-orange-500 text-xs font-bold bg-orange-50 dark:bg-orange-900/20 p-2 rounded-xl border border-orange-100 dark:border-orange-900/50 flex items-center justify-center gap-2 animate-in fade-in">
