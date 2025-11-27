@@ -1,4 +1,15 @@
 steps:
+  - name: 'ubuntu'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Debug: Checking _GEMINI_API_KEY"
+        if [ -z "${_GEMINI_API_KEY}" ]; then
+          echo "Error: _GEMINI_API_KEY is empty"
+        else
+          echo "Success: _GEMINI_API_KEY is set. First 4 chars: ${_GEMINI_API_KEY:0:4}..."
+        fi
   - name: 'gcr.io/cloud-builders/docker'
     args: [
       'build',
