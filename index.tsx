@@ -8,6 +8,9 @@ if (!rootElement) {
 }
 
 
+const key = process.env.GEMINI_API_KEY || process.env.API_KEY;
+console.log('[App Start] API Key:', key ? key.substring(0, 4) + '...' : 'MISSING');
+
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
