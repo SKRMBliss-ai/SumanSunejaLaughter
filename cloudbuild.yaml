@@ -1,3 +1,6 @@
+substitutions:
+  _GEMINI_API_KEY: ''
+
 steps:
   - name: 'ubuntu'
     entrypoint: 'bash'
