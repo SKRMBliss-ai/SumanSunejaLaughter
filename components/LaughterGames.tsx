@@ -409,7 +409,7 @@ export const LaughterGames: React.FC = () => {
             <button
               onClick={() => handleGenerate(activeTab === 'JOKES' ? 'joke' : 'story')}
               disabled={isLoading || !topic.trim()}
-              className={`w-full mt-4 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-transform disabled:opacity-50 disabled:scale-100 flex items-center justify-center gap-2 hover:scale-[1.02] ${activeTab === 'JOKES' ? 'bg-gradient-to-r from-red-300 to-pink-300 shadow-red-200 hover:brightness-105' : 'bg-gradient-to-r from-[#C3B8D5] to-[#AABBCC] dark:from-slate-700 dark:to-slate-600 shadow-[#C3B8D5]/30'}`}
+              className={`w-full mt-4 font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-transform disabled:opacity-50 disabled:scale-100 flex items-center justify-center gap-2 hover:scale-[1.02] ${activeTab === 'JOKES' ? 'bg-gradient-to-r from-red-300 to-pink-300 shadow-red-200 hover:brightness-105 text-red-900 dark:text-white' : 'bg-gradient-to-r from-[#C3B8D5] to-[#AABBCC] dark:from-slate-700 dark:to-slate-600 shadow-[#C3B8D5]/30 text-slate-800 dark:text-white'}`}
             >
               {activeTab === 'JOKES' ? "Tell Me a Joke & Laugh!" : "Generate Joy Story"}
             </button>
@@ -418,13 +418,13 @@ export const LaughterGames: React.FC = () => {
 
         {activeTab === 'MOOD' && (
           <div className="grid grid-cols-2 gap-3 animate-fade-in-up delay-300">
-            <button onClick={() => handleMood("pure joy")} className="bg-[#ABCEC9] hover:bg-[#9BBDB8] text-white p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-105">
+            <button onClick={() => handleMood("pure joy")} className="bg-[#ABCEC9] hover:bg-[#9BBDB8] text-teal-900 p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-105">
               Giggle Fit 🤭
             </button>
-            <button onClick={() => handleMood("relief")} className="bg-[#AABBCC] hover:bg-[#97a9bb] text-white p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-105">
+            <button onClick={() => handleMood("relief")} className="bg-[#AABBCC] hover:bg-[#97a9bb] text-slate-800 p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-105">
               Belly Laugh 😂
             </button>
-            <button onClick={() => handleMood("silly")} className="bg-[#C3B8D5] hover:bg-[#b0a5c4] text-white p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-105">
+            <button onClick={() => handleMood("silly")} className="bg-[#C3B8D5] hover:bg-[#b0a5c4] text-purple-900 p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-105">
               Snort Laugh 🐽
             </button>
             <button onClick={() => handleMood("evil plan")} className="bg-[#EDE8F8] dark:bg-slate-700 hover:bg-[#e0daf0] dark:hover:bg-slate-600 text-gray-600 dark:text-gray-200 p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm border-2 border-white dark:border-slate-600 hover:scale-105">

@@ -536,7 +536,7 @@ export const LaughterCoach: React.FC = () => {
           disabled={isSessionLoading || isRecording || (isSessionActive && sessionType !== 'QUICK')}
           className={`w-full p-4 rounded-2xl shadow-lg flex items-center justify-between transition-all transform active:scale-95 border-2 hover:scale-[1.02] ${isSessionActive && sessionType === 'QUICK'
             ? 'bg-white dark:bg-slate-800 border-[#ABCEC9] ring-4 ring-[#ABCEC9]/20 text-[#ABCEC9]'
-            : 'bg-gradient-to-r from-[#ABCEC9] to-[#C3B8D5] dark:from-teal-800 dark:to-purple-800 text-white border-transparent'
+            : 'bg-gradient-to-r from-[#ABCEC9] to-[#C3B8D5] dark:from-teal-800 dark:to-purple-800 text-teal-900 dark:text-white border-transparent'
             } ${isSessionActive && sessionType !== 'QUICK' ? 'opacity-50' : ''}`}
         >
           <div className="flex items-center gap-3">
@@ -546,8 +546,8 @@ export const LaughterCoach: React.FC = () => {
                   <Zap size={24} fill="currentColor" />}
             </div>
             <div className="text-left">
-              <h3 className={`font-bold ${isSessionActive && sessionType === 'QUICK' ? 'text-gray-800 dark:text-gray-100' : 'text-white'}`}>{t('coach.quick_laugh')}</h3>
-              <p className={`text-xs ${isSessionActive && sessionType === 'QUICK' ? 'opacity-70 text-gray-600 dark:text-gray-400' : 'text-white/80'}`}>{t('coach.guided_boost')}</p>
+              <h3 className={`font-bold ${isSessionActive && sessionType === 'QUICK' ? 'text-gray-800 dark:text-gray-100' : 'text-teal-900 dark:text-white'}`}>{t('coach.quick_laugh')}</h3>
+              <p className={`text-xs ${isSessionActive && sessionType === 'QUICK' ? 'opacity-70 text-gray-600 dark:text-gray-400' : 'text-teal-800/80 dark:text-white/80'}`}>{t('coach.guided_boost')}</p>
             </div>
           </div>
           {isSessionActive && sessionType === 'QUICK' && (
