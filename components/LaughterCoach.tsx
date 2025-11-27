@@ -47,19 +47,20 @@ export const LaughterCoach: React.FC = () => {
   const { t, language } = useSettings();
 
   // --- DEBUG HELPER ---
-  // This confirms if the key was successfully injected
   const getDebugKeyInfo = () => {
-    let key = import.meta.env.VITE_GEMINI_API_KEY;
-    let source = "Build Env";
+    // 1. Try Runtime Config (Server-Side Injection)
+    let key = (window as any).RUNTIME_CONFIG?.VITE_GEMINI_API_KEY;
+    let source = "Runtime Config (config.js)";
 
-    // Check runtime injection
-    if (!key && typeof window !== 'undefined' && (window as any).__GEMINI_API_KEY__) {
-      key = (window as any).__GEMINI_API_KEY__;
-      source = "Window Object (Injected)";
+    // 2. Fallback to Build Time (Local Dev)
+    if (!key) {
+      key = import.meta.env.VITE_GEMINI_API_KEY;
+      source = "Build Env (.env)";
     }
 
-    if (!key) return "❌ KEY NOT FOUND - Injection Failed";
-    if (key.length < 10) return "❌ KEY INVALID";
+    if (!key) return "❌ KEY NOT FOUND";
+    if (key.length < 10) return "❌ KEY INVALID (Too Short)";
+    
     return `✅ ${source} | Ends with: ...${key.slice(-4)}`;
   };
 
@@ -127,12 +128,12 @@ export const LaughterCoach: React.FC = () => {
     setShowFeedback(false);
   };
 
-  // --- CORRECTED LIVE SESSION LOGIC ---
+  // --- LIVE SESSION START ---
   const startLiveSession = async () => {
-    // 1. Get Key with Fallback (The fix!)
-    let apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-    if (!apiKey && typeof window !== 'undefined' && (window as any).__GEMINI_API_KEY__) {
-      apiKey = (window as any).__GEMINI_API_KEY__;
+    // 1. Get Key with new robust method
+    let apiKey = (window as any).RUNTIME_CONFIG?.VITE_GEMINI_API_KEY;
+    if (!apiKey) {
+      apiKey = import.meta.env.VITE_GEMINI_API_KEY;
     }
 
     if (!apiKey) {
