@@ -3,6 +3,7 @@ import { Video, ArrowRight, Star, Bell, X, Sparkles, Smile, Globe, Calendar, Loc
 import { ViewState, RewardState } from '../types';
 import { getRewardState } from '../services/rewardService';
 import { useSettings, SUPPORTED_LANGUAGES, FontSize } from '../contexts/SettingsContext';
+import { useLiveWidget } from '../contexts/LiveWidgetContext';
 
 interface HomeProps {
   onNavigate: (view: ViewState) => void;
@@ -15,6 +16,7 @@ interface ReminderState {
 
 export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
   const { t, theme, toggleTheme, language, setLanguage, fontSize, setFontSize } = useSettings();
+  const { openWidget } = useLiveWidget();
   const [notification, setNotification] = useState<{ title: string; message: string; link: string } | null>(null);
   const [showReminderSettings, setShowReminderSettings] = useState<string | null>(null);
   const [rewards, setRewards] = useState<RewardState>(getRewardState());
@@ -322,7 +324,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
               Experience the world's first real-time Laughter Yoga AI. Have a conversation, get instant feedback, and laugh together!
             </p>
             <button
-              onClick={() => onNavigate(ViewState.COACH)}
+              onClick={openWidget}
               className="w-full md:w-auto bg-gradient-to-r from-[#ABCEC9] to-[#9BBDB8] text-white font-bold py-3 px-8 rounded-xl shadow-md hover:shadow-lg hover:shadow-[#ABCEC9]/30 active:scale-95 transition-all flex items-center justify-center gap-2 group-hover:gap-3"
             >
               Start Live Interaction <ArrowRight size={18} />

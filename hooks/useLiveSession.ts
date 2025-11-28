@@ -128,7 +128,7 @@ export const useLiveSession = ({ onSessionEnd, onError, onAudioStart }: UseLiveS
           4. Keep your responses short, punchy, and filled with laughter sounds. 
           5. Be spontaneous and fun. Do not give long lectures. Just laugh and guide.`;
 
-            const sessionPromise = ai.live.connect({
+            const session = await ai.live.connect({
                 model: 'gemini-2.0-flash-exp',
                 config: {
                     responseModalities: [Modality.AUDIO],
@@ -177,9 +177,10 @@ export const useLiveSession = ({ onSessionEnd, onError, onAudioStart }: UseLiveS
                             }
 
                             const pcmBlob = createBlob(inputData);
-                            sessionPromise.then((session) => {
-                                session.sendRealtimeInput({ media: pcmBlob });
-                            });
+                            // Use the ref which is set after connect resolves
+                            if (liveSessionRef.current) {
+                                liveSessionRef.current.sendRealtimeInput({ media: pcmBlob });
+                            }
                         };
 
                         source.connect(processor);
@@ -229,7 +230,15 @@ export const useLiveSession = ({ onSessionEnd, onError, onAudioStart }: UseLiveS
                 }
             });
 
-            liveSessionRef.current = sessionPromise;
+            liveSessionRef.current = session;
+
+            // Trigger AI to speak immediately
+            try {
+                // @ts-ignore
+                await session.send("Hello, start the session now.");
+            } catch (e) {
+                console.warn("Failed to send initial trigger message:", e);
+            }
 
         } catch (err) {
             console.error(err);

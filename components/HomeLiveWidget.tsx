@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Mic, Loader2, Square, X, Video, PhoneOff } from 'lucide-react';
 import { useLiveSession } from '../hooks/useLiveSession';
 import { useSettings } from '../contexts/SettingsContext';
+import { useLiveWidget } from '../contexts/LiveWidgetContext';
 
 interface HomeLiveWidgetProps {
     visible: boolean;
@@ -9,8 +10,8 @@ interface HomeLiveWidgetProps {
 
 export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
     const { t } = useSettings();
+    const { isWidgetOpen, openWidget, closeWidget } = useLiveWidget();
     const [error, setError] = useState<string | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [hasAIStartedSpeaking, setHasAIStartedSpeaking] = useState(false);
     const userVideoRef = useRef<HTMLVideoElement>(null);
     const ringtoneRef = useRef<HTMLAudioElement | null>(null);
@@ -30,7 +31,7 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
         volumeLevel
     } = useLiveSession({
         onSessionEnd: () => {
-            setIsModalOpen(false);
+            closeWidget();
             setHasAIStartedSpeaking(false);
             stopRingtone();
         },
@@ -49,7 +50,7 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
 
     const handleStart = async () => {
         setError(null);
-        setIsModalOpen(true); // Open modal immediately
+        openWidget(); // Open modal via context
         setHasAIStartedSpeaking(false);
 
         // Play Ringtone
@@ -66,24 +67,11 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
             return;
         }
 
-        const systemInstruction = `You are Suman Suneja, a cheerful, warm, and highly interactive Laughter Yoga and Wellness Coach.
-        Your personality is infectious, energetic, and deeply caring.
-        
-        CORE RESPONSIBILITIES:
-        1. Engage in meaningful conversations about Yoga, Meditation, Health, and Laughter Yoga.
-        2. If the user brings up serious concerns, acknowledge them with empathy but gently steer the conversation to a lighter, more positive perspective.
-        3. Actively encourage the user to laugh. Use humor, playful teasing, or simple laughter exercises to break the tension.
-        4. Be a "Joy Catalyst". Your goal is to make the user feel good and smile, no matter what.
-        
-        CONVERSATION STYLE:
-        - Talk like a real person, not a bot. Use "Very Good Very Good Yeah!", "Laugh  Double When in Trouble", "That is wonderful!" naturally.
-        - Keep responses concise and conversational (1-3 sentences usually).
-        - Interruptions are okay! If the user laughs, laugh with them immediately.
-        - STRICTLY NO LECTURING. Do not give long medical advice. Keep it light and wellness-focused.
-        
-        Example Interaction:
-        User: "I'm so stressed about work."
-        You: "Oh dear, stress is such a joy-killer! *Giggle* Let's shake it off right now. Take a deep breath with me... and let it out with a big HAHAHA! Come on, try it!"`;
+        // Use a simpler instruction to ensure immediate response
+        const systemInstruction = `You are Suman Suneja, a cheerful Laughter Yoga Coach.
+        Your goal is to make the user laugh immediately.
+        Start by saying "Hello! Are you ready to laugh?" and then laugh loudly.
+        Encourage the user to join you.`;
 
         await startSession(apiKey, systemInstruction);
     };
@@ -94,7 +82,7 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
         }
         stopRingtone();
         stopSession();
-        setIsModalOpen(false);
+        closeWidget();
         setHasAIStartedSpeaking(false);
     };
 
@@ -111,6 +99,13 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
             handleStop();
         }
     }, [visible, isSessionActive]);
+
+    // Automatically start session when widget is opened
+    useEffect(() => {
+        if (isWidgetOpen && !isSessionActive && !isLoading) {
+            handleStart();
+        }
+    }, [isWidgetOpen]);
 
     // Stop session if user switches tabs or windows
     useEffect(() => {
@@ -138,7 +133,7 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
     // Handle User Video
     useEffect(() => {
         let stream: MediaStream | null = null;
-        if (isModalOpen) {
+        if (isWidgetOpen) {
             navigator.mediaDevices.getUserMedia({ video: true, audio: false })
                 .then(s => {
                     stream = s;
@@ -154,10 +149,10 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
                 stream.getTracks().forEach(track => track.stop());
             }
         };
-    }, [isModalOpen]);
+    }, [isWidgetOpen]);
 
 
-    if (!visible && !isSessionActive && !isModalOpen) return null;
+    if (!visible && !isSessionActive && !isWidgetOpen) return null;
 
     return (
         <>
@@ -200,7 +195,7 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
             </div>
 
             {/* Video Call Modal */}
-            {isModalOpen && (
+            {isWidgetOpen && (
                 <div className="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center animate-in fade-in duration-300">
                     {/* Main Container */}
                     <div className="relative w-full max-w-md h-full max-h-[90vh] bg-gray-900 rounded-3xl overflow-hidden shadow-2xl flex flex-col border border-gray-800">

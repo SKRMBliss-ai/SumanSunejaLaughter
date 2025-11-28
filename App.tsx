@@ -19,6 +19,7 @@ import { checkDailyStreak } from './services/rewardService';
 import { ViewState } from './types';
 import { Loader2 } from 'lucide-react';
 import { SettingsProvider } from './contexts/SettingsContext';
+import { LiveWidgetProvider } from './contexts/LiveWidgetContext';
 
 const AppContent: React.FC = () => {
   const [currentView, setView] = useState<ViewState>(ViewState.HOME);
@@ -104,7 +105,9 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
   return (
     <SettingsProvider>
-      <AppContent />
+      <LiveWidgetProvider>
+        <AppContent />
+      </LiveWidgetProvider>
     </SettingsProvider>
   );
 };

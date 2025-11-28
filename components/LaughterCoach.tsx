@@ -7,6 +7,7 @@ import { addPoints } from '../services/rewardService';
 import { useSettings } from '../contexts/SettingsContext';
 import { useLiveSession } from '../hooks/useLiveSession';
 import { VoiceChatWidget } from './VoiceChatWidget';
+import { useLiveWidget } from '../contexts/LiveWidgetContext';
 
 interface HistoryItem {
   id: number;
@@ -50,6 +51,8 @@ function decode(base64: string) {
 
 export const LaughterCoach: React.FC = () => {
   const { t } = useSettings();
+  const { openWidget } = useLiveWidget();
+
   // Main modes
   const [isRecording, setIsRecording] = useState(false); // For Score Analyzer
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -500,33 +503,20 @@ export const LaughterCoach: React.FC = () => {
       <div className="w-full max-w-sm space-y-3 animate-fade-in-up">
         {/* Live Session Button */}
         <button
-          onClick={() => isSessionActive && sessionType === 'LIVE' ? stopSession() : startLiveSession()}
-          disabled={isSessionLoading || isRecording || (isSessionActive && sessionType !== 'LIVE')}
-          className={`w-full p-4 rounded-2xl shadow-lg flex items-center justify-between transition-all transform active:scale-95 border-2 hover:scale-[1.02] ${isSessionActive && sessionType === 'LIVE'
-            ? 'bg-white dark:bg-slate-800 border-purple-400 ring-4 ring-purple-100 dark:ring-purple-900 text-purple-700 dark:text-purple-400'
-            : 'bg-white dark:bg-slate-800 border-purple-100 dark:border-slate-700 text-purple-600 dark:text-purple-400 hover:border-purple-200 dark:hover:border-purple-800'
-            } ${isSessionActive && sessionType !== 'LIVE' ? 'opacity-50' : ''}`}
+          onClick={openWidget}
+          className={`w-full p-4 rounded-2xl shadow-lg flex items-center justify-between transition-all transform active:scale-95 border-2 hover:scale-[1.02] bg-white dark:bg-slate-800 border-purple-100 dark:border-slate-700 text-purple-600 dark:text-purple-400 hover:border-purple-200 dark:hover:border-purple-800`}
         >
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-full ${isSessionActive && sessionType === 'LIVE' ? 'bg-purple-500 text-white' : 'bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-300'}`}>
-              {isSessionLoading && sessionType === 'LIVE' ? <Loader2 size={24} className="animate-spin" /> :
-                isSessionActive && sessionType === 'LIVE' ? <StopCircle size={24} fill="currentColor" /> :
-                  <Mic size={24} />}
+            <div className={`p-2 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-300`}>
+              <Mic size={24} />
             </div>
             <div className="text-left">
               <h3 className="font-bold text-gray-800 dark:text-gray-100">
-                {isSessionActive && sessionType === 'LIVE' ? 'Stop Session' : t('coach.start_live')}
+                {t('coach.start_live')}
               </h3>
               <p className="text-xs opacity-70 text-gray-600 dark:text-gray-400">{t('coach.interactive')}</p>
             </div>
           </div>
-          {isSessionActive && sessionType === 'LIVE' && (
-            <div className="flex gap-1 items-end h-4">
-              <div className="w-1 bg-purple-400 h-2 animate-[bounce_1s_infinite]"></div>
-              <div className="w-1 bg-purple-400 h-4 animate-[bounce_1.2s_infinite]"></div>
-              <div className="w-1 bg-purple-400 h-3 animate-[bounce_0.8s_infinite]"></div>
-            </div>
-          )}
         </button>
 
         {/* Quick Laugh Button */}
