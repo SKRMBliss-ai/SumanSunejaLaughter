@@ -13,6 +13,14 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [hasAIStartedSpeaking, setHasAIStartedSpeaking] = useState(false);
     const userVideoRef = useRef<HTMLVideoElement>(null);
+    const ringtoneRef = useRef<HTMLAudioElement | null>(null);
+
+    const stopRingtone = () => {
+        if (ringtoneRef.current) {
+            ringtoneRef.current.pause();
+            ringtoneRef.current.currentTime = 0;
+        }
+    };
 
     const {
         startSession,
@@ -24,12 +32,17 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
         onSessionEnd: () => {
             setIsModalOpen(false);
             setHasAIStartedSpeaking(false);
+            stopRingtone();
         },
-        onError: (err) => setError(err),
+        onError: (err) => {
+            setError(err);
+            stopRingtone();
+        },
         onAudioStart: () => {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
             }
+            stopRingtone();
             setHasAIStartedSpeaking(true);
         }
     });
@@ -39,9 +52,17 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
         setIsModalOpen(true); // Open modal immediately
         setHasAIStartedSpeaking(false);
 
+        // Play Ringtone
+        if (!ringtoneRef.current) {
+            ringtoneRef.current = new Audio("https://res.cloudinary.com/dfopoyt9v/video/upload/v1764309131/ringtone-023-376906_t3rona.mp3");
+            ringtoneRef.current.loop = true;
+        }
+        ringtoneRef.current.play().catch(err => console.warn("Ringtone playback failed:", err));
+
         const apiKey = process.env.API_KEY;
         if (!apiKey) {
             setError("API Key missing");
+            stopRingtone();
             return;
         }
 
@@ -71,6 +92,7 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel();
         }
+        stopRingtone();
         stopSession();
         setIsModalOpen(false);
         setHasAIStartedSpeaking(false);

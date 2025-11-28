@@ -211,7 +211,7 @@ export const LaughterCoach: React.FC = () => {
 
   // Wrapper to start session using the new hook
   const startLiveSession = async () => {
-    playImmediateGreeting("Starting live session");
+    playImmediateGreeting("Live laughter session");
     const apiKey = process.env.API_KEY;
     if (!apiKey) {
       setError(t('coach.live_unavailable'));
@@ -561,22 +561,6 @@ export const LaughterCoach: React.FC = () => {
           )}
         </button>
 
-        {/* Voice Chat Button */}
-        <button
-          onClick={() => setShowVoiceChat(true)}
-          disabled={isSessionActive}
-          className={`w-full p-4 rounded-2xl shadow-lg flex items-center justify-between transition-all transform active:scale-95 border-2 hover:scale-[1.02] bg-white dark:bg-slate-800 border-blue-100 dark:border-slate-700 text-blue-600 dark:text-blue-400 hover:border-blue-200 dark:hover:border-blue-800 ${isSessionActive ? 'opacity-50' : ''}`}
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300">
-              <MessageCircle size={24} />
-            </div>
-            <div className="text-left">
-              <h3 className="font-bold text-gray-800 dark:text-gray-100">Voice Chat</h3>
-              <p className="text-xs opacity-70 text-gray-600 dark:text-gray-400">Ask Suman anything</p>
-            </div>
-          </div>
-        </button>
       </div>
 
       <div className="text-center space-y-2 animate-pop-in delay-200">
