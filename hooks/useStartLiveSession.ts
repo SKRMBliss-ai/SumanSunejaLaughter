@@ -1,10 +1,23 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useLiveSession } from './useLiveSession';
 import { useSettings } from '../contexts/SettingsContext';
 
+/* -------------------------------------------------
+   Module‑level singletons – created once when the app loads
+   ------------------------------------------------- */
+const globalAudioContext: AudioContext =
+    new (window.AudioContext || (window as any).webkitAudioContext)();
+
+const globalRingtone = new Audio(
+    'https://res.cloudinary.com/dfopoyt9v/video/upload/v1764314599/ring_xidpqi.mp4'
+);
+globalRingtone.loop = false; // play once
+// Pre‑load the media so the first play is instant
+globalRingtone.load();
+
 /**
  * Shared hook used by LaughterCoach and HomeLiveWidget.
- * Starts the ringtone and the live session in parallel for an instant feel.
+ * Starts the ringtone and the live session **in parallel** for an instant feel.
  */
 export const useStartLiveSession = () => {
     const { t } = useSettings();
@@ -13,9 +26,9 @@ export const useStartLiveSession = () => {
     const [error, setError] = useState<string | null>(null);
     const [hasAIStartedSpeaking, setHasAIStartedSpeaking] = useState(false);
 
-    // Refs for media objects
-    const ringtoneRef = useRef<HTMLAudioElement | null>(null);
-    const audioContextRef = useRef<AudioContext | null>(null);
+    // Refs to the singletons (so components can access them)
+    const audioContextRef = useRef<AudioContext>(globalAudioContext);
+    const ringtoneRef = useRef<HTMLAudioElement>(globalRingtone);
 
     // Helper to stop the ringtone
     const stopRingtone = () => {
@@ -52,25 +65,20 @@ export const useStartLiveSession = () => {
     });
 
     // -------------------------------------------------
-    // Start live session + ringtone in parallel
+    // Start live session + ringtone **in parallel**
     // -------------------------------------------------
     const startLive = async () => {
         setError(null);
 
-        // Ensure AudioContext exists and is resumed (autoplay policy)
-        if (!audioContextRef.current) {
-            audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-        }
+        // Resume the global AudioContext (fire‑and‑forget)
         if (audioContextRef.current.state === 'suspended') {
-            await audioContextRef.current.resume();
+            audioContextRef.current.resume().catch(() => { });
         }
 
-        // Initialise and play ringtone (non‑blocking)
-        if (!ringtoneRef.current) {
-            ringtoneRef.current = new Audio('https://res.cloudinary.com/dfopoyt9v/video/upload/v1764314599/ring_xidpqi.mp4');
-            ringtoneRef.current.loop = false; // play once
-        }
-        ringtoneRef.current.play().catch((err) => console.warn('Ringtone playback failed:', err));
+        // Play the pre‑loaded ringtone immediately
+        ringtoneRef.current
+            .play()
+            .catch((err) => console.warn('Ringtone playback failed:', err));
 
         // System prompt for Gemini
         const systemInstruction = `You are Suman Suneja, a cheerful Laughter Yoga Coach.
@@ -85,16 +93,15 @@ Encourage the user to join you.`;
             return;
         }
 
-        // Fire the live‑session request – we do NOT await the ringtone
+        // Fire the live‑session request **without awaiting** it.
         const sessionPromise = startSession(apiKey, systemInstruction);
-        await sessionPromise;
+        sessionPromise.catch((e) => {
+            setError(`Live session failed: ${e}`);
+            stopRingtone();
+        });
 
-        // Safety timeout: log if AI hasn't spoken after 10 s
-        setTimeout(() => {
-            if (!hasAIStartedSpeaking && isSessionActive) {
-                console.log('AI voice not started within timeout');
-            }
-        }, 10000);
+        // UI can now show loading state instantly.
+        // The `onAudioStart` callback will stop the ringtone when audio arrives.
     };
 
     // -------------------------------------------------
