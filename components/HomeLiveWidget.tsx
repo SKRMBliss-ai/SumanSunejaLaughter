@@ -34,29 +34,10 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
         }
     });
 
-    // Helper for immediate feedback
-    const playImmediateGreeting = (text: string) => {
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.rate = 1.0;
-            utterance.lang = 'en-US';
-
-            const voices = window.speechSynthesis.getVoices();
-            const femaleVoice = voices.find(v =>
-                (v.lang === 'en-US' && (v.name.includes('Female') || v.name.includes('Google') || v.name.includes('Zira')))
-            );
-            if (femaleVoice) utterance.voice = femaleVoice;
-
-            window.speechSynthesis.speak(utterance);
-        }
-    };
-
     const handleStart = async () => {
         setError(null);
         setIsModalOpen(true); // Open modal immediately
         setHasAIStartedSpeaking(false);
-        playImmediateGreeting("Connecting...");
 
         const apiKey = process.env.API_KEY;
         if (!apiKey) {
