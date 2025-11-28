@@ -11,6 +11,7 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
     const { t } = useSettings();
     const [error, setError] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [hasAIStartedSpeaking, setHasAIStartedSpeaking] = useState(false);
     const userVideoRef = useRef<HTMLVideoElement>(null);
 
     const {
@@ -22,12 +23,14 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
     } = useLiveSession({
         onSessionEnd: () => {
             setIsModalOpen(false);
+            setHasAIStartedSpeaking(false);
         },
         onError: (err) => setError(err),
         onAudioStart: () => {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
             }
+            setHasAIStartedSpeaking(true);
         }
     });
 
@@ -52,6 +55,7 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
     const handleStart = async () => {
         setError(null);
         setIsModalOpen(true); // Open modal immediately
+        setHasAIStartedSpeaking(false);
         playImmediateGreeting("Connecting...");
 
         const apiKey = process.env.API_KEY;
@@ -88,6 +92,7 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
         }
         stopSession();
         setIsModalOpen(false);
+        setHasAIStartedSpeaking(false);
     };
 
     const toggleSession = () => {
@@ -200,8 +205,10 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
                         {/* Header */}
                         <div className="absolute top-0 left-0 right-0 p-4 z-10 flex justify-between items-center bg-gradient-to-b from-black/60 to-transparent">
                             <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                                <span className="text-white font-medium text-sm">Suman Suneja (AI Coach)</span>
+                                <div className={`w-2 h-2 rounded-full ${hasAIStartedSpeaking ? 'bg-green-500 animate-pulse' : 'bg-yellow-500'}`}></div>
+                                <span className="text-white font-medium text-sm">
+                                    {hasAIStartedSpeaking ? 'Suman Suneja (AI Coach)' : 'Calling Suman...'}
+                                </span>
                             </div>
                             <button onClick={() => setIsModalOpen(false)} className="text-white/80 hover:text-white">
                                 <X size={24} />
@@ -210,17 +217,39 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
 
                         {/* Main Video (Suman) */}
                         <div className="flex-1 relative bg-gray-800 flex items-center justify-center overflow-hidden">
-                            <video
-                                src="https://res.cloudinary.com/dfopoyt9v/video/upload/v1764306359/media_1_qcvke1.mp4"
-                                autoPlay
-                                loop
-                                muted
-                                playsInline
-                                className={`w-full h-full object-cover transition-transform duration-700 ${volumeLevel > 0.05 ? 'scale-105' : 'scale-100'}`}
-                            />
-                            {/* Speaking Indicator Ring */}
-                            {volumeLevel > 0.05 && (
-                                <div className="absolute inset-0 border-4 border-purple-500/50 animate-pulse"></div>
+                            {!hasAIStartedSpeaking ? (
+                                // Ringing State
+                                <div className="relative w-full h-full flex items-center justify-center">
+                                    <img
+                                        src="/suman.png"
+                                        alt="Suman Suneja"
+                                        className="w-full h-full object-cover opacity-50 blur-sm scale-110"
+                                    />
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+                                        <div className="w-24 h-24 rounded-full bg-purple-500/20 flex items-center justify-center animate-[ping_2s_infinite]">
+                                            <div className="w-16 h-16 rounded-full bg-purple-500/40 flex items-center justify-center animate-[ping_1.5s_infinite]">
+                                                <img src="/suman.png" className="w-12 h-12 rounded-full object-cover border-2 border-white" />
+                                            </div>
+                                        </div>
+                                        <p className="mt-4 text-white font-bold text-lg animate-pulse">Connecting...</p>
+                                    </div>
+                                </div>
+                            ) : (
+                                // Connected State (Video Loop)
+                                <>
+                                    <video
+                                        src="https://res.cloudinary.com/dfopoyt9v/video/upload/v1764306359/media_1_qcvke1.mp4"
+                                        autoPlay
+                                        loop
+                                        muted
+                                        playsInline
+                                        className={`w-full h-full object-cover transition-transform duration-700 ${volumeLevel > 0.05 ? 'scale-105' : 'scale-100'}`}
+                                    />
+                                    {/* Speaking Indicator Ring */}
+                                    {volumeLevel > 0.05 && (
+                                        <div className="absolute inset-0 border-4 border-purple-500/50 animate-pulse"></div>
+                                    )}
+                                </>
                             )}
                         </div>
 
@@ -237,12 +266,9 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
 
                         {/* Controls */}
                         <div className="h-20 bg-gray-900 flex items-center justify-center gap-6 pb-4">
-                            <button className="p-4 rounded-full bg-gray-800 text-white hover:bg-gray-700 transition-colors">
-                                <MicOff size={24} />
-                            </button>
                             <button
                                 onClick={handleStop}
-                                className="p-4 rounded-full bg-red-600 text-white hover:bg-red-700 transition-colors transform hover:scale-110 active:scale-95 shadow-lg"
+                                className="p-4 rounded-full bg-red-600 text-white hover:bg-red-700 transition-colors transform hover:scale-110 active:scale-95 shadow-lg animate-pulse"
                             >
                                 <PhoneOff size={32} fill="currentColor" />
                             </button>
