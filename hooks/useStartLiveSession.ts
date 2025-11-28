@@ -57,7 +57,7 @@ export const useStartLiveSession = () => {
         // Play ringtone while connecting
         if (!ringtoneRef.current) {
             ringtoneRef.current = new Audio('https://res.cloudinary.com/dfopoyt9v/video/upload/v1764314599/ring_xidpqi.mp4');
-            ringtoneRef.current.loop = true;
+            ringtoneRef.current.loop = false;
         }
         ringtoneRef.current.play().catch((err) => console.warn('Ringtone playback failed:', err));
 
