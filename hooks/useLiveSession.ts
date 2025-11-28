@@ -129,7 +129,7 @@ export const useLiveSession = ({ onSessionEnd, onError, onAudioStart }: UseLiveS
           5. Be spontaneous and fun. Do not give long lectures. Just laugh and guide.`;
 
             const sessionPromise = ai.live.connect({
-                model: 'gemini-2.5-flash-native-audio-preview-09-2025',
+                model: 'gemini-2.0-flash-exp',
                 config: {
                     responseModalities: [Modality.AUDIO],
                     speechConfig: {
@@ -138,8 +138,12 @@ export const useLiveSession = ({ onSessionEnd, onError, onAudioStart }: UseLiveS
                     systemInstruction: customSystemInstruction || defaultInstruction,
                 },
                 callbacks: {
-                    onopen: () => {
+                    onopen: async () => {
                         setIsLoading(false);
+
+                        if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
+                            await audioContextRef.current.resume();
+                        }
 
                         // Setup Input Processing
                         if (!liveInputContextRef.current) return;
