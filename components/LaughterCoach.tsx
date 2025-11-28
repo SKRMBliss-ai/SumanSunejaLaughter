@@ -111,6 +111,20 @@ export const LaughterCoach: React.FC = () => {
     localStorage.setItem('laughterHistory', JSON.stringify(history));
   }, [history]);
 
+  // Visibility Change Listener - Stop session when tab is hidden
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden && isSessionActive) {
+        stopSession();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isSessionActive]);
+
   const cleanupAudio = () => {
     if (sourceRef.current) sourceRef.current.stop();
     window.speechSynthesis.cancel();
@@ -516,7 +530,7 @@ export const LaughterCoach: React.FC = () => {
             </div>
             <div className="text-left">
               <h3 className="font-bold text-gray-800 dark:text-gray-100">
-                {isSessionActive && sessionType === 'LIVE' ? 'Stop Session' : t('coach.start_live')}
+                {isSessionActive && sessionType === 'LIVE' ? 'Stop Session' : 'Live Laughter Session'}
               </h3>
               <p className="text-xs opacity-70 text-gray-600 dark:text-gray-400">{t('coach.interactive')}</p>
             </div>

@@ -53,6 +53,19 @@ export const useStartLiveSession = () => {
     // -------------------------------------------------
     const startLive = async () => {
         setError(null);
+
+        // IMMEDIATE FEEDBACK: Speak using browser TTS while connecting
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel(); // Stop any previous speech
+            const utterance = new SpeechSynthesisUtterance("Hello! Connecting to joy...");
+            utterance.rate = 1.2;
+            // Try to find a female voice
+            const voices = window.speechSynthesis.getVoices();
+            const femaleVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Google US English'));
+            if (femaleVoice) utterance.voice = femaleVoice;
+            window.speechSynthesis.speak(utterance);
+        }
+
         // Resume the AudioContext (required by autoplay policies)
         if (audioContextRef.current.state === 'suspended') {
             await audioContextRef.current.resume().catch(() => { });
@@ -73,6 +86,7 @@ Encourage the user to join you.`;
         const sessionPromise = startSession(apiKey, systemInstruction);
         sessionPromise.catch((e) => {
             setError(`Live session failed: ${e}`);
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
         });
     };
 

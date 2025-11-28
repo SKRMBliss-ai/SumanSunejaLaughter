@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Pause, Volume2, Sparkles, Loader2, Music, Wand2, RefreshCw, Zap, Bot, Mic, Smile, AlertCircle, WifiOff } from 'lucide-react';
+import { Play, Pause, Volume2, Sparkles, Loader2, Music, Wand2, Zap, Bot, Smile, AlertCircle, WifiOff } from 'lucide-react';
 import { generateHumor, generateSpeech, createAudioBufferFromPCM } from '../services/geminiService';
 import { addPoints } from '../services/rewardService';
 
@@ -203,6 +203,19 @@ export const LaughterGames: React.FC = () => {
     stopAudio();
 
     try {
+      // IMMEDIATE FEEDBACK: Play a short "thinking" sound or phrase
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(
+          activeTab === 'JOKES' ? "Let me think of a funny one..." : "Brewing some joy..."
+        );
+        utterance.rate = 1.2;
+        const voices = window.speechSynthesis.getVoices();
+        const femaleVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Google US English'));
+        if (femaleVoice) utterance.voice = femaleVoice;
+        window.speechSynthesis.speak(utterance);
+      }
+
       // 1. Text Generation
       const text = await generateHumor(topic, type);
       setCurrentText(text);
@@ -250,6 +263,17 @@ export const LaughterGames: React.FC = () => {
     window.dispatchEvent(new CustomEvent('MUSIC_MOOD', { detail: 'ENERGY' }));
 
     try {
+      // IMMEDIATE FEEDBACK
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(`Feeling ${mood}? Let's change that!`);
+        utterance.rate = 1.2;
+        const voices = window.speechSynthesis.getVoices();
+        const femaleVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Google US English'));
+        if (femaleVoice) utterance.voice = femaleVoice;
+        window.speechSynthesis.speak(utterance);
+      }
+
       const text = await generateHumor(`feeling ${mood}`, 'story');
       setCurrentText(text);
 
