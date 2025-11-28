@@ -13,8 +13,11 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
     const { isWidgetOpen, openWidget, closeWidget } = useLiveWidget();
     const [error, setError] = useState<string | null>(null);
     const [hasAIStartedSpeaking, setHasAIStartedSpeaking] = useState(false);
+    const [isCameraOn, setIsCameraOn] = useState(true);
+
     const userVideoRef = useRef<HTMLVideoElement>(null);
     const ringtoneRef = useRef<HTMLAudioElement | null>(null);
+    const audioContextRef = useRef<AudioContext | null>(null);
 
     const stopRingtone = () => {
         if (ringtoneRef.current) {
@@ -53,6 +56,14 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
         openWidget(); // Open modal via context
         setHasAIStartedSpeaking(false);
 
+        // Resume Audio Context immediately on user interaction
+        if (!audioContextRef.current) {
+            audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        }
+        if (audioContextRef.current.state === 'suspended') {
+            await audioContextRef.current.resume();
+        }
+
         // Play Ringtone
         if (!ringtoneRef.current) {
             ringtoneRef.current = new Audio("https://res.cloudinary.com/dfopoyt9v/video/upload/v1764309131/ringtone-023-376906_t3rona.mp3");
@@ -74,6 +85,13 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
         Encourage the user to join you.`;
 
         await startSession(apiKey, systemInstruction);
+
+        // Safety timeout: If AI doesn't speak in 10s, log warning
+        setTimeout(() => {
+            if (!hasAIStartedSpeaking && isSessionActive) {
+                console.log("Connection taking long...");
+            }
+        }, 10000);
     };
 
     const handleStop = () => {
@@ -92,6 +110,10 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
         } else {
             handleStart();
         }
+    };
+
+    const toggleCamera = () => {
+        setIsCameraOn(prev => !prev);
     };
 
     useEffect(() => {
@@ -140,6 +162,8 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
                     if (userVideoRef.current) {
                         userVideoRef.current.srcObject = stream;
                     }
+                    // Apply initial camera state
+                    s.getVideoTracks().forEach(track => track.enabled = isCameraOn);
                 })
                 .catch(err => console.warn("Camera access denied or error:", err));
         }
@@ -150,6 +174,14 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
             }
         };
     }, [isWidgetOpen]);
+
+    // Effect to toggle video tracks when isCameraOn changes
+    useEffect(() => {
+        if (userVideoRef.current && userVideoRef.current.srcObject) {
+            const stream = userVideoRef.current.srcObject as MediaStream;
+            stream.getVideoTracks().forEach(track => track.enabled = isCameraOn);
+        }
+    }, [isCameraOn]);
 
 
     if (!visible && !isSessionActive && !isWidgetOpen) return null;
@@ -258,8 +290,13 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
                                 autoPlay
                                 muted
                                 playsInline
-                                className="w-full h-full object-cover transform scale-x-[-1]"
+                                className={`w-full h-full object-cover transform scale-x-[-1] ${!isCameraOn ? 'hidden' : ''}`}
                             />
+                            {!isCameraOn && (
+                                <div className="w-full h-full flex items-center justify-center bg-gray-800 text-white/50">
+                                    <Video size={32} />
+                                </div>
+                            )}
                         </div>
 
                         {/* Controls */}
@@ -270,7 +307,10 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
                             >
                                 <PhoneOff size={32} fill="currentColor" />
                             </button>
-                            <button className="p-4 rounded-full bg-gray-800 text-white hover:bg-gray-700 transition-colors">
+                            <button
+                                onClick={toggleCamera}
+                                className={`p-4 rounded-full transition-colors ${isCameraOn ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-white text-gray-900 hover:bg-gray-200'}`}
+                            >
                                 <Video size={24} />
                             </button>
                         </div>
