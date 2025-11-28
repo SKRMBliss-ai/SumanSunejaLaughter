@@ -141,10 +141,10 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
                     onClick={toggleSession}
                     disabled={isLoading}
                     className={`relative w-14 h-14 rounded-full flex items-center justify-center shadow-lg border-2 border-white transition-all duration-300 ${isSessionActive
-                            ? 'bg-red-500 hover:bg-red-600 text-white scale-110'
-                            : 'bg-gradient-to-br from-purple-500 to-indigo-600 text-white hover:scale-110 active:scale-90 animate-bounce-gentle'
+                        ? 'bg-red-500 hover:bg-red-600 text-white scale-110'
+                        : 'bg-gradient-to-br from-purple-500 to-indigo-600 text-white hover:scale-110 active:scale-90 animate-bounce-gentle'
                         }`}
-                    title={isSessionActive ? "End Conversation" : "Start Voice Chat"}
+                    title={isSessionActive ? "End Call" : "Talk to Suman"}
                 >
                     {isLoading ? (
                         <Loader2 size={24} className="animate-spin" />
