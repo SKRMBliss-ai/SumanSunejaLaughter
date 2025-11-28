@@ -43,11 +43,29 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+      const validExtension = /\.(jpg|jpeg|png)$/i.test(file.name);
+
+      if (!validTypes.includes(file.type) && !validExtension) {
+        setMessage({ type: 'error', text: 'Only JPG, JPEG, and PNG files are allowed.' });
+        return;
+      }
+
+      // Validate file size (Max 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        setMessage({ type: 'error', text: 'File is too big. Maximum size is 5MB.' });
+        return;
+      }
+
       const reader = new FileReader();
 
       reader.onloadend = () => {
         const base64String = reader.result as string;
         setPhotoURL(base64String);
+        setMessage(null);
       };
 
       reader.readAsDataURL(file);
@@ -186,8 +204,7 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
                 type="file"
                 ref={fileInputRef}
                 onChange={handleFileChange}
-                accept="image/*"
-                capture="user"
+                accept=".jpg, .jpeg, .png"
                 className="hidden"
               />
             </div>
