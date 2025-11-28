@@ -210,7 +210,7 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
                                     {hasAIStartedSpeaking ? 'Suman Suneja (AI Coach)' : 'Calling Suman...'}
                                 </span>
                             </div>
-                            <button onClick={() => setIsModalOpen(false)} className="text-white/80 hover:text-white">
+                            <button onClick={handleStop} className="text-white/80 hover:text-white">
                                 <X size={24} />
                             </button>
                         </div>
@@ -221,14 +221,14 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
                                 // Ringing State
                                 <div className="relative w-full h-full flex items-center justify-center">
                                     <img
-                                        src="/suman.png"
+                                        src="https://res.cloudinary.com/dfopoyt9v/image/upload/v1764307833/Gemini_Generated_Image_g3m0lng3m0lng3m0_ttyvxr.png"
                                         alt="Suman Suneja"
                                         className="w-full h-full object-cover opacity-50 blur-sm scale-110"
                                     />
                                     <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
                                         <div className="w-24 h-24 rounded-full bg-purple-500/20 flex items-center justify-center animate-[ping_2s_infinite]">
                                             <div className="w-16 h-16 rounded-full bg-purple-500/40 flex items-center justify-center animate-[ping_1.5s_infinite]">
-                                                <img src="/suman.png" className="w-12 h-12 rounded-full object-cover border-2 border-white" />
+                                                <img src="https://res.cloudinary.com/dfopoyt9v/image/upload/v1764307833/Gemini_Generated_Image_g3m0lng3m0lng3m0_ttyvxr.png" className="w-12 h-12 rounded-full object-cover border-2 border-white" />
                                             </div>
                                         </div>
                                         <p className="mt-4 text-white font-bold text-lg animate-pulse">Connecting...</p>
