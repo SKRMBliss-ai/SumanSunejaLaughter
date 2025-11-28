@@ -168,8 +168,8 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
                         onClick={toggleSession}
                         disabled={isLoading}
                         className={`relative w-14 h-14 rounded-full flex items-center justify-center shadow-lg border-2 border-white transition-all duration-300 ${isSessionActive
-                                ? 'bg-red-500 hover:bg-red-600 text-white scale-110'
-                                : 'bg-gradient-to-br from-purple-500 to-indigo-600 text-white hover:scale-110 active:scale-90 animate-bounce-gentle'
+                            ? 'bg-red-500 hover:bg-red-600 text-white scale-110'
+                            : 'bg-gradient-to-br from-purple-500 to-indigo-600 text-white hover:scale-110 active:scale-90 animate-bounce-gentle'
                             }`}
                         title={isSessionActive ? "End Call" : "Talk to Suman"}
                     >
@@ -210,9 +210,12 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
 
                         {/* Main Video (Suman) */}
                         <div className="flex-1 relative bg-gray-800 flex items-center justify-center overflow-hidden">
-                            <img
-                                src="/suman.png"
-                                alt="Suman Suneja"
+                            <video
+                                src="https://res.cloudinary.com/dfopoyt9v/video/upload/v1764306359/media_1_qcvke1.mp4"
+                                autoPlay
+                                loop
+                                muted
+                                playsInline
                                 className={`w-full h-full object-cover transition-transform duration-700 ${volumeLevel > 0.05 ? 'scale-105' : 'scale-100'}`}
                             />
                             {/* Speaking Indicator Ring */}
