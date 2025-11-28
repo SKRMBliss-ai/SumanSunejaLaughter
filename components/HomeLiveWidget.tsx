@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Mic, Loader2, Square } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Mic, Loader2, Square, X, Video, MicOff, PhoneOff } from 'lucide-react';
 import { useLiveSession } from '../hooks/useLiveSession';
 import { useSettings } from '../contexts/SettingsContext';
 
@@ -10,6 +10,8 @@ interface HomeLiveWidgetProps {
 export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
     const { t } = useSettings();
     const [error, setError] = useState<string | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const userVideoRef = useRef<HTMLVideoElement>(null);
 
     const {
         startSession,
@@ -19,7 +21,7 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
         volumeLevel
     } = useLiveSession({
         onSessionEnd: () => {
-            // Session ended
+            setIsModalOpen(false);
         },
         onError: (err) => setError(err),
         onAudioStart: () => {
@@ -34,10 +36,9 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.rate = 1.0; // Slightly slower for clarity
-            utterance.lang = 'en-US'; // Force English to avoid wrong language selection
+            utterance.rate = 1.0;
+            utterance.lang = 'en-US';
 
-            // Try to select a female voice (e.g., Google US English, Microsoft Zira)
             const voices = window.speechSynthesis.getVoices();
             const femaleVoice = voices.find(v =>
                 (v.lang === 'en-US' && (v.name.includes('Female') || v.name.includes('Google') || v.name.includes('Zira')))
@@ -50,6 +51,7 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
 
     const handleStart = async () => {
         setError(null);
+        setIsModalOpen(true); // Open modal immediately
         playImmediateGreeting("Connecting...");
 
         const apiKey = process.env.API_KEY;
@@ -85,6 +87,7 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
             window.speechSynthesis.cancel();
         }
         stopSession();
+        setIsModalOpen(false);
     };
 
     const toggleSession = () => {
@@ -99,7 +102,7 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
         if (!visible && isSessionActive) {
             handleStop();
         }
-    }, [visible]);
+    }, [visible, isSessionActive]);
 
     // Stop session if user switches tabs or windows
     useEffect(() => {
@@ -124,44 +127,129 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
         };
     }, [isSessionActive]);
 
-    if (!visible && !isSessionActive) return null;
+    // Handle User Video
+    useEffect(() => {
+        let stream: MediaStream | null = null;
+        if (isModalOpen) {
+            navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+                .then(s => {
+                    stream = s;
+                    if (userVideoRef.current) {
+                        userVideoRef.current.srcObject = stream;
+                    }
+                })
+                .catch(err => console.warn("Camera access denied or error:", err));
+        }
+
+        return () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        };
+    }, [isModalOpen]);
+
+
+    if (!visible && !isSessionActive && !isModalOpen) return null;
 
     return (
-        <div className={`fixed bottom-48 left-4 z-40 flex flex-col items-start gap-2 transition-all duration-500 ${visible ? 'translate-x-0' : '-translate-x-20'}`}>
-            <div className="relative">
-                {/* Ripples when active */}
-                {isSessionActive && (
-                    <>
-                        <div className="absolute inset-0 rounded-full bg-purple-500/30 animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
-                        <div className="absolute inset-0 rounded-full bg-purple-500/20 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite] delay-150"></div>
-                    </>
-                )}
-
-                <button
-                    onClick={toggleSession}
-                    disabled={isLoading}
-                    className={`relative w-14 h-14 rounded-full flex items-center justify-center shadow-lg border-2 border-white transition-all duration-300 ${isSessionActive
-                        ? 'bg-red-500 hover:bg-red-600 text-white scale-110'
-                        : 'bg-gradient-to-br from-purple-500 to-indigo-600 text-white hover:scale-110 active:scale-90 animate-bounce-gentle'
-                        }`}
-                    title={isSessionActive ? "End Call" : "Talk to Suman"}
-                >
-                    {isLoading ? (
-                        <Loader2 size={24} className="animate-spin" />
-                    ) : isSessionActive ? (
-                        <Square size={20} fill="currentColor" />
-                    ) : (
-                        <Mic size={24} />
+        <>
+            {/* Floating Button */}
+            <div className={`fixed bottom-48 left-4 z-40 flex flex-col items-start gap-2 transition-all duration-500 ${visible ? 'translate-x-0' : '-translate-x-20'}`}>
+                <div className="relative">
+                    {/* Ripples when active */}
+                    {isSessionActive && (
+                        <>
+                            <div className="absolute inset-0 rounded-full bg-purple-500/30 animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
+                            <div className="absolute inset-0 rounded-full bg-purple-500/20 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite] delay-150"></div>
+                        </>
                     )}
-                </button>
 
-                {/* Error Tooltip */}
-                {error && (
-                    <div className="absolute left-16 top-2 bg-red-100 text-red-600 text-xs px-2 py-1 rounded whitespace-nowrap animate-fade-in">
-                        {error}
-                    </div>
-                )}
+                    <button
+                        onClick={toggleSession}
+                        disabled={isLoading}
+                        className={`relative w-14 h-14 rounded-full flex items-center justify-center shadow-lg border-2 border-white transition-all duration-300 ${isSessionActive
+                                ? 'bg-red-500 hover:bg-red-600 text-white scale-110'
+                                : 'bg-gradient-to-br from-purple-500 to-indigo-600 text-white hover:scale-110 active:scale-90 animate-bounce-gentle'
+                            }`}
+                        title={isSessionActive ? "End Call" : "Talk to Suman"}
+                    >
+                        {isLoading ? (
+                            <Loader2 size={24} className="animate-spin" />
+                        ) : isSessionActive ? (
+                            <Square size={20} fill="currentColor" />
+                        ) : (
+                            <Mic size={24} />
+                        )}
+                    </button>
+
+                    {/* Error Tooltip */}
+                    {error && (
+                        <div className="absolute left-16 top-2 bg-red-100 text-red-600 text-xs px-2 py-1 rounded whitespace-nowrap animate-fade-in">
+                            {error}
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
+
+            {/* Video Call Modal */}
+            {isModalOpen && (
+                <div className="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center animate-in fade-in duration-300">
+                    {/* Main Container */}
+                    <div className="relative w-full max-w-md h-full max-h-[90vh] bg-gray-900 rounded-3xl overflow-hidden shadow-2xl flex flex-col border border-gray-800">
+
+                        {/* Header */}
+                        <div className="absolute top-0 left-0 right-0 p-4 z-10 flex justify-between items-center bg-gradient-to-b from-black/60 to-transparent">
+                            <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                                <span className="text-white font-medium text-sm">Suman Suneja (AI Coach)</span>
+                            </div>
+                            <button onClick={() => setIsModalOpen(false)} className="text-white/80 hover:text-white">
+                                <X size={24} />
+                            </button>
+                        </div>
+
+                        {/* Main Video (Suman) */}
+                        <div className="flex-1 relative bg-gray-800 flex items-center justify-center overflow-hidden">
+                            <img
+                                src="/suman.png"
+                                alt="Suman Suneja"
+                                className={`w-full h-full object-cover transition-transform duration-700 ${volumeLevel > 0.05 ? 'scale-105' : 'scale-100'}`}
+                            />
+                            {/* Speaking Indicator Ring */}
+                            {volumeLevel > 0.05 && (
+                                <div className="absolute inset-0 border-4 border-purple-500/50 animate-pulse"></div>
+                            )}
+                        </div>
+
+                        {/* User Video (PIP) */}
+                        <div className="absolute bottom-24 right-4 w-32 h-48 bg-black rounded-xl overflow-hidden border-2 border-white/20 shadow-lg">
+                            <video
+                                ref={userVideoRef}
+                                autoPlay
+                                muted
+                                playsInline
+                                className="w-full h-full object-cover transform scale-x-[-1]"
+                            />
+                        </div>
+
+                        {/* Controls */}
+                        <div className="h-20 bg-gray-900 flex items-center justify-center gap-6 pb-4">
+                            <button className="p-4 rounded-full bg-gray-800 text-white hover:bg-gray-700 transition-colors">
+                                <MicOff size={24} />
+                            </button>
+                            <button
+                                onClick={handleStop}
+                                className="p-4 rounded-full bg-red-600 text-white hover:bg-red-700 transition-colors transform hover:scale-110 active:scale-95 shadow-lg"
+                            >
+                                <PhoneOff size={32} fill="currentColor" />
+                            </button>
+                            <button className="p-4 rounded-full bg-gray-800 text-white hover:bg-gray-700 transition-colors">
+                                <Video size={24} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
     );
 };
