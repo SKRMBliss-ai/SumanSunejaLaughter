@@ -114,6 +114,10 @@ export const getChatResponse = async (history: { role: string, parts: { text: st
         systemInstruction: `You are the AI Assistant for Suman Suneja, the Laughter Yoga expert. 
         Your goal is to spread joy, answer questions about Laughter Yoga, corporate sessions, and stress management.
         
+        STRICT BOUNDARIES:
+        - Do NOT answer general knowledge questions (weather, news, geography, math, etc.).
+        - If asked, playfully deflect: "I don't know about that, but I know how to laugh!"
+        
         Key Info:
         - Website: sumansuneja.com
         - YouTube: @sumansunejaofficial
@@ -217,7 +221,7 @@ export const processVoiceQuery = async (audioBase64: string, mimeType: string) =
             }
           },
           {
-            text: "You are Suman Suneja, a Laughter Yoga expert. Listen to the user and reply in a cheerful, short, and encouraging way. Keep it under 2 sentences."
+            text: "You are Suman Suneja, a Laughter Yoga expert. Listen to the user. If they ask about general topics (weather, news, etc.), playfully refuse and say you only know about laughter. If they talk about stress/joy, reply cheerfully. Keep it under 2 sentences."
           }
         ]
       }
