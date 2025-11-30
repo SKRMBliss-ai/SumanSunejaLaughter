@@ -3,6 +3,25 @@ import { Play, Pause, Volume2, Sparkles, Loader2, Music, Wand2, Zap, Bot, Smile,
 import { generateHumor, generateSpeech, createAudioBufferFromPCM } from '../services/geminiService';
 import { addPoints } from '../services/rewardService';
 
+const STORY_PRESETS = [
+  "Embarrassing Date", "Office Mishap",
+  "Cooking Disaster", "Gym Fail",
+  "Tech Support", "Vacation Chaos",
+  "Pet Shenanigans", "DIY Fiasco",
+  "Zoom Blunder", "Grocery Drama",
+  "Parenting 101", "Traffic Jam"
+];
+
+const JOKE_PRESETS = [
+  "Work Life", "Marriage",
+  "Getting Old", "Technology",
+  "Coffee Addiction", "Monday Blues",
+  "Dating Apps", "Dieting",
+  "In-Laws", "Tax Season",
+  "Teenagers", "Retirement"
+];
+
+
 export const LaughterGames: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'GENERATOR' | 'MOOD' | 'JOKES'>('GENERATOR');
   const [topic, setTopic] = useState('');
@@ -192,8 +211,9 @@ export const LaughterGames: React.FC = () => {
     window.speechSynthesis.speak(utterance);
   };
 
-  const handleGenerate = async (type: 'story' | 'joke' = 'story') => {
-    if (!topic.trim()) return;
+  const handleGenerate = async (type: 'story' | 'joke' = 'story', overrideTopic?: string) => {
+    const selectedTopic = overrideTopic || topic;
+    if (!selectedTopic.trim()) return;
 
     setIsLoading(true);
     setCurrentText(null);
@@ -217,7 +237,7 @@ export const LaughterGames: React.FC = () => {
       }
 
       // 1. Text Generation
-      const text = await generateHumor(topic, type);
+      const text = await generateHumor(selectedTopic, type);
       setCurrentText(text);
 
       // 2. Audio Generation
@@ -431,13 +451,49 @@ export const LaughterGames: React.FC = () => {
               </div>
             </div>
             <button
-              onClick={() => handleGenerate(activeTab === 'JOKES' ? 'joke' : 'story')}
-              disabled={isLoading || !topic.trim()}
-              className={`w-full mt-4 font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-transform disabled:opacity-50 disabled:scale-100 flex items-center justify-center gap-2 hover:scale-[1.02] ${activeTab === 'JOKES' ? 'bg-gradient-to-r from-red-300 to-pink-300 shadow-red-200 hover:brightness-105 text-red-900 dark:text-white' : 'bg-gradient-to-r from-[#C3B8D5] to-[#AABBCC] dark:from-slate-700 dark:to-slate-600 shadow-[#C3B8D5]/30 text-slate-800 dark:text-white'}`}
+              onClick={() => isPlaying ? stopAudio() : handleGenerate(activeTab === 'JOKES' ? 'joke' : 'story')}
+              disabled={isLoading || (!topic.trim() && !isPlaying)}
+              className={`w-full mt-4 font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-transform disabled:opacity-50 disabled:scale-100 flex items-center justify-center gap-2 hover:scale-[1.02] ${isPlaying
+                  ? 'bg-red-100 text-red-600 border-2 border-red-200 hover:bg-red-200'
+                  : activeTab === 'JOKES'
+                    ? 'bg-gradient-to-r from-red-300 to-pink-300 shadow-red-200 hover:brightness-105 text-red-900 dark:text-white'
+                    : 'bg-gradient-to-r from-[#C3B8D5] to-[#AABBCC] dark:from-slate-700 dark:to-slate-600 shadow-[#C3B8D5]/30 text-slate-800 dark:text-white'
+                }`}
             >
-              {activeTab === 'JOKES' ? "Tell Me a Joke & Laugh!" : "Generate Joy Story"}
+              {isPlaying ? (
+                <>
+                  <Pause size={20} /> Stop Audio
+                </>
+              ) : (
+                activeTab === 'JOKES' ? "Tell Me a Joke & Laugh!" : "Generate Joy Story"
+              )}
             </button>
+
+            {/* Presets Grid */}
+            <div className="mt-6">
+              <p className="text-sm font-bold text-gray-400 mb-3 uppercase tracking-wider text-center">
+                Or Pick a {activeTab === 'JOKES' ? 'Topic' : 'Theme'}
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                {(activeTab === 'JOKES' ? JOKE_PRESETS : STORY_PRESETS).map((preset) => (
+                  <button
+                    key={preset}
+                    onClick={() => {
+                      setTopic(preset);
+                      handleGenerate(activeTab === 'JOKES' ? 'joke' : 'story', preset);
+                    }}
+                    className={`p-3 rounded-xl text-sm font-bold transition-all active:scale-95 shadow-sm border ${activeTab === 'JOKES'
+                        ? 'bg-red-50 text-red-800 border-red-100 hover:bg-red-100'
+                        : 'bg-[#F5F3FA] text-slate-700 border-[#EDE8F8] hover:bg-[#EDE8F8]'
+                      }`}
+                  >
+                    {preset}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
+
         )}
 
         {activeTab === 'MOOD' && (
@@ -458,14 +514,7 @@ export const LaughterGames: React.FC = () => {
         )}
 
         {/* Playback Control (if playing) */}
-        {isPlaying && (
-          <button
-            onClick={stopAudio}
-            className="w-full bg-white dark:bg-slate-800 border-2 border-red-100 dark:border-red-900 text-red-400 font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors animate-pop-in"
-          >
-            <Pause size={18} fill="currentColor" /> Stop Audio
-          </button>
-        )}
+
       </div>
 
     </div>
