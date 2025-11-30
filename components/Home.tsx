@@ -113,6 +113,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
   const BRAND_ACCENT = "bg-[#C497A2]"; // Pinkish
   const BRAND_ACCENT_HOVER = "hover:bg-[#a7818b]";
   const BRAND_GRADIENT = "bg-gradient-to-br from-[#783766] to-[#508086]";
+  const BRAND_TERRACOTTA_GRADIENT = "bg-gradient-to-r from-[#9A3E36] to-[#7E332C]"; // Extracted from 'Click to join' button
 
   return (
     <div className="p-4 space-y-6 pb-44 relative">
@@ -335,7 +336,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             </p>
             <button
               onClick={openWidget}
-              className={`w-full md:w-auto ${BRAND_PRIMARY} ${BRAND_PRIMARY_HOVER} text-white font-bold py-3 px-8 rounded-xl shadow-md hover:shadow-lg hover:shadow-[#783766]/30 active:scale-95 transition-all flex items-center justify-center gap-2 group-hover:gap-3`}
+              className={`w-full md:w-auto ${BRAND_TERRACOTTA_GRADIENT} hover:brightness-110 text-white font-bold py-3 px-8 rounded-xl shadow-md hover:shadow-lg hover:shadow-[#9A3E36]/30 active:scale-95 transition-all flex items-center justify-center gap-2 group-hover:gap-3`}
             >
               Start Live Interaction <ArrowRight size={18} />
             </button>
