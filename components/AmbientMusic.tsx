@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Music, Volume2, VolumeX, Wind, Zap, Sliders } from 'lucide-react';
+import { Music, VolumeX, Wind, Zap, Sliders } from 'lucide-react';
+import { useSettings } from '../contexts/SettingsContext';
 
 // --- Generative Engine Logic ---
 
@@ -153,6 +154,7 @@ class GenerativeEngine {
 }
 
 export const AmbientMusic: React.FC = () => {
+  const { currentTheme } = useSettings();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [mood, setMood] = useState<'CALM' | 'ENERGY'>('CALM');
@@ -218,20 +220,20 @@ export const AmbientMusic: React.FC = () => {
 
       {/* Expanded Controls */}
       {isExpanded && (
-        <div className="bg-white/90 backdrop-blur-md p-3 rounded-2xl shadow-xl border border-[#8B3A3A] mb-2 animate-in slide-in-from-right fade-in duration-300 w-32 origin-bottom-right">
-          <div className="text-[10px] font-bold text-[#8B3A3A] uppercase mb-2 tracking-wider flex items-center gap-1">
+        <div className="bg-white/90 backdrop-blur-md p-3 rounded-2xl shadow-xl border border-gray-200 mb-2 animate-in slide-in-from-right fade-in duration-300 w-32 origin-bottom-right">
+          <div className={`text-[10px] font-bold ${currentTheme.MUSIC_ICON} uppercase mb-2 tracking-wider flex items-center gap-1`}>
             <Sliders size={10} /> Mood
           </div>
           <div className="space-y-2">
             <button
               onClick={() => changeMoodManual('CALM')}
-              className={`w-full flex items-center gap-2 text-xs font-bold px-3 py-2 rounded-xl transition-all ${mood === 'CALM' ? 'bg-[#8B3A3A] text-white shadow-md scale-105' : 'hover:bg-gray-100 text-gray-500'}`}
+              className={`w-full flex items-center gap-2 text-xs font-bold px-3 py-2 rounded-xl transition-all ${mood === 'CALM' ? `${currentTheme.MUSIC_BTN_ACTIVE} shadow-md scale-105` : 'hover:bg-gray-100 text-gray-500'}`}
             >
               <Wind size={12} /> Calm
             </button>
             <button
               onClick={() => changeMoodManual('ENERGY')}
-              className={`w-full flex items-center gap-2 text-xs font-bold px-3 py-2 rounded-xl transition-all ${mood === 'ENERGY' ? 'bg-[#A64D40] text-white shadow-md scale-105' : 'hover:bg-gray-100 text-gray-500'}`}
+              className={`w-full flex items-center gap-2 text-xs font-bold px-3 py-2 rounded-xl transition-all ${mood === 'ENERGY' ? `${currentTheme.MUSIC_BTN_ACTIVE} shadow-md scale-105` : 'hover:bg-gray-100 text-gray-500'}`}
             >
               <Zap size={12} /> Energy
             </button>
@@ -242,7 +244,7 @@ export const AmbientMusic: React.FC = () => {
       {/* Main Floating Button */}
       <div className="flex items-center gap-2 group">
         {isPlaying && (
-          <div className="hidden sm:block bg-white/80 backdrop-blur px-3 py-1.5 rounded-full shadow-sm border border-white text-xs font-bold text-[#8B3A3A] animate-in fade-in cursor-default select-none">
+          <div className={`hidden sm:block bg-white/80 backdrop-blur px-3 py-1.5 rounded-full shadow-sm border border-white text-xs font-bold ${currentTheme.MUSIC_ICON} animate-in fade-in cursor-default select-none`}>
             {mood === 'CALM' ? 'Relaxing...' : 'Energizing...'}
           </div>
         )}
@@ -251,8 +253,8 @@ export const AmbientMusic: React.FC = () => {
           onClick={() => isExpanded ? setIsExpanded(false) : togglePlay()}
           onContextMenu={(e) => { e.preventDefault(); setIsExpanded(!isExpanded); }}
           className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg border-2 transition-all active:scale-90 ${isPlaying
-            ? (mood === 'CALM' ? 'bg-[#8B3A3A] border-white text-white animate-[pulse_4s_infinite]' : 'bg-[#A64D40] border-white text-white animate-[bounce-gentle_1s_infinite]')
-            : 'bg-white border-[#EDE8F8] text-[#C3B8D5] hover:border-[#8B3A3A] hover:text-[#8B3A3A] hover:scale-110'
+            ? `${currentTheme.MUSIC_BTN_ACTIVE} animate-[pulse_4s_infinite]`
+            : `${currentTheme.MUSIC_BTN} hover:scale-110`
             }`}
           title="Tap to play/pause, Right-click for mood"
         >
@@ -264,7 +266,7 @@ export const AmbientMusic: React.FC = () => {
         </button>
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="w-6 h-6 bg-white shadow-sm rounded-full flex items-center justify-center text-gray-400 hover:text-[#8B3A3A] hover:bg-gray-50 transition-colors transform group-hover:scale-110"
+          className={`w-6 h-6 bg-white shadow-sm rounded-full flex items-center justify-center text-gray-400 hover:${currentTheme.MUSIC_ICON.replace('text-', 'text-')} hover:bg-gray-50 transition-colors transform group-hover:scale-110`}
         >
           <Sliders size={12} />
         </button>

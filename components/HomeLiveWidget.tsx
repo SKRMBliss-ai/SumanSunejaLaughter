@@ -9,7 +9,7 @@ interface HomeLiveWidgetProps {
 }
 
 export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
-    const { t } = useSettings();
+    const { t, currentTheme } = useSettings();
     const { isWidgetOpen, openWidget, closeWidget } = useLiveWidget();
     const [isCameraOn, setIsCameraOn] = useState(true);
     const userVideoRef = useRef<HTMLVideoElement>(null);
@@ -125,14 +125,14 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
                     {/* Ripples when active */}
                     {isSessionActive && (
                         <>
-                            <div className="absolute inset-0 rounded-full bg-[#8B3A3A]/30 animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite]" />
-                            <div className="absolute inset-0 rounded-full bg-[#8B3A3A]/20 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite] delay-150" />
+                            <div className={`absolute inset-0 rounded-full ${currentTheme.MIC_RIPPLE} animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite]`} />
+                            <div className={`absolute inset-0 rounded-full ${currentTheme.MIC_RIPPLE} animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite] delay-150`} />
                         </>
                     )}
                     <button
                         onClick={toggleSession}
                         disabled={isLoading}
-                        className={`relative w-14 h-14 rounded-full flex items-center justify-center shadow-lg border-2 border-white transition-all duration-300 ${isSessionActive ? 'bg-red-500 hover:bg-red-600 text-white scale-110' : 'bg-[linear-gradient(135deg,#8B3A3A_0%,#B85C5C_50%,#8B3A3A_100%)] text-white hover:scale-110 active:scale-90 animate-bounce-gentle'}`}
+                        className={`relative w-14 h-14 rounded-full flex items-center justify-center shadow-lg border-2 border-white transition-all duration-300 ${isSessionActive ? 'bg-red-500 hover:bg-red-600 text-white scale-110' : `${currentTheme.MIC_BTN} active:scale-90 animate-bounce-gentle`}`}
                         title={isSessionActive ? 'End Call' : 'Talk to Suman'}
                     >
                         {isLoading ? (

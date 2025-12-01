@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Video, ArrowRight, Star, Bell, X, Sparkles, Smile, Globe, Calendar, Lock, Check, Clock, Trophy, Flame, Moon, Sun, Type } from 'lucide-react';
+import { Video, ArrowRight, Star, Bell, X, Sparkles, Smile, Globe, Calendar, Lock, Check, Clock, Trophy, Flame, Moon, Sun, Type, Palette, ChevronDown } from 'lucide-react';
 import { ViewState, RewardState } from '../types';
 import { getRewardState } from '../services/rewardService';
 import { useSettings, SUPPORTED_LANGUAGES, FontSize } from '../contexts/SettingsContext';
@@ -15,12 +15,13 @@ interface ReminderState {
 }
 
 export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
-  const { t, theme, toggleTheme, language, setLanguage, fontSize, setFontSize } = useSettings();
+  const { t, theme, toggleTheme, colorTheme, setColorTheme, language, setLanguage, fontSize, setFontSize, currentTheme } = useSettings();
   const { openWidget } = useLiveWidget();
   const [notification, setNotification] = useState<{ title: string; message: string; link: string } | null>(null);
   const [showReminderSettings, setShowReminderSettings] = useState<string | null>(null);
   const [rewards, setRewards] = useState<RewardState>(getRewardState());
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
+  const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
 
   const [reminderMinutes, setReminderMinutes] = useState(() => {
     const saved = localStorage.getItem('zoomReminderMinutes');
@@ -105,26 +106,11 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
     setFontSize(sizes[nextIndex]);
   };
 
-  // BRAND COLORS - Extracted from sumansuneja.com & Design Image
-  const BRAND_PRIMARY = "bg-[#7A3E3E]"; // Richer Brown/Red
-  const BRAND_PRIMARY_HOVER = "hover:bg-[#653232]";
-  const BRAND_SECONDARY = "bg-[#A64D40]"; // Vibrant Terracotta
-  const BRAND_SECONDARY_HOVER = "hover:bg-[#8F4236]";
-  const BRAND_ACCENT = "bg-[#E6C9A8]"; // Soft Gold/Tan
-  const BRAND_ACCENT_HOVER = "hover:bg-[#D4B897]";
-
-  // Gradients matching the Premium Wellness Design with SHINE/GLOW effect
-  // Hero: Deep reddish-brown with a lighter central glow
-  const HERO_GRADIENT = "bg-[linear-gradient(110deg,#592E2E_0%,#8C4A4A_50%,#592E2E_100%)]";
-
-  const AI_CARD_GRADIENT = ""; // Deprecated in favor of glassmorphism styles
-
-  // Button: Shiny Terracotta/Copper - Matches the user's image color with a glow
-  const BUTTON_GRADIENT = "bg-[linear-gradient(135deg,#8B3A3A_0%,#B85C5C_50%,#8B3A3A_100%)] shadow-[0_4px_20px_rgba(139,58,58,0.4)] hover:brightness-110 border-none";
-
-  // Games & Book: Matching the shiny button style
-  const GAMES_GRADIENT = "bg-[linear-gradient(135deg,#8B3A3A_0%,#B85C5C_50%,#8B3A3A_100%)]";
-  const BOOK_GRADIENT = "bg-[linear-gradient(135deg,#8B3A3A_0%,#B85C5C_50%,#8B3A3A_100%)]";
+  // THEME CONFIGURATION
+  const THEME_OPTIONS = [
+    { value: 'pastel' as const, label: 'Pastel' },
+    { value: 'red_brick' as const, label: 'Brand Color' }
+  ];
 
   return (
     <div className="p-4 space-y-6 pb-44 relative">
@@ -136,6 +122,36 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         >
           {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
         </button>
+
+        {/* Theme Dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => setIsThemeMenuOpen(!isThemeMenuOpen)}
+            className="p-2 bg-white/50 dark:bg-slate-700/50 backdrop-blur-md rounded-full border border-white/20 shadow-sm text-gray-600 dark:text-gray-200 flex items-center gap-1 active:scale-95 hover:bg-white/80 dark:hover:bg-slate-700"
+            title="Change Theme"
+          >
+            <Palette size={18} className={colorTheme === 'pastel' ? 'text-purple-500' : 'text-[#8B3A3A]'} />
+            <ChevronDown size={14} />
+          </button>
+          {isThemeMenuOpen && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setIsThemeMenuOpen(false)}></div>
+              <div className="absolute top-full end-0 mt-2 bg-white dark:bg-slate-800 rounded-xl shadow-xl p-1 z-50 min-w-[140px] animate-in zoom-in-95 border border-gray-100 dark:border-slate-700 origin-top-right rtl:origin-top-left">
+                {THEME_OPTIONS.map(themeOpt => (
+                  <button
+                    key={themeOpt.value}
+                    onClick={() => { setColorTheme(themeOpt.value); setIsThemeMenuOpen(false); }}
+                    className={`w-full text-start px-3 py-2 text-xs font-bold rounded-lg transition-colors flex items-center gap-2 ${colorTheme === themeOpt.value ? (themeOpt.value === 'pastel' ? 'bg-purple-100 text-purple-700' : 'bg-pink-100 text-pink-700') : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700'}`}
+                  >
+                    {colorTheme === themeOpt.value && <Check size={14} />}
+                    <span className="flex-1">{themeOpt.label}</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+
         <button
           onClick={cycleFontSize}
           className="p-2 bg-white/50 dark:bg-slate-700/50 backdrop-blur-md rounded-full border border-white/20 shadow-sm text-gray-600 dark:text-gray-200 transition-transform active:scale-95 hover:bg-white/80 dark:hover:bg-slate-700 relative group"
@@ -236,8 +252,8 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
 
       {/* Stats Cards - Pop In */}
       <div className="flex flex-wrap gap-3 animate-pop-in delay-100">
-        <div className="flex-1 min-w-[140px] bg-[#FFF8F0] dark:bg-slate-800 p-3 rounded-2xl flex items-center gap-3 border border-orange-100 dark:border-orange-900 shadow-sm">
-          <div className="bg-white dark:bg-orange-900 p-2 rounded-xl text-orange-500 shadow-sm shrink-0">
+        <div className={`flex-1 min-w-[140px] ${currentTheme.STAT_BG_1} dark:bg-slate-800 p-3 rounded-2xl flex items-center gap-3 shadow-sm`}>
+          <div className={`${currentTheme.STAT_ICON_BG_1} dark:bg-orange-900 p-2 rounded-xl shadow-sm shrink-0`}>
             <Flame size={20} fill="currentColor" className="animate-pulse" />
           </div>
           <div className="min-w-0">
@@ -245,8 +261,8 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             <div className="text-[0.65rem] font-bold text-orange-400 uppercase truncate">{t('streak')}</div>
           </div>
         </div>
-        <div className="flex-1 min-w-[140px] bg-[#F8F0FF] dark:bg-slate-800 p-3 rounded-2xl flex items-center gap-3 border border-purple-100 dark:border-purple-900 shadow-sm">
-          <div className="bg-white dark:bg-purple-900 p-2 rounded-xl text-purple-500 shadow-sm shrink-0">
+        <div className={`flex-1 min-w-[140px] ${currentTheme.STAT_BG_2} dark:bg-slate-800 p-3 rounded-2xl flex items-center gap-3 shadow-sm`}>
+          <div className={`${currentTheme.STAT_ICON_BG_2} dark:bg-purple-900 p-2 rounded-xl shadow-sm shrink-0`}>
             <Trophy size={20} fill="currentColor" className="animate-wiggle" />
           </div>
           <div className="min-w-0">
@@ -287,7 +303,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
       )}
 
       {/* Main Welcome Card - Fade In Up - RTL Compatible */}
-      <div className={`${HERO_GRADIENT} dark:from-indigo-900 dark:to-purple-900 rounded-[2rem] p-6 text-white shadow-2xl shadow-[#783766]/30 dark:shadow-none relative overflow-hidden group min-h-[240px] h-auto animate-fade-in-up delay-200 flex flex-col justify-center`}>
+      <div className={`${currentTheme.HERO} dark:from-indigo-900 dark:to-purple-900 rounded-[2rem] p-6 text-white shadow-2xl shadow-[#783766]/30 dark:shadow-none relative overflow-hidden group min-h-[240px] h-auto animate-fade-in-up delay-200 flex flex-col justify-center`}>
         {/* Enhanced Glow Gradient behind the photo */}
         <div className="absolute top-[-10%] end-[-10%] w-[70%] h-[120%] bg-[radial-gradient(circle,rgba(167,139,250,0.4)_0%,rgba(167,139,250,0)_70%)] dark:bg-slate-800/50 rounded-full mix-blend-screen filter blur-3xl opacity-100 transform translate-x-10 rtl:-translate-x-10 group-hover:scale-110 transition-transform duration-700 pointer-events-none"></div>
         <div className="absolute top-[10%] end-[5%] w-48 h-48 bg-indigo-400/30 rounded-full filter blur-[50px] mix-blend-screen opacity-80 animate-pulse-slow pointer-events-none"></div>
@@ -314,16 +330,16 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           </p>
           <button
             onClick={() => onNavigate(ViewState.COACH)}
-            className={`${BUTTON_GRADIENT} text-white px-5 py-2.5 rounded-full text-xs font-bold shadow-lg shadow-black/20 active:scale-95 transition-all flex items-center gap-2 hover:scale-105 border border-white/20`}
+            className={`${currentTheme.HERO_BUTTON} px-5 py-2.5 rounded-full text-xs font-bold active:scale-95 transition-all flex items-center gap-2 hover:scale-105`}
           >
-            <Star size={14} fill="currentColor" className="text-yellow-300" />
-            {t('home.test_laugh')}
+            <Star size={14} fill="currentColor" className={colorTheme === 'pastel' ? "text-[#A9A9C6]" : "text-yellow-300"} />
+            <span className={colorTheme === 'pastel' ? "text-[#A9A9C6]" : "text-white"}>{t('home.test_laugh')}</span>
           </button>
         </div>
       </div>
 
       {/* Live AI Interaction Card - Enhanced Standout Design */}
-      <div className="bg-white/70 dark:bg-slate-800/80 backdrop-blur-xl border-2 border-purple-300/50 dark:border-purple-500/30 shadow-[0_10px_40px_-10px_rgba(120,55,102,0.2)] rounded-[24px] p-1 relative overflow-hidden group animate-fade-in-up delay-250 my-6 transform transition-all hover:scale-[1.02] hover:shadow-[0_20px_50px_-10px_rgba(120,55,102,0.3)] hover:border-purple-300">
+      <div className={`${currentTheme.LIVE_CARD_BG} dark:bg-slate-800/80 shadow-[0_10px_40px_-10px_rgba(120,55,102,0.2)] rounded-[24px] p-1 relative overflow-hidden group animate-fade-in-up delay-250 my-6 transform transition-all hover:scale-[1.02] hover:shadow-[0_20px_50px_-10px_rgba(120,55,102,0.3)] hover:border-purple-300`}>
         <div className="rounded-[1.8rem] p-6 relative z-10 flex flex-col md:flex-row items-center gap-6 text-center md:text-start">
 
           <div className="relative shrink-0">
@@ -343,12 +359,12 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             <h3 className="text-2xl font-bold text-[#333333] dark:text-white mb-2 flex items-center justify-center md:justify-start gap-2">
               Talk to Suman AI <Sparkles size={20} className="text-yellow-400 animate-spin-slow" />
             </h3>
-            <p className="text-[#934139] dark:text-gray-300 text-sm font-medium leading-relaxed mb-4 max-w-md mx-auto md:mx-0">
+            <p className={`${currentTheme.TEXT_PRIMARY} dark:text-gray-300 text-sm font-medium leading-relaxed mb-4 max-w-md mx-auto md:mx-0`}>
               Experience the world's first real-time Laughter Yoga AI. Have a conversation, get instant feedback, and laugh together!
             </p>
             <button
               onClick={openWidget}
-              className={`${BUTTON_GRADIENT} w-full md:w-auto hover:brightness-110 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-teal-700/20 hover:shadow-teal-700/40 active:scale-95 transition-all flex items-center justify-center gap-2 text-base`}
+              className={`${currentTheme.LIVE_BTN} w-full md:w-auto font-bold py-3 px-8 rounded-xl active:scale-95 transition-all flex items-center justify-center gap-2 text-base`}
             >
               Start Live Interaction <ArrowRight size={18} />
             </button>
@@ -362,7 +378,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           <div className="p-1.5 bg-pink-100 rounded-lg">
             <Video size={18} className="text-pink-500" />
           </div>
-          <h3 className="font-bold text-[#934139] dark:text-gray-200">Live Sessions</h3>
+          <h3 className={`font-bold ${currentTheme.TEXT_PRIMARY} dark:text-gray-200`}>Live Sessions</h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -387,7 +403,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 </button>
               </div>
 
-              <h4 className="font-fredoka font-bold text-xl text-[#934139] dark:text-gray-100 mb-2 leading-tight">{t('daily_session')}</h4>
+              <h4 className={`font-fredoka font-bold text-xl ${currentTheme.TEXT_PRIMARY} dark:text-gray-100 mb-2 leading-tight`}>{t('daily_session')}</h4>
 
               <div className="space-y-1.5 mb-4">
                 <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
@@ -415,7 +431,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 href="https://zoom.us/j/3415272874"
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`w-full ${BUTTON_GRADIENT} text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 text-sm hover:scale-[1.02]`}
+                className={`w-full ${currentTheme.BUTTON} font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 text-sm hover:scale-[1.02]`}
               >
                 {t('join_session')} <ArrowRight size={16} className="rtl:rotate-180" />
               </a>
@@ -443,7 +459,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 </button>
               </div>
 
-              <h4 className="font-fredoka font-bold text-xl text-[#934139] dark:text-gray-100 mb-2 leading-tight">{t('traditional_yoga')}</h4>
+              <h4 className={`font-fredoka font-bold text-xl ${currentTheme.TEXT_PRIMARY} dark:text-gray-100 mb-2 leading-tight`}>{t('traditional_yoga')}</h4>
 
               <div className="space-y-1.5 mb-4">
                 <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
@@ -467,7 +483,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 href="https://zoom.us/join"
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`w-full ${BUTTON_GRADIENT} text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 text-sm hover:scale-[1.02]`}
+                className={`w-full ${currentTheme.BUTTON_SECONDARY} font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 text-sm hover:scale-[1.02]`}
               >
                 {t('join_yoga')} <ArrowRight size={16} className="rtl:rotate-180" />
               </a>
@@ -481,18 +497,22 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
       <div className="grid grid-cols-2 gap-4 animate-fade-in-up delay-300">
         <button
           onClick={() => onNavigate(ViewState.GAMES)}
-          className={`${GAMES_GRADIENT} dark:bg-slate-800 p-4 rounded-[2rem] flex flex-col items-center justify-center text-center gap-2 hover:brightness-110 dark:hover:bg-slate-700 transition-all shadow-lg group hover:scale-[1.02] h-full min-h-[100px] border-2 border-white/20`}
+          className={`${currentTheme.GAMES} dark:bg-slate-800 p-4 rounded-[2rem] flex flex-col items-center justify-center text-center gap-2 hover:brightness-110 dark:hover:bg-slate-700 transition-all shadow-lg group hover:scale-[1.02] h-full min-h-[100px]`}
         >
-          <Star size={24} fill="currentColor" className="text-white group-hover:rotate-12 transition-transform" />
-          <span className="font-bold text-white text-base leading-tight">{t('fun_games')}</span>
+          <div className={`${currentTheme.GAMES_ICON_BG} rounded-full flex items-center justify-center`}>
+            <Star size={24} fill="currentColor" className="group-hover:rotate-12 transition-transform" />
+          </div>
+          <span className={`font-bold text-base leading-tight ${colorTheme === 'pastel' ? 'text-[#5B5166]' : 'text-white'}`}>{t('fun_games')}</span>
         </button>
 
         <button
           onClick={() => onNavigate(ViewState.CONTACT)}
-          className={`${BOOK_GRADIENT} dark:bg-slate-800 p-4 rounded-[2rem] flex flex-col items-center justify-center text-center gap-2 hover:brightness-110 dark:hover:bg-slate-700 transition-all shadow-lg group hover:scale-[1.02] h-full min-h-[100px] border-2 border-white/20`}
+          className={`${currentTheme.BOOK} dark:bg-slate-800 p-4 rounded-[2rem] flex flex-col items-center justify-center text-center gap-2 hover:brightness-110 dark:hover:bg-slate-700 transition-all shadow-lg group hover:scale-[1.02] h-full min-h-[100px]`}
         >
-          <Calendar size={24} className="text-white group-hover:-rotate-12 transition-transform" />
-          <span className="font-bold text-white text-base leading-tight">{t('book_session')}</span>
+          <div className={`${currentTheme.BOOK_ICON_BG} rounded-full flex items-center justify-center`}>
+            <Calendar size={24} className="group-hover:-rotate-12 transition-transform" />
+          </div>
+          <span className={`font-bold text-base leading-tight ${colorTheme === 'pastel' ? 'text-[#5B5166]' : 'text-white'}`}>{t('book_session')}</span>
         </button>
       </div>
 

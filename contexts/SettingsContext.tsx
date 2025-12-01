@@ -1,21 +1,11 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-export type Theme = 'light' | 'dark';
 export type Language = 'en' | 'hi' | 'es' | 'ar' | 'fr' | 'de' | 'ja';
+export type Theme = 'light' | 'dark';
+export type ColorTheme = 'red_brick' | 'pastel';
 export type FontSize = 'small' | 'normal' | 'large' | 'xl';
 
-interface SettingsContextType {
-  theme: Theme;
-  toggleTheme: () => void;
-  language: Language;
-  setLanguage: (lang: Language) => void;
-  fontSize: FontSize;
-  setFontSize: (size: FontSize) => void;
-  t: (key: string) => string;
-  dir: 'ltr' | 'rtl';
-}
-
-export const SUPPORTED_LANGUAGES: { code: Language, label: string }[] = [
+export const SUPPORTED_LANGUAGES: { code: Language; label: string }[] = [
   { code: 'en', label: 'English' },
   { code: 'hi', label: 'हिंदी' },
   { code: 'es', label: 'Español' },
@@ -24,6 +14,19 @@ export const SUPPORTED_LANGUAGES: { code: Language, label: string }[] = [
   { code: 'de', label: 'Deutsch' },
   { code: 'ja', label: '日本語' },
 ];
+
+interface SettingsContextType {
+  theme: Theme;
+  toggleTheme: () => void;
+  colorTheme: ColorTheme;
+  setColorTheme: (theme: ColorTheme) => void;
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  fontSize: FontSize;
+  setFontSize: (size: FontSize) => void;
+  t: (key: string) => string;
+  dir: 'ltr' | 'rtl';
+}
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
@@ -1108,11 +1111,6 @@ const translations: Record<Language, Record<string, string>> = {
     'coach.listen_laugh': '聞いて笑おう',
     'coach.listening': '聞いています...',
     'coach.ready': '準備完了',
-    'coach.rate_my_laugh': '笑いを採点',
-    'coach.stop_rate': '停止＆採点',
-    'coach.energy': 'エネルギー',
-    'coach.play_again': 'もう一度',
-    'coach.offline_voice': 'オフライン音声（接続エラー）',
     'coach.laughter_log': '笑いの記録',
     'coach.clear': '消去',
     'coach.clear_confirm': '記録を消去しますか？',
@@ -1127,13 +1125,125 @@ const translations: Record<Language, Record<string, string>> = {
   }
 };
 
+export interface ThemeColors {
+  HERO: string;
+  HERO_BUTTON: string;
+  BUTTON: string;
+  BUTTON_SECONDARY: string;
+  GAMES: string;
+  GAMES_ICON_BG: string;
+  BOOK: string;
+  BOOK_ICON_BG: string;
+  TEXT_PRIMARY: string;
+  ICON_BG: string;
+  ICON_COLOR: string;
+  STAT_BG_1: string;
+  STAT_ICON_BG_1: string;
+  STAT_BG_2: string;
+  STAT_ICON_BG_2: string;
+  LIVE_CARD_BG: string;
+  LIVE_BTN: string;
+  // New additions for Header, Music, and Mic
+  HEADER_BG: string;
+  HEADER_TEXT: string;
+  HEADER_BORDER: string;
+  SUBSCRIBE_BTN: string;
+  MUSIC_BTN: string;
+  MUSIC_BTN_ACTIVE: string;
+  MUSIC_ICON: string;
+  MIC_BTN: string;
+  MIC_RIPPLE: string;
+}
+
+export const THEMES: Record<ColorTheme, ThemeColors> = {
+  pastel: {
+    HERO: "bg-[#A9A9C6]",
+    HERO_BUTTON: "bg-white text-[#A9A9C6] shadow-sm hover:bg-gray-50 border-none",
+    BUTTON: "bg-[#A8C8C0] text-white shadow-sm hover:brightness-105 border-none",
+    BUTTON_SECONDARY: "bg-[#C0B8D0] text-white shadow-sm hover:brightness-105 border-none",
+    GAMES: "bg-[#EFEFF5] text-[#5B5166] border-none",
+    GAMES_ICON_BG: "bg-[#B8B8D0] text-white p-3 rounded-full mb-1",
+    BOOK: "bg-[#EFEFF5] text-[#5B5166] border-none",
+    BOOK_ICON_BG: "bg-[#A0B0B0] text-white p-3 rounded-full mb-1",
+    TEXT_PRIMARY: "text-[#5B5166]",
+    ICON_BG: "bg-[#E8DFF5]",
+    ICON_COLOR: "text-[#9B86BD]",
+    STAT_BG_1: "bg-[#FFF0E0] border border-orange-100",
+    STAT_ICON_BG_1: "bg-white text-orange-400",
+    STAT_BG_2: "bg-[#F0F0FF] border border-purple-100",
+    STAT_ICON_BG_2: "bg-white text-purple-400",
+    LIVE_CARD_BG: "bg-white border-2 border-purple-100",
+    LIVE_BTN: "bg-[#A8C8C0] text-white hover:brightness-105 shadow-md",
+    // Header
+    HEADER_BG: "bg-[#EFEFF5]",
+    HEADER_TEXT: "text-[#5B5166]",
+    HEADER_BORDER: "border-[#B8B8D0]/20",
+    SUBSCRIBE_BTN: "bg-[#C0B8D0] hover:bg-[#B0A8C0]",
+    // Music
+    MUSIC_BTN: "bg-white border-[#EDE8F8] text-[#C3B8D5] hover:border-[#A8C8C0] hover:text-[#A8C8C0]",
+    MUSIC_BTN_ACTIVE: "bg-[#A8C8C0] border-white text-white",
+    MUSIC_ICON: "text-[#A8C8C0]",
+    // Mic
+    MIC_BTN: "bg-[#C0B8D0] text-white hover:scale-110",
+    MIC_RIPPLE: "bg-[#C0B8D0]/30"
+  },
+  red_brick: {
+    HERO: "bg-[linear-gradient(110deg,#592E2E_0%,#8C4A4A_50%,#592E2E_100%)]",
+    HERO_BUTTON: "bg-[linear-gradient(135deg,#8B3A3A_0%,#B85C5C_50%,#8B3A3A_100%)] text-white shadow-lg border border-white/20",
+    BUTTON: "bg-[linear-gradient(135deg,#8B3A3A_0%,#B85C5C_50%,#8B3A3A_100%)] text-white shadow-[0_4px_20px_rgba(139,58,58,0.4)] hover:brightness-110 border-none",
+    BUTTON_SECONDARY: "bg-[linear-gradient(135deg,#8B3A3A_0%,#B85C5C_50%,#8B3A3A_100%)] text-white shadow-[0_4px_20px_rgba(139,58,58,0.4)] hover:brightness-110 border-none",
+    GAMES: "bg-[linear-gradient(135deg,#8B3A3A_0%,#B85C5C_50%,#8B3A3A_100%)] text-white border-2 border-white/20",
+    GAMES_ICON_BG: "text-white mb-1",
+    BOOK: "bg-[linear-gradient(135deg,#8B3A3A_0%,#B85C5C_50%,#8B3A3A_100%)] text-white border-2 border-white/20",
+    BOOK_ICON_BG: "text-white mb-1",
+    TEXT_PRIMARY: "text-[#934139]",
+    ICON_BG: "bg-pink-100",
+    ICON_COLOR: "text-pink-500",
+    STAT_BG_1: "bg-[#FFF8F0] border border-orange-100",
+    STAT_ICON_BG_1: "bg-white text-orange-500",
+    STAT_BG_2: "bg-[#F8F0FF] border border-purple-100",
+    STAT_ICON_BG_2: "bg-white text-purple-500",
+    LIVE_CARD_BG: "bg-white/70 backdrop-blur-xl border-2 border-purple-300/50",
+    LIVE_BTN: "bg-[linear-gradient(135deg,#8B3A3A_0%,#B85C5C_50%,#8B3A3A_100%)] text-white shadow-lg shadow-teal-700/20",
+    // Header
+    HEADER_BG: "bg-[#FEF4E6]",
+    HEADER_TEXT: "text-[#783766]",
+    HEADER_BORDER: "border-[#783766]/10",
+    SUBSCRIBE_BTN: "bg-[#934139] hover:bg-[#7a302a]",
+    // Music
+    MUSIC_BTN: "bg-white border-[#EDE8F8] text-[#C3B8D5] hover:border-[#8B3A3A] hover:text-[#8B3A3A]",
+    MUSIC_BTN_ACTIVE: "bg-[#8B3A3A] border-white text-white",
+    MUSIC_ICON: "text-[#8B3A3A]",
+    // Mic
+    MIC_BTN: "bg-[linear-gradient(135deg,#8B3A3A_0%,#B85C5C_50%,#8B3A3A_100%)] text-white hover:scale-110",
+    MIC_RIPPLE: "bg-[#8B3A3A]/30"
+  }
+};
+
+interface SettingsContextType {
+  theme: Theme;
+  toggleTheme: () => void;
+  colorTheme: ColorTheme;
+  setColorTheme: (theme: ColorTheme) => void;
+  currentTheme: ThemeColors;
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  fontSize: FontSize;
+  setFontSize: (size: FontSize) => void;
+  t: (key: string) => string;
+  dir: 'ltr' | 'rtl';
+}
+
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
 export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('app_theme') as Theme) || 'light');
+  const [colorTheme, setColorTheme] = useState<ColorTheme>(() => (localStorage.getItem('app_color_theme') as ColorTheme) || 'red_brick');
   const [language, setLanguage] = useState<Language>(() => (localStorage.getItem('app_lang') as Language) || 'en');
   const [fontSize, setFontSize] = useState<FontSize>(() => (localStorage.getItem('app_fontsize') as FontSize) || 'normal');
   const [dir, setDir] = useState<'ltr' | 'rtl'>('ltr');
+
+  const currentTheme = THEMES[colorTheme] || THEMES.red_brick;
 
   useEffect(() => {
     localStorage.setItem('app_theme', theme);
@@ -1143,6 +1253,10 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       document.documentElement.classList.remove('dark');
     }
   }, [theme]);
+
+  useEffect(() => {
+    localStorage.setItem('app_color_theme', colorTheme);
+  }, [colorTheme]);
 
   useEffect(() => {
     localStorage.setItem('app_lang', language);
@@ -1170,7 +1284,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   return (
-    <SettingsContext.Provider value={{ theme, toggleTheme, language, setLanguage, fontSize, setFontSize, t, dir }}>
+    <SettingsContext.Provider value={{ theme, toggleTheme, colorTheme, setColorTheme, currentTheme, language, setLanguage, fontSize, setFontSize, t, dir }}>
       {children}
     </SettingsContext.Provider>
   );
