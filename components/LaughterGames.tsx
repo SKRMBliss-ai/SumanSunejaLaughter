@@ -362,7 +362,10 @@ export const LaughterGames: React.FC = () => {
       </div>
 
       {/* Main Display Area */}
-      <div className={`rounded-[2.5rem] p-6 shadow-xl relative overflow-hidden min-h-[300px] h-auto flex flex-col items-center justify-center text-center transition-colors duration-500 animate-fade-in-up delay-200 ${currentTheme.GAMES}`}>
+      <div className={`rounded-[2.5rem] p-6 shadow-xl relative overflow-hidden min-h-[300px] h-auto flex flex-col items-center justify-center text-center transition-colors duration-500 animate-fade-in-up delay-200 bg-white dark:bg-slate-800 border-2 ${currentTheme.VIDEO_BORDER}`}>
+
+        {/* Pulsing Background Effect */}
+        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 ${currentTheme.HERO} rounded-full blur-3xl opacity-20 animate-pulse`}></div>
 
         {/* Visualizer Canvas */}
         <div className="relative z-10 w-full h-32 flex items-center justify-center mb-4 shrink-0">
@@ -377,8 +380,8 @@ export const LaughterGames: React.FC = () => {
               </div>
             )
           ) : (
-            <div className={`w-24 h-24 rounded-full bg-white/50 border-4 border-dashed flex items-center justify-center transition-colors border-white/30 animate-float`}>
-              <Music size={32} className="text-white/70" />
+            <div className={`w-24 h-24 rounded-full bg-gray-50 dark:bg-slate-700 border-4 border-dashed flex items-center justify-center transition-colors ${currentTheme.VIDEO_BORDER} animate-float`}>
+              <Music size={32} className={currentTheme.TEXT_ACCENT} />
             </div>
           )}
         </div>
@@ -506,8 +509,6 @@ export const LaughterGames: React.FC = () => {
             </button>
           </div>
         )}
-
-        {/* Playback Control (if playing) */}
 
       </div>
 

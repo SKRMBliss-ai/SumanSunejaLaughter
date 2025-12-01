@@ -49,7 +49,7 @@ function decode(base64: string) {
 }
 
 export const LaughterCoach: React.FC = () => {
-  const { t } = useSettings();
+  const { t, currentTheme } = useSettings();
 
   // Main modes
   const [isRecording, setIsRecording] = useState(false); // For Score Analyzer
@@ -482,9 +482,9 @@ export const LaughterCoach: React.FC = () => {
       {showFeedback && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-pop-in">
           <div className="bg-white dark:bg-slate-800 rounded-[2rem] p-6 w-full max-w-xs shadow-2xl relative border-4 border-[#EDE8F8] dark:border-slate-700 text-center">
-            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#ABCEC9] to-[#C3B8D5]"></div>
+            <div className={`absolute top-0 left-0 w-full h-2 bg-gradient-to-r ${currentTheme.VIDEO_RING_1} ${currentTheme.VIDEO_RING_2}`}></div>
             <h3 className="text-xl font-fredoka font-bold text-gray-700 dark:text-gray-100 mb-2 mt-2">{t('coach.how_was_it')}</h3>
-            <p className="text-sm text-[#AABBCC] mb-6">{t('coach.help_improve')}</p>
+            <p className={`text-sm ${currentTheme.TEXT_PRIMARY} mb-6`}>{t('coach.help_improve')}</p>
 
             <div className="flex gap-4 justify-center">
               <button
@@ -519,11 +519,11 @@ export const LaughterCoach: React.FC = () => {
           disabled={isSessionLoading || isRecording || (isSessionActive && sessionType !== 'LIVE')}
           className={`w-full p-4 rounded-2xl shadow-lg flex items-center justify-between transition-all transform active:scale-95 border-2 hover:scale-[1.02] ${isSessionActive && sessionType === 'LIVE'
             ? 'bg-white dark:bg-slate-800 border-purple-400 ring-4 ring-purple-100 dark:ring-purple-900 text-purple-700 dark:text-purple-400'
-            : 'bg-white dark:bg-slate-800 border-purple-100 dark:border-slate-700 text-purple-600 dark:text-purple-400 hover:border-purple-200 dark:hover:border-purple-800'
+            : `bg-white dark:bg-slate-800 ${currentTheme.VIDEO_BORDER} text-purple-600 dark:text-purple-400 hover:border-purple-200 dark:hover:border-purple-800`
             } ${isSessionActive && sessionType !== 'LIVE' ? 'opacity-50' : ''}`}
         >
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-full ${isSessionActive && sessionType === 'LIVE' ? 'bg-purple-500 text-white' : 'bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-300'}`}>
+            <div className={`p-2 rounded-full ${isSessionActive && sessionType === 'LIVE' ? 'bg-purple-500 text-white' : `${currentTheme.ICON_BG} text-purple-600 dark:text-purple-300`}`}>
               {isSessionLoading && sessionType === 'LIVE' ? <Loader2 size={24} className="animate-spin" /> :
                 isSessionActive && sessionType === 'LIVE' ? <StopCircle size={24} fill="currentColor" /> :
                   <Mic size={24} />}
@@ -550,8 +550,8 @@ export const LaughterCoach: React.FC = () => {
           onClick={() => isSessionActive && sessionType === 'QUICK' ? stopSession() : handleQuickSession()}
           disabled={isSessionLoading || isRecording || (isSessionActive && sessionType !== 'QUICK')}
           className={`w-full p-4 rounded-2xl shadow-lg flex items-center justify-between transition-all transform active:scale-95 border-2 hover:scale-[1.02] ${isSessionActive && sessionType === 'QUICK'
-            ? 'bg-white dark:bg-slate-800 border-[#ABCEC9] ring-4 ring-[#ABCEC9]/20 text-[#ABCEC9]'
-            : 'bg-gradient-to-r from-[#ABCEC9] to-[#C3B8D5] dark:from-teal-800 dark:to-purple-800 text-teal-900 dark:text-white border-transparent'
+            ? `bg-white dark:bg-slate-800 border-[#ABCEC9] ring-4 ring-[#ABCEC9]/20 text-[#ABCEC9]`
+            : `${currentTheme.BUTTON} border-transparent`
             } ${isSessionActive && sessionType !== 'QUICK' ? 'opacity-50' : ''}`}
         >
           <div className="flex items-center gap-3">
@@ -561,17 +561,17 @@ export const LaughterCoach: React.FC = () => {
                   <Zap size={24} fill="currentColor" />}
             </div>
             <div className="text-left">
-              <h3 className={`font-bold ${isSessionActive && sessionType === 'QUICK' ? 'text-gray-800 dark:text-gray-100' : 'text-teal-900 dark:text-white'}`}>
+              <h3 className={`font-bold ${isSessionActive && sessionType === 'QUICK' ? 'text-gray-800 dark:text-gray-100' : 'text-white'}`}>
                 {isSessionActive && sessionType === 'QUICK' ? 'Stop Session' : t('coach.quick_laugh')}
               </h3>
-              <p className={`text-xs ${isSessionActive && sessionType === 'QUICK' ? 'opacity-70 text-gray-600 dark:text-gray-400' : 'text-teal-800/80 dark:text-white/80'}`}>{t('coach.guided_boost')}</p>
+              <p className={`text-xs ${isSessionActive && sessionType === 'QUICK' ? 'opacity-70 text-gray-600 dark:text-gray-400' : 'text-white/80'}`}>{t('coach.guided_boost')}</p>
             </div>
           </div>
           {isSessionActive && sessionType === 'QUICK' && (
             <div className="flex gap-1 items-end h-4">
-              <div className="w-1 bg-[#ABCEC9] h-2 animate-[bounce_1s_infinite]"></div>
-              <div className="w-1 bg-[#ABCEC9] h-4 animate-[bounce_1.2s_infinite]"></div>
-              <div className="w-1 bg-[#ABCEC9] h-3 animate-[bounce_0.8s_infinite]"></div>
+              <div className="w-1 bg-white h-2 animate-[bounce_1s_infinite]"></div>
+              <div className="w-1 bg-white h-4 animate-[bounce_1.2s_infinite]"></div>
+              <div className="w-1 bg-white h-3 animate-[bounce_0.8s_infinite]"></div>
             </div>
           )}
         </button>
@@ -579,8 +579,8 @@ export const LaughterCoach: React.FC = () => {
       </div>
 
       <div className="text-center space-y-2 animate-pop-in delay-200">
-        <h2 className="text-4xl font-fredoka font-bold text-[#C3B8D5] drop-shadow-sm">{t('coach.title')}</h2>
-        <p className="text-[#AABBCC] font-medium">{t('coach.subtitle')}</p>
+        <h2 className={`text-4xl font-fredoka font-bold ${currentTheme.TEXT_PRIMARY} drop-shadow-sm`}>{t('coach.title')}</h2>
+        <p className={`${currentTheme.TEXT_PRIMARY} font-medium`}>{t('coach.subtitle')}</p>
       </div>
 
       {/* Interactive Visualizer */}
@@ -588,17 +588,17 @@ export const LaughterCoach: React.FC = () => {
         {/* Ripples */}
         {(isRecording || isSessionActive) && (
           <>
-            <div className={`absolute w-full h-full rounded-full opacity-20 animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite] ${sessionType === 'LIVE' ? 'bg-purple-300 dark:bg-purple-900' : 'bg-[#ABCEC9]'}`}></div>
-            <div className={`absolute w-3/4 h-3/4 rounded-full opacity-30 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite] ${sessionType === 'LIVE' ? 'bg-purple-200 dark:bg-purple-800' : 'bg-[#C3B8D5]'}`}></div>
+            <div className={`absolute w-full h-full rounded-full opacity-20 animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite] ${sessionType === 'LIVE' ? 'bg-purple-300 dark:bg-purple-900' : currentTheme.VIDEO_RING_1}`}></div>
+            <div className={`absolute w-3/4 h-3/4 rounded-full opacity-30 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite] ${sessionType === 'LIVE' ? 'bg-purple-200 dark:bg-purple-800' : currentTheme.VIDEO_RING_2}`}></div>
           </>
         )}
 
         {/* Main Circle */}
-        <div className={`relative w-56 h-56 rounded-full bg-gradient-to-br from-[#EDE8F8] to-white dark:from-slate-700 dark:to-slate-600 flex items-center justify-center shadow-inner border-4 border-white dark:border-slate-500 transition-all duration-300 ${isRecording || isSessionActive ? 'scale-110 shadow-lg animate-bounce-gentle' : 'animate-float'}`}>
+        <div className={`relative w-56 h-56 rounded-full bg-gradient-to-br ${currentTheme.ICON_BG} to-white dark:from-slate-700 dark:to-slate-600 flex items-center justify-center shadow-inner border-4 border-white dark:border-slate-500 transition-all duration-300 ${isRecording || isSessionActive ? 'scale-110 shadow-lg animate-bounce-gentle' : 'animate-float'}`}>
           <div className="absolute w-44 h-44 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center shadow-lg overflow-hidden p-4">
             {isAnalyzing ? (
               <div className="flex flex-col items-center">
-                <Loader2 className="w-12 h-12 text-[#ABCEC9] animate-spin mb-2" />
+                <Loader2 className={`w-12 h-12 ${currentTheme.TEXT_ACCENT} animate-spin mb-2`} />
                 <span className="text-xs font-bold text-[#AABBCC] animate-pulse">{t('coach.analyzing')}</span>
               </div>
             ) : isMissingKey ? (
@@ -610,20 +610,20 @@ export const LaughterCoach: React.FC = () => {
             ) : scoreData ? (
               <div className="text-center animate-pop-in">
                 <div className="flex justify-center mb-1"><Trophy className="text-yellow-300 w-8 h-8 fill-current animate-wiggle" /></div>
-                <span className="block text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#ABCEC9] to-[#C3B8D5]">{scoreData.score}</span>
+                <span className={`block text-6xl font-black ${currentTheme.TEXT_PRIMARY}`}>{scoreData.score}</span>
                 <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t('coach.joy_score')}</span>
               </div>
             ) : isSessionActive ? (
               <div className="text-center flex flex-col items-center">
-                {sessionType === 'LIVE' ? <Mic className="w-10 h-10 text-purple-400 mb-2 animate-pulse" /> : <Volume2 className="w-10 h-10 text-[#ABCEC9] mb-2 animate-pulse" />}
+                {sessionType === 'LIVE' ? <Mic className="w-10 h-10 text-purple-400 mb-2 animate-pulse" /> : <Volume2 className={`w-10 h-10 ${currentTheme.TEXT_ACCENT} mb-2 animate-pulse`} />}
                 <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
                   {sessionType === 'LIVE' ? t('coach.ai_listening') : t('coach.listen_laugh')}
                 </span>
               </div>
             ) : (
               <div className="text-center">
-                <Sparkles className={`w-16 h-16 mx-auto mb-2 transition-colors duration-300 ${isRecording ? 'text-[#C3B8D5] animate-spin-slow' : 'text-gray-200 dark:text-slate-600'}`} />
-                <span className={`text-xs font-bold uppercase tracking-wider ${isRecording ? 'text-[#C3B8D5]' : 'text-gray-300 dark:text-slate-500'}`}>
+                <Sparkles className={`w-16 h-16 mx-auto mb-2 transition-colors duration-300 ${isRecording ? `${currentTheme.TEXT_PRIMARY} animate-spin-slow` : 'text-gray-200 dark:text-slate-600'}`} />
+                <span className={`text-xs font-bold uppercase tracking-wider ${isRecording ? currentTheme.TEXT_PRIMARY : 'text-gray-300 dark:text-slate-500'}`}>
                   {isRecording ? t('coach.listening') : t('coach.ready')}
                 </span>
               </div>
@@ -637,7 +637,7 @@ export const LaughterCoach: React.FC = () => {
         {!isRecording && !isAnalyzing && !scoreData && !isSessionActive && (
           <button
             onClick={startRecording}
-            className="w-full bg-white dark:bg-slate-800 border-2 border-[#ABCEC9] text-[#ABCEC9] hover:bg-[#ABCEC9] hover:text-white font-bold py-4 rounded-2xl shadow-md transform transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-3 text-lg animate-fade-in-up delay-400"
+            className={`w-full bg-white dark:bg-slate-800 border-2 ${currentTheme.VIDEO_BORDER} ${currentTheme.TEXT_ACCENT} hover:brightness-95 font-bold py-4 rounded-2xl shadow-md transform transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-3 text-lg animate-fade-in-up delay-400`}
           >
             <Mic size={24} /> {t('coach.rate_my_laugh')}
           </button>
@@ -646,7 +646,7 @@ export const LaughterCoach: React.FC = () => {
         {isRecording && (
           <button
             onClick={stopRecording}
-            className="w-full bg-white dark:bg-slate-800 border-2 border-[#C3B8D5] text-[#C3B8D5] font-bold py-5 rounded-2xl shadow-lg transform transition active:scale-95 flex items-center justify-center gap-3 text-xl animate-pulse"
+            className={`w-full bg-white dark:bg-slate-800 border-2 ${currentTheme.VIDEO_BORDER} ${currentTheme.TEXT_PRIMARY} font-bold py-5 rounded-2xl shadow-lg transform transition active:scale-95 flex items-center justify-center gap-3 text-xl animate-pulse`}
           >
             <Square fill="currentColor" size={20} /> {t('coach.stop_rate')}
           </button>
@@ -664,7 +664,7 @@ export const LaughterCoach: React.FC = () => {
               </button>
               <button
                 onClick={startRecording}
-                className="bg-[#ABCEC9] text-white font-bold py-3 px-6 rounded-xl hover:bg-[#9BBDB8] transition-colors shadow-md"
+                className={`${currentTheme.BUTTON} font-bold py-3 px-6 rounded-xl hover:brightness-105 transition-colors shadow-md`}
               >
                 {t('coach.try_again')}
               </button>
@@ -709,7 +709,7 @@ export const LaughterCoach: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <div className="text-xs font-bold text-[#ABCEC9] px-2 py-1 bg-[#ABCEC9]/10 rounded-lg">
+                <div className={`text-xs font-bold ${currentTheme.TEXT_ACCENT} px-2 py-1 bg-gray-100 rounded-lg`}>
                   {item.energyLevel}
                 </div>
               </div>

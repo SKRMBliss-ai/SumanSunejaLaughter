@@ -24,6 +24,15 @@ const ITEMS_PER_PAGE = 5;
 
 export const VideoLibrary: React.FC = () => {
   const { t, currentTheme } = useSettings();
+
+  // Helper to get translated category
+  const getCategoryTranslation = (category: string) => {
+    const key = `video.category_${category.toLowerCase().replace(/ /g, '_')}`;
+    const translated = t(key);
+    // Fallback if translation key doesn't exist (returns key usually, so check if it looks like a key or just return original)
+    return translated !== key ? translated : category;
+  };
+
   const [activeTab, setActiveTab] = useState<'ALL' | 'FAV'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -106,14 +115,6 @@ export const VideoLibrary: React.FC = () => {
   );
 
   const playingVideo = videos.find(v => v.id === playingVideoId);
-
-  // Helper to get translated category
-  const getCategoryTranslation = (category: string) => {
-    const key = `video.category_${category.toLowerCase().replace(/ /g, '_')}`;
-    const translated = t(key);
-    // Fallback if translation key doesn't exist (returns key usually, so check if it looks like a key or just return original)
-    return translated !== key ? translated : category;
-  };
 
   return (
     <div className={`p-4 pb-28 min-h-screen ${currentTheme.VIDEO_BG} dark:bg-slate-900 animate-in fade-in duration-500`}>
