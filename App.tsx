@@ -87,7 +87,7 @@ const AppContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#EDE8F8] dark:bg-slate-900 font-sans text-gray-800 dark:text-gray-100 flex flex-col transition-colors duration-500">
+    <div className="min-h-screen bg-[#FFF8F0] dark:bg-slate-900 font-sans text-gray-800 dark:text-gray-100 flex flex-col transition-colors duration-500">
       <Header onNavigate={setView} />
 
       <main className="flex-1 max-w-2xl mx-auto w-full bg-white/50 dark:bg-slate-800/50 min-h-screen shadow-2xl transition-colors duration-500">

@@ -125,14 +125,14 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
                     {/* Ripples when active */}
                     {isSessionActive && (
                         <>
-                            <div className="absolute inset-0 rounded-full bg-purple-500/30 animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite]" />
-                            <div className="absolute inset-0 rounded-full bg-purple-500/20 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite] delay-150" />
+                            <div className="absolute inset-0 rounded-full bg-[#8B3A3A]/30 animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite]" />
+                            <div className="absolute inset-0 rounded-full bg-[#8B3A3A]/20 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite] delay-150" />
                         </>
                     )}
                     <button
                         onClick={toggleSession}
                         disabled={isLoading}
-                        className={`relative w-14 h-14 rounded-full flex items-center justify-center shadow-lg border-2 border-white transition-all duration-300 ${isSessionActive ? 'bg-red-500 hover:bg-red-600 text-white scale-110' : 'bg-gradient-to-br from-purple-500 to-indigo-600 text-white hover:scale-110 active:scale-90 animate-bounce-gentle'}`}
+                        className={`relative w-14 h-14 rounded-full flex items-center justify-center shadow-lg border-2 border-white transition-all duration-300 ${isSessionActive ? 'bg-red-500 hover:bg-red-600 text-white scale-110' : 'bg-[linear-gradient(135deg,#8B3A3A_0%,#B85C5C_50%,#8B3A3A_100%)] text-white hover:scale-110 active:scale-90 animate-bounce-gentle'}`}
                         title={isSessionActive ? 'End Call' : 'Talk to Suman'}
                     >
                         {isLoading ? (
@@ -179,8 +179,8 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
                                         className="w-full h-full object-cover opacity-50 blur-sm scale-110"
                                     />
                                     <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-                                        <div className="w-24 h-24 rounded-full bg-purple-500/20 flex items-center justify-center animate-[ping_2s_infinite]">
-                                            <div className="w-16 h-16 rounded-full bg-purple-500/40 flex items-center justify-center animate-[ping_1.5s_infinite]">
+                                        <div className="w-24 h-24 rounded-full bg-[#8B3A3A]/20 flex items-center justify-center animate-[ping_2s_infinite]">
+                                            <div className="w-16 h-16 rounded-full bg-[#8B3A3A]/40 flex items-center justify-center animate-[ping_1.5s_infinite]">
                                                 <img src="https://res.cloudinary.com/dfopoyt9v/image/upload/v1764307833/Gemini_Generated_Image_g3m0lng3m0lng3m0_ttyvxr.png" className="w-12 h-12 rounded-full object-cover border-2 border-white" />
                                             </div>
                                         </div>
@@ -199,7 +199,7 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
                                         className={`w-full h-full object-cover transition-transform duration-700 ${volumeLevel > 0.05 ? 'scale-105' : 'scale-100'}`}
                                     />
                                     {volumeLevel > 0.05 && (
-                                        <div className="absolute inset-0 border-4 border-purple-500/50 animate-pulse" />
+                                        <div className="absolute inset-0 border-4 border-[#8B3A3A]/50 animate-pulse" />
                                     )}
                                 </>
                             )}
