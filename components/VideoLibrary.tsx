@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Search, Heart, Download, Play, Pause, Filter, WifiOff, Trash2, Check, Loader2, Youtube, ChevronLeft, ChevronRight, ExternalLink, X } from 'lucide-react';
+import { Search, Heart, Play, Pause, Filter, Trash2, Youtube, ChevronLeft, ChevronRight, ExternalLink, X } from 'lucide-react';
 import { addPoints } from '../services/rewardService';
 import { useSettings } from '../contexts/SettingsContext';
 
@@ -23,7 +23,7 @@ const ITEMS_PER_PAGE = 5;
 
 export const VideoLibrary: React.FC = () => {
   const { t } = useSettings();
-  const [activeTab, setActiveTab] = useState<'ALL' | 'FAV' | 'OFFLINE'>('ALL');
+  const [activeTab, setActiveTab] = useState<'ALL' | 'FAV'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -36,20 +36,9 @@ export const VideoLibrary: React.FC = () => {
     return saved ? JSON.parse(saved) : [];
   });
 
-  const [downloads, setDownloads] = useState<string[]>(() => {
-    const saved = localStorage.getItem('suman_dl_videos');
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  const [downloading, setDownloading] = useState<string | null>(null);
-
   useEffect(() => {
     localStorage.setItem('suman_fav_videos', JSON.stringify(favorites));
   }, [favorites]);
-
-  useEffect(() => {
-    localStorage.setItem('suman_dl_videos', JSON.stringify(downloads));
-  }, [downloads]);
 
   useEffect(() => {
     let element = document.getElementById('player-portal');
@@ -70,24 +59,6 @@ export const VideoLibrary: React.FC = () => {
     }
   };
 
-  const handleDownload = (id: string) => {
-    if (downloads.includes(id)) {
-      // Remove
-      if (window.confirm(t('video.remove_confirm'))) {
-        setDownloads(prev => prev.filter(vidId => vidId !== id));
-      }
-      return;
-    }
-
-    setDownloading(id);
-    // Simulate network delay
-    setTimeout(() => {
-      setDownloads(prev => [...prev, id]);
-      setDownloading(null);
-      addPoints(10, t('video.saved_toast'), 'VIDEO');
-    }, 2000);
-  };
-
   const handlePlay = (id: string) => {
     setPlayingVideoId(id);
     addPoints(5, t('video.started_toast'), 'VIDEO');
@@ -103,9 +74,7 @@ export const VideoLibrary: React.FC = () => {
   const filteredVideos = SAMPLE_VIDEOS.filter(video => {
     const matchesSearch = video.title.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory ? video.category === selectedCategory : true;
-    const matchesTab =
-      activeTab === 'FAV' ? favorites.includes(video.id) :
-        activeTab === 'OFFLINE' ? downloads.includes(video.id) : true;
+    const matchesTab = activeTab === 'FAV' ? favorites.includes(video.id) : true;
 
     return matchesSearch && matchesCategory && matchesTab;
   });
@@ -158,12 +127,6 @@ export const VideoLibrary: React.FC = () => {
             className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${activeTab === 'FAV' ? 'bg-[#C3B8D5] text-white shadow-md' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'}`}
           >
             <Heart size={12} fill={activeTab === 'FAV' ? "currentColor" : "none"} /> {t('video.tab_favorites')}
-          </button>
-          <button
-            onClick={() => { setActiveTab('OFFLINE'); setCurrentPage(1); }}
-            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${activeTab === 'OFFLINE' ? 'bg-gray-700 text-white shadow-md' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'}`}
-          >
-            {activeTab === 'OFFLINE' ? <WifiOff size={12} /> : <Download size={12} />} {t('video.tab_offline')}
           </button>
         </div>
 
@@ -266,23 +229,6 @@ export const VideoLibrary: React.FC = () => {
                   >
                     <Youtube size={14} /> {t('video.open_app')}
                   </a>
-
-                  <button
-                    onClick={() => handleDownload(video.id)}
-                    disabled={downloading === video.id}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-all ${downloads.includes(video.id)
-                      ? 'bg-green-50 dark:bg-green-900/30 text-green-600'
-                      : 'bg-[#EDE8F8] dark:bg-slate-700 text-[#AABBCC] dark:text-gray-400 hover:bg-[#C3B8D5] hover:text-white dark:hover:bg-slate-600'
-                      }`}
-                  >
-                    {downloading === video.id ? (
-                      <><Loader2 size={12} className="animate-spin" /> {t('video.saving')}</>
-                    ) : downloads.includes(video.id) ? (
-                      <><Check size={12} /> {t('video.saved')}</>
-                    ) : (
-                      <><Download size={12} /> {t('video.save_offline')}</>
-                    )}
-                  </button>
                 </div>
               </div>
             </div>
