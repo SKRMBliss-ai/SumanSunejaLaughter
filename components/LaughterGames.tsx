@@ -24,7 +24,7 @@ const JOKE_PRESETS = [
 
 
 export const LaughterGames: React.FC = () => {
-  const { currentTheme } = useSettings();
+  const { currentTheme, colorTheme } = useSettings();
   const [activeTab, setActiveTab] = useState<'GENERATOR' | 'MOOD' | 'JOKES'>('GENERATOR');
   const [topic, setTopic] = useState('');
   const [currentText, setCurrentText] = useState<string | null>(null);
@@ -100,33 +100,29 @@ export const LaughterGames: React.FC = () => {
       const radius = 30; // Base radius
 
       ctx.beginPath();
-      // Create a dynamic circle based on audio data
-      let sum = 0;
+      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+      ctx.fillStyle = '#FFB6C1'; // Light pink center
+      ctx.fill();
+
+      // Draw bars around the circle
+      const barWidth = (2 * Math.PI * radius) / bufferLength;
+      let angle = 0;
+
       for (let i = 0; i < bufferLength; i++) {
-        sum += dataArray[i];
-      }
-      const average = sum / bufferLength;
-      const dynamicRadius = radius + (average / 1.5); // More sensitive bounce
+        const barHeight = dataArray[i] / 2;
+        const x1 = centerX + Math.cos(angle) * radius;
+        const y1 = centerY + Math.sin(angle) * radius;
+        const x2 = centerX + Math.cos(angle) * (radius + barHeight);
+        const y2 = centerY + Math.sin(angle) * (radius + barHeight);
 
-      ctx.arc(centerX, centerY, dynamicRadius, 0, 2 * Math.PI);
-      // Use theme color for visualizer
-      ctx.fillStyle = activeTab === 'JOKES' ? '#FCA5A5' : '#ABCEC9';
-      ctx.fill();
+        ctx.strokeStyle = `hsl(${i * 2 + 300}, 100%, 70%)`; // Pink/Purple hues
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
 
-      // Outer glow/pulse
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, dynamicRadius + 15, 0, 2 * Math.PI);
-      ctx.fillStyle = activeTab === 'JOKES' ? 'rgba(252, 165, 165, 0.4)' : 'rgba(195, 184, 213, 0.4)';
-      ctx.fill();
-
-      // Fun particles if loud enough
-      if (average > 30) {
-        ctx.fillStyle = activeTab === 'JOKES' ? '#FECACA' : '#E0E7FF';
-        for (let i = 0; i < 3; i++) {
-          const px = centerX + (Math.random() - 0.5) * dynamicRadius * 2.5;
-          const py = centerY + (Math.random() - 0.5) * dynamicRadius * 2.5;
-          ctx.fillRect(px, py, 4, 4);
-        }
+        angle += (2 * Math.PI) / bufferLength;
       }
     };
 
@@ -137,31 +133,18 @@ export const LaughterGames: React.FC = () => {
     if (!audioContextRef.current) return;
 
     try {
-      if (audioContextRef.current.state === 'suspended') {
-        await audioContextRef.current.resume();
-      }
-
       stopAudio();
-
-      // Decode the audio manually since Gemini returns raw PCM without headers
-      const audioBuffer = createAudioBufferFromPCM(audioContextRef.current, base64Audio);
+      const audioBuffer = await createAudioBufferFromPCM(audioContextRef.current, base64Audio);
 
       const source = audioContextRef.current.createBufferSource();
       source.buffer = audioBuffer;
-
-      // Connect to analyser and destination
-      if (analyserRef.current) {
-        source.connect(analyserRef.current);
-        analyserRef.current.connect(audioContextRef.current.destination);
-      } else {
-        source.connect(audioContextRef.current.destination);
-      }
+      source.connect(analyserRef.current!);
+      analyserRef.current!.connect(audioContextRef.current.destination);
 
       source.onended = () => {
         setIsPlaying(false);
         if (animationFrameRef.current) {
           cancelAnimationFrame(animationFrameRef.current);
-          animationFrameRef.current = null;
         }
       };
 
@@ -171,32 +154,21 @@ export const LaughterGames: React.FC = () => {
       drawVisualizer();
 
     } catch (e) {
-      console.error("Audio playback failed", e);
-      setIsPlaying(false);
-      // Fallback if needed, though raw PCM decode should work
-      if (currentText) fallbackSpeak(currentText);
+      console.error("Audio Playback Error", e);
+      // Fallback to browser TTS if audio context fails
+      fallbackSpeak(currentText || "Ha ha ha!");
     }
   };
 
   const fallbackSpeak = (text: string) => {
-    console.warn("Using browser fallback for speech");
     setUsingFallbackVoice(true);
-
+    window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
 
-    // Pick a high quality voice if available
+    // Try to find a female voice
     const voices = window.speechSynthesis.getVoices();
-    // Prioritize natural sounding female voices
-    const preferredVoice = voices.find(v =>
-      v.name.includes('Google UK English Female') ||
-      v.name.includes('Google US English') ||
-      v.name.includes('Samantha') ||
-      (v.name.includes('Female') && v.lang.includes('en'))
-    );
-
-    if (preferredVoice) {
-      utterance.voice = preferredVoice;
-    }
+    const femaleVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Google US English'));
+    if (femaleVoice) utterance.voice = femaleVoice;
 
     utterance.rate = 1.05; // Slightly peppier
     utterance.pitch = 1.1; // Cheerful pitch
@@ -355,7 +327,7 @@ export const LaughterGames: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('MOOD')}
-          className={`flex-1 py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-all ${activeTab === 'MOOD' ? `${currentTheme.BUTTON}` : 'text-gray-400 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'}`}
+          className={`flex-1 py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-all ${activeTab === 'MOOD' ? `${currentTheme.BUTTON}` : 'text-gray-400 dark:text-gray-400 hover:text-gray-200'}`}
         >
           <Zap size={14} /> Moods
         </button>
@@ -475,36 +447,62 @@ export const LaughterGames: React.FC = () => {
                 Or Pick a {activeTab === 'JOKES' ? 'Topic' : 'Theme'}
               </p>
               <div className="grid grid-cols-2 gap-3">
-                {(activeTab === 'JOKES' ? JOKE_PRESETS : STORY_PRESETS).map((preset) => (
-                  <button
-                    key={preset}
-                    onClick={() => {
-                      setTopic(preset);
-                      handleGenerate(activeTab === 'JOKES' ? 'joke' : 'story', preset);
-                    }}
-                    className={`p-3 rounded-xl text-sm font-bold transition-all active:scale-95 shadow-sm border ${currentTheme.BUTTON_SECONDARY} opacity-80 hover:opacity-100`}
-                  >
-                    {preset}
-                  </button>
-                ))}
+                {(activeTab === 'JOKES' ? JOKE_PRESETS : STORY_PRESETS).map((preset, index) => {
+                  // Checkerboard logic: Red, Cream, Cream, Red...
+                  const isRed = (Math.floor(index / 2) + index % 2) % 2 === 0;
+                  return (
+                    <button
+                      key={preset}
+                      onClick={() => {
+                        setTopic(preset);
+                        handleGenerate(activeTab === 'JOKES' ? 'joke' : 'story', preset);
+                      }}
+                      className={`p-3 rounded-xl text-sm font-bold transition-all duration-300 active:scale-95 border-2 ${colorTheme === 'red_brick'
+                          ? (isRed
+                            ? 'bg-[#8B3A3A] text-white border-[#FFC1C1]/30 shadow-[0_4px_14px_0_rgba(139,58,58,0.4)] hover:bg-[#FFF8F0] hover:text-[#8B3A3A] hover:border-[#8B3A3A] hover:shadow-[0_0_20px_rgba(139,58,58,0.4)]'
+                            : 'bg-[#FFF8F0] text-[#8B3A3A] border-[#8B3A3A]/20 shadow-[0_4px_14px_0_rgba(0,0,0,0.05)] hover:bg-[#8B3A3A] hover:text-white hover:border-[#FFC1C1]/30 hover:shadow-[0_0_20px_rgba(139,58,58,0.4)]')
+                          : (isRed
+                            ? 'bg-purple-200 text-purple-900 border-purple-300 shadow-[0_4px_14px_0_rgba(147,51,234,0.2)] hover:bg-purple-100 hover:text-purple-800 hover:border-purple-400 hover:shadow-[0_0_20px_rgba(147,51,234,0.3)]'
+                            : 'bg-pink-100 text-pink-800 border-pink-200 shadow-[0_4px_14px_0_rgba(236,72,153,0.1)] hover:bg-pink-200 hover:text-pink-900 hover:border-pink-300 hover:shadow-[0_0_20px_rgba(236,72,153,0.3)]')
+                        } hover:-translate-y-0.5`}
+                    >
+                      {preset}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
-
         )}
 
         {activeTab === 'MOOD' && (
           <div className="grid grid-cols-2 gap-3 animate-fade-in-up delay-300">
-            <button onClick={() => handleMood("pure joy")} className={`${currentTheme.BUTTON} p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-105`}>
+            {/* Button 1: Primary (Red/Purple) */}
+            <button onClick={() => handleMood("pure joy")} className={`p-4 rounded-2xl font-bold active:scale-95 transition-all duration-300 text-sm hover:-translate-y-0.5 border-2 ${colorTheme === 'red_brick'
+                ? 'bg-[#8B3A3A] text-white border-[#FFC1C1]/30 shadow-[0_4px_14px_0_rgba(139,58,58,0.4)] hover:bg-[#FFF8F0] hover:text-[#8B3A3A] hover:border-[#8B3A3A] hover:shadow-[0_0_20px_rgba(139,58,58,0.4)]'
+                : 'bg-purple-200 text-purple-900 border-purple-300 shadow-[0_4px_14px_0_rgba(147,51,234,0.2)] hover:bg-purple-100 hover:text-purple-800 hover:border-purple-400 hover:shadow-[0_0_20px_rgba(147,51,234,0.3)]'
+              }`}>
               Giggle Fit 🤭
             </button>
-            <button onClick={() => handleMood("relief")} className={`${currentTheme.BUTTON_SECONDARY} p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-105`}>
+            {/* Button 2: Secondary (Cream/Pink) */}
+            <button onClick={() => handleMood("relief")} className={`p-4 rounded-2xl font-bold active:scale-95 transition-all duration-300 text-sm hover:-translate-y-0.5 border-2 ${colorTheme === 'red_brick'
+                ? 'bg-[#FFF8F0] text-[#8B3A3A] border-[#8B3A3A]/20 shadow-[0_4px_14px_0_rgba(0,0,0,0.05)] hover:bg-[#8B3A3A] hover:text-white hover:border-[#FFC1C1]/30 hover:shadow-[0_0_20px_rgba(139,58,58,0.4)]'
+                : 'bg-pink-100 text-pink-800 border-pink-200 shadow-[0_4px_14px_0_rgba(236,72,153,0.1)] hover:bg-pink-200 hover:text-pink-900 hover:border-pink-300 hover:shadow-[0_0_20px_rgba(236,72,153,0.3)]'
+              }`}>
               Belly Laugh 😂
             </button>
-            <button onClick={() => handleMood("silly")} className={`${currentTheme.BUTTON} p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-105`}>
+            {/* Button 3: Secondary (Cream/Pink) */}
+            <button onClick={() => handleMood("silly")} className={`p-4 rounded-2xl font-bold active:scale-95 transition-all duration-300 text-sm hover:-translate-y-0.5 border-2 ${colorTheme === 'red_brick'
+                ? 'bg-[#FFF8F0] text-[#8B3A3A] border-[#8B3A3A]/20 shadow-[0_4px_14px_0_rgba(0,0,0,0.05)] hover:bg-[#8B3A3A] hover:text-white hover:border-[#FFC1C1]/30 hover:shadow-[0_0_20px_rgba(139,58,58,0.4)]'
+                : 'bg-pink-100 text-pink-800 border-pink-200 shadow-[0_4px_14px_0_rgba(236,72,153,0.1)] hover:bg-pink-200 hover:text-pink-900 hover:border-pink-300 hover:shadow-[0_0_20px_rgba(236,72,153,0.3)]'
+              }`}>
               Snort Laugh 🐽
             </button>
-            <button onClick={() => handleMood("evil plan")} className={`${currentTheme.BUTTON_SECONDARY} p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm border-2 border-white dark:border-slate-600 hover:scale-105`}>
+            {/* Button 4: Primary (Red/Purple) */}
+            <button onClick={() => handleMood("evil plan")} className={`p-4 rounded-2xl font-bold active:scale-95 transition-all duration-300 text-sm hover:-translate-y-0.5 border-2 ${colorTheme === 'red_brick'
+                ? 'bg-[#8B3A3A] text-white border-[#FFC1C1]/30 shadow-[0_4px_14px_0_rgba(139,58,58,0.4)] hover:bg-[#FFF8F0] hover:text-[#8B3A3A] hover:border-[#8B3A3A] hover:shadow-[0_0_20px_rgba(139,58,58,0.4)]'
+                : 'bg-purple-200 text-purple-900 border-purple-300 shadow-[0_4px_14px_0_rgba(147,51,234,0.2)] hover:bg-purple-100 hover:text-purple-800 hover:border-purple-400 hover:shadow-[0_0_20px_rgba(147,51,234,0.3)]'
+              }`}>
               Witchy Cackle 🧙‍♀️
             </button>
           </div>
