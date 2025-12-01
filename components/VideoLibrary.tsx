@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Search, Heart, Play, Pause, Filter, Trash2, Youtube, ChevronLeft, ChevronRight, ExternalLink, X } from 'lucide-react';
 import { addPoints } from '../services/rewardService';
 import { useSettings } from '../contexts/SettingsContext';
+import { fetchLatestVideos, VideoItem } from '../services/youtubeService';
 
 // Updated with specific requested videos
 const SAMPLE_VIDEOS = [
@@ -29,6 +30,8 @@ export const VideoLibrary: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
   const [portalElement, setPortalElement] = useState<HTMLElement | null>(null);
+  const [videos, setVideos] = useState<any[]>(SAMPLE_VIDEOS);
+  const [isLoadingVideos, setIsLoadingVideos] = useState(false);
 
   // Persisted State
   const [favorites, setFavorites] = useState<string[]>(() => {
@@ -48,6 +51,23 @@ export const VideoLibrary: React.FC = () => {
       document.body.appendChild(element);
     }
     setPortalElement(element);
+
+    // Fetch latest videos
+    const loadVideos = async () => {
+      setIsLoadingVideos(true);
+      try {
+        const latest = await fetchLatestVideos();
+        // Merge latest videos at the top, avoiding duplicates if any
+        const latestIds = new Set(latest.map(v => v.id));
+        const filteredSample = SAMPLE_VIDEOS.filter(v => !latestIds.has(v.id));
+        setVideos([...latest, ...filteredSample]);
+      } catch (e) {
+        console.error("Failed to load videos", e);
+      } finally {
+        setIsLoadingVideos(false);
+      }
+    };
+    loadVideos();
   }, []);
 
   // Actions
@@ -69,9 +89,9 @@ export const VideoLibrary: React.FC = () => {
   };
 
   // Filter Logic
-  const categories = Array.from(new Set(SAMPLE_VIDEOS.map(v => v.category)));
+  const categories = Array.from(new Set(videos.map(v => v.category)));
 
-  const filteredVideos = SAMPLE_VIDEOS.filter(video => {
+  const filteredVideos = videos.filter(video => {
     const matchesSearch = video.title.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory ? video.category === selectedCategory : true;
     const matchesTab = activeTab === 'FAV' ? favorites.includes(video.id) : true;
@@ -85,7 +105,7 @@ export const VideoLibrary: React.FC = () => {
     currentPage * ITEMS_PER_PAGE
   );
 
-  const playingVideo = SAMPLE_VIDEOS.find(v => v.id === playingVideoId);
+  const playingVideo = videos.find(v => v.id === playingVideoId);
 
   // Helper to get translated category
   const getCategoryTranslation = (category: string) => {
@@ -165,7 +185,12 @@ export const VideoLibrary: React.FC = () => {
 
       {/* Video List */}
       <div className="space-y-4">
-        {displayedVideos.length === 0 ? (
+        {isLoadingVideos ? (
+          <div className="text-center py-10">
+            <div className="animate-spin w-8 h-8 border-4 border-[#ABCEC9] border-t-transparent rounded-full mx-auto mb-2"></div>
+            <p className="text-gray-400 text-sm font-bold">Loading latest laughter...</p>
+          </div>
+        ) : displayedVideos.length === 0 ? (
           <div className="text-center py-10 opacity-50">
             <Filter size={48} className="mx-auto mb-2 text-[#C3B8D5]" />
             <p className="font-bold text-gray-400">{t('video.no_videos')}</p>
@@ -193,7 +218,7 @@ export const VideoLibrary: React.FC = () => {
               ) : (
                 <div className="relative group cursor-pointer" onClick={() => handlePlay(video.id)}>
                   <img
-                    src={`https://img.youtube.com/vi/${video.id}/mqdefault.jpg`}
+                    src={video.thumbnail || `https://img.youtube.com/vi/${video.id}/mqdefault.jpg`}
                     alt={video.title}
                     className="w-full h-48 object-cover"
                   />
@@ -242,7 +267,7 @@ export const VideoLibrary: React.FC = () => {
           <div className="flex items-center gap-3 overflow-hidden">
             <div className="w-10 h-10 rounded-lg bg-gray-800 shrink-0 overflow-hidden relative">
               <img
-                src={`https://img.youtube.com/vi/${playingVideo.id}/default.jpg`}
+                src={playingVideo.thumbnail || `https://img.youtube.com/vi/${playingVideo.id}/default.jpg`}
                 alt="Thumbnail"
                 className="w-full h-full object-cover opacity-80"
               />
