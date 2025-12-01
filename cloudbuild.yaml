@@ -17,6 +17,10 @@ steps:
       - '--no-cache'
       - '--build-arg'
       - 'GEMINI_API_KEY=${_GEMINI_API_KEY}'
+      - '--build-arg'
+      - 'VITE_YOUTUBE_API_KEY=${_VITE_YOUTUBE_API_KEY}'
+      - '--build-arg'
+      - 'VITE_YOUTUBE_CHANNEL_ID=${_VITE_YOUTUBE_CHANNEL_ID}'
       - '-t'
       - >-
         $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
@@ -53,6 +57,8 @@ options:
   logging: CLOUD_LOGGING_ONLY
 substitutions:
   _GEMINI_API_KEY: ''
+  _VITE_YOUTUBE_API_KEY: ''
+  _VITE_YOUTUBE_CHANNEL_ID: ''
   _DEPLOY_REGION: me-central1
   _AR_HOSTNAME: me-central1-docker.pkg.dev
   _AR_REPOSITORY: cloud-run-source-deploy
