@@ -57,7 +57,7 @@ export const useStartLiveSession = () => {
         // IMMEDIATE FEEDBACK: Speak using browser TTS while connecting
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel(); // Stop any previous speech
-            const utterance = new SpeechSynthesisUtterance("Hello! Connecting to joy...");
+            const utterance = new SpeechSynthesisUtterance("Connecting to Suman, please take a deep breath and wait");
             utterance.rate = 1.2;
             // Try to find a female voice
             const voices = window.speechSynthesis.getVoices();
