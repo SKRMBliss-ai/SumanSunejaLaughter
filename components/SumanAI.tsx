@@ -5,7 +5,7 @@ import { ChatMessage } from '../types';
 
 export const SumanAI: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: 'model', text: 'Namaste! I am your AI assistant trained on Suman Suneja\'s wisdom. Ask me about Laughter Yoga, corporate sessions, or how to relieve stress!' }
+    { role: 'model', text: 'Namaste! I am your AI assistant trained on Suman Suneja\'s wisdom. Ask Suman about Laughter Yoga, corporate sessions, or how to relieve stress!' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -35,14 +35,14 @@ export const SumanAI: React.FC = () => {
 
     try {
       const responseText = await getChatResponse(history, userMsg.text);
-      
+
       // Check if result is undefined or empty
       const safeResponse = responseText || "I'm smiling, but I couldn't think of an answer. Try again?";
-      
+
       setMessages(prev => [...prev, { role: 'model', text: safeResponse }]);
     } catch (e: any) {
       let errorMessage = "Connection error. Keep laughing though!";
-      
+
       if (e.message === "MISSING_GEMINI_KEY") {
         errorMessage = "Oh no! I lost my brain. 🧠\n\n(Deployment Error: Gemini API Key is missing. Please add 'API_KEY' to your environment variables.)";
       }
@@ -58,11 +58,10 @@ export const SumanAI: React.FC = () => {
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((msg, idx) => (
           <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[80%] p-3 rounded-2xl shadow-sm ${
-              msg.role === 'user' 
-                ? 'bg-[#ABCEC9] text-white rounded-br-none' 
+            <div className={`max-w-[80%] p-3 rounded-2xl shadow-sm ${msg.role === 'user'
+                ? 'bg-[#ABCEC9] text-white rounded-br-none'
                 : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-100 border border-gray-100 dark:border-slate-700 rounded-bl-none'
-            }`}>
+              }`}>
               <div className="flex items-center gap-2 mb-1 opacity-80 text-xs">
                 {msg.role === 'user' ? <User size={12} /> : <Bot size={12} />}
                 <span className="font-bold uppercase">{msg.role === 'user' ? 'You' : 'Suman AI'}</span>
@@ -73,9 +72,9 @@ export const SumanAI: React.FC = () => {
         ))}
         {isLoading && (
           <div className="flex justify-start">
-             <div className="bg-white/50 dark:bg-slate-800/50 text-[#AABBCC] dark:text-gray-400 p-3 rounded-2xl rounded-bl-none animate-pulse text-sm">
-               Thinking happily...
-             </div>
+            <div className="bg-white/50 dark:bg-slate-800/50 text-[#AABBCC] dark:text-gray-400 p-3 rounded-2xl rounded-bl-none animate-pulse text-sm">
+              Thinking happily...
+            </div>
           </div>
         )}
         <div ref={messagesEndRef} />
@@ -91,7 +90,7 @@ export const SumanAI: React.FC = () => {
             placeholder="Ask about Laughter Yoga..."
             className="flex-1 p-3 bg-[#EDE8F8] dark:bg-slate-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C3B8D5] text-sm text-gray-700 dark:text-gray-100"
           />
-          <button 
+          <button
             onClick={handleSend}
             disabled={isLoading}
             className="p-3 bg-[#C3B8D5] hover:bg-[#b0a5c4] text-white rounded-xl disabled:opacity-50 transition-colors"
