@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API_KEY = process.env.VITE_YOUTUBE_API_KEY;
-const CHANNEL_ID = process.env.VITE_YOUTUBE_CHANNEL_ID || 'UC_x5XG1OV2P6uZZ5FSM9Ttw'; // Placeholder, user needs to set this
+const CHANNEL_ID = process.env.VITE_YOUTUBE_CHANNEL_ID || 'UC1SZ2c4NJszdwybZ7gahO5Q'; // Suman Suneja Official
 
 // Fallback data
 const FALLBACK_VIDEOS = [
