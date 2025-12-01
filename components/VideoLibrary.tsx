@@ -23,7 +23,7 @@ const SAMPLE_VIDEOS = [
 const ITEMS_PER_PAGE = 5;
 
 export const VideoLibrary: React.FC = () => {
-  const { t } = useSettings();
+  const { t, currentTheme } = useSettings();
   const [activeTab, setActiveTab] = useState<'ALL' | 'FAV'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -116,13 +116,13 @@ export const VideoLibrary: React.FC = () => {
   };
 
   return (
-    <div className="p-4 pb-28 min-h-screen bg-[#F5F3FA] dark:bg-slate-900 animate-in fade-in duration-500">
+    <div className={`p-4 pb-28 min-h-screen ${currentTheme.VIDEO_BG} dark:bg-slate-900 animate-in fade-in duration-500`}>
 
       {/* Header & Tabs */}
-      <div className="sticky top-0 bg-[#F5F3FA] dark:bg-slate-900 z-20 pb-4 pt-2">
+      <div className={`sticky top-0 ${currentTheme.VIDEO_BG} dark:bg-slate-900 z-20 pb-4 pt-2`}>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-2xl font-fredoka font-bold text-gray-700 dark:text-gray-100 flex items-center gap-2">
+            <h2 className={`text-2xl font-fredoka font-bold ${currentTheme.HEADER_TEXT} dark:text-gray-100 flex items-center gap-2`}>
               <Youtube className="text-red-500" /> {t('video.title')}
             </h2>
             <a href="https://www.youtube.com/@sumansunejaofficial" target="_blank" rel="noopener noreferrer" className="text-xs text-[#AABBCC] font-bold flex items-center gap-1 hover:text-red-500 transition-colors">
@@ -138,13 +138,13 @@ export const VideoLibrary: React.FC = () => {
         <div className="flex p-1 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 mb-4">
           <button
             onClick={() => { setActiveTab('ALL'); setCurrentPage(1); }}
-            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${activeTab === 'ALL' ? 'bg-[#ABCEC9] text-white shadow-md' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'}`}
+            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${activeTab === 'ALL' ? `${currentTheme.BUTTON} shadow-md` : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'}`}
           >
             {t('video.tab_all')}
           </button>
           <button
             onClick={() => { setActiveTab('FAV'); setCurrentPage(1); }}
-            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${activeTab === 'FAV' ? 'bg-[#C3B8D5] text-white shadow-md' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'}`}
+            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${activeTab === 'FAV' ? `${currentTheme.BUTTON_SECONDARY} shadow-md` : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'}`}
           >
             <Heart size={12} fill={activeTab === 'FAV' ? "currentColor" : "none"} /> {t('video.tab_favorites')}
           </button>
@@ -158,7 +158,7 @@ export const VideoLibrary: React.FC = () => {
               placeholder={t('video.search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-[#ABCEC9] bg-white dark:bg-slate-800 dark:text-white text-sm font-medium placeholder:text-gray-400"
+              className={`w-full pl-10 pr-4 py-3 rounded-2xl border-none shadow-sm focus:ring-2 ${currentTheme.INPUT_RING} bg-white dark:bg-slate-800 dark:text-white text-sm font-medium placeholder:text-gray-400`}
             />
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
           </div>
@@ -174,7 +174,7 @@ export const VideoLibrary: React.FC = () => {
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
-                className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors border ${selectedCategory === cat ? 'bg-[#ABCEC9] text-white border-[#ABCEC9]' : 'bg-white dark:bg-slate-800 text-gray-500 dark:text-gray-300 border-gray-200 dark:border-slate-700'}`}
+                className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors border ${selectedCategory === cat ? `${currentTheme.BUTTON} border-transparent` : 'bg-white dark:bg-slate-800 text-gray-500 dark:text-gray-300 border-gray-200 dark:border-slate-700'}`}
               >
                 {getCategoryTranslation(cat)}
               </button>
@@ -187,12 +187,12 @@ export const VideoLibrary: React.FC = () => {
       <div className="space-y-4">
         {isLoadingVideos ? (
           <div className="text-center py-10">
-            <div className="animate-spin w-8 h-8 border-4 border-[#ABCEC9] border-t-transparent rounded-full mx-auto mb-2"></div>
+            <div className={`animate-spin w-8 h-8 border-4 ${currentTheme.LOADING_SPINNER} border-t-transparent rounded-full mx-auto mb-2`}></div>
             <p className="text-gray-400 text-sm font-bold">Loading latest laughter...</p>
           </div>
         ) : displayedVideos.length === 0 ? (
           <div className="text-center py-10 opacity-50">
-            <Filter size={48} className="mx-auto mb-2 text-[#C3B8D5]" />
+            <Filter size={48} className={`mx-auto mb-2 ${currentTheme.TEXT_ACCENT}`} />
             <p className="font-bold text-gray-400">{t('video.no_videos')}</p>
           </div>
         ) : (
@@ -234,7 +234,7 @@ export const VideoLibrary: React.FC = () => {
               <div className="p-4">
                 <div className="flex justify-between items-start gap-2 mb-2">
                   <div>
-                    <span className="text-[10px] font-bold text-[#ABCEC9] uppercase tracking-wider">{getCategoryTranslation(video.category)}</span>
+                    <span className={`text-[10px] font-bold ${currentTheme.TEXT_ACCENT} uppercase tracking-wider`}>{getCategoryTranslation(video.category)}</span>
                     <h3 className="font-bold text-gray-800 dark:text-gray-100 leading-tight">{video.title}</h3>
                   </div>
                   <button
@@ -272,13 +272,13 @@ export const VideoLibrary: React.FC = () => {
                 className="w-full h-full object-cover opacity-80"
               />
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-1 h-3 bg-[#ABCEC9] mx-0.5 animate-[bounce_1s_infinite]"></div>
-                <div className="w-1 h-4 bg-[#ABCEC9] mx-0.5 animate-[bounce_1.2s_infinite]"></div>
-                <div className="w-1 h-2 bg-[#ABCEC9] mx-0.5 animate-[bounce_0.8s_infinite]"></div>
+                <div className={`w-1 h-3 ${currentTheme.BUTTON} mx-0.5 animate-[bounce_1s_infinite]`}></div>
+                <div className={`w-1 h-4 ${currentTheme.BUTTON} mx-0.5 animate-[bounce_1.2s_infinite]`}></div>
+                <div className={`w-1 h-2 ${currentTheme.BUTTON} mx-0.5 animate-[bounce_0.8s_infinite]`}></div>
               </div>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-bold text-[#ABCEC9] uppercase tracking-wider">{t('video.now_playing')}</p>
+              <p className={`text-[10px] font-bold ${currentTheme.TEXT_ACCENT} uppercase tracking-wider`}>{t('video.now_playing')}</p>
               <p className="text-sm font-bold truncate">{playingVideo.title}</p>
             </div>
           </div>
@@ -310,7 +310,7 @@ export const VideoLibrary: React.FC = () => {
           <button
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="p-2 rounded-full bg-white dark:bg-slate-800 shadow-md disabled:opacity-30 text-gray-600 dark:text-gray-300 hover:text-[#ABCEC9]"
+            className={`p-2 rounded-full bg-white dark:bg-slate-800 shadow-md disabled:opacity-30 text-gray-600 dark:text-gray-300 ${currentTheme.TEXT_ACCENT.replace('text-', 'hover:text-')}`}
           >
             <ChevronLeft size={20} />
           </button>
@@ -320,7 +320,7 @@ export const VideoLibrary: React.FC = () => {
           <button
             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
-            className="p-2 rounded-full bg-white dark:bg-slate-800 shadow-md disabled:opacity-30 text-gray-600 dark:text-gray-300 hover:text-[#ABCEC9]"
+            className={`p-2 rounded-full bg-white dark:bg-slate-800 shadow-md disabled:opacity-30 text-gray-600 dark:text-gray-300 ${currentTheme.TEXT_ACCENT.replace('text-', 'hover:text-')}`}
           >
             <ChevronRight size={20} />
           </button>

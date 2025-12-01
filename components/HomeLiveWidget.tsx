@@ -155,7 +155,7 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
             {/* Video Call Modal */}
             {isWidgetOpen && (
                 <div className="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center animate-in fade-in duration-300">
-                    <div className="relative w-full max-w-md h-full max-h-[90vh] bg-gray-900 rounded-3xl overflow-hidden shadow-2xl flex flex-col border border-gray-800">
+                    <div className={`relative w-full max-w-md h-full max-h-[90vh] bg-gray-900 rounded-3xl overflow-hidden shadow-2xl flex flex-col border ${currentTheme.HEADER_BORDER}`}>
                         {/* Header */}
                         <div className="absolute top-0 left-0 right-0 p-4 z-10 flex justify-between items-center bg-gradient-to-b from-black/60 to-transparent">
                             <div className="flex items-center gap-2">
@@ -179,8 +179,8 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
                                         className="w-full h-full object-cover opacity-50 blur-sm scale-110"
                                     />
                                     <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-                                        <div className="w-24 h-24 rounded-full bg-[#8B3A3A]/20 flex items-center justify-center animate-[ping_2s_infinite]">
-                                            <div className="w-16 h-16 rounded-full bg-[#8B3A3A]/40 flex items-center justify-center animate-[ping_1.5s_infinite]">
+                                        <div className={`w-24 h-24 rounded-full ${currentTheme.VIDEO_RING_1} flex items-center justify-center animate-[ping_2s_infinite]`}>
+                                            <div className={`w-16 h-16 rounded-full ${currentTheme.VIDEO_RING_2} flex items-center justify-center animate-[ping_1.5s_infinite]`}>
                                                 <img src="https://res.cloudinary.com/dfopoyt9v/image/upload/v1764307833/Gemini_Generated_Image_g3m0lng3m0lng3m0_ttyvxr.png" className="w-12 h-12 rounded-full object-cover border-2 border-white" />
                                             </div>
                                         </div>
@@ -199,7 +199,7 @@ export const HomeLiveWidget: React.FC<HomeLiveWidgetProps> = ({ visible }) => {
                                         className={`w-full h-full object-cover transition-transform duration-700 ${volumeLevel > 0.05 ? 'scale-105' : 'scale-100'}`}
                                     />
                                     {volumeLevel > 0.05 && (
-                                        <div className="absolute inset-0 border-4 border-[#8B3A3A]/50 animate-pulse" />
+                                        <div className={`absolute inset-0 border-4 ${currentTheme.VIDEO_BORDER} animate-pulse`} />
                                     )}
                                 </>
                             )}
