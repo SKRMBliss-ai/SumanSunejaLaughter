@@ -1,8 +1,16 @@
 import { GoogleGenAI, Type, Schema, Modality } from "@google/genai";
 
-const apiKey = process.env.API_KEY || '';
-// Initialize conditionally to prevent crashes if key is strictly validated on init
-const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
+let ai: GoogleGenAI | null = null;
+
+const getAI = () => {
+  if (ai) return ai;
+  const key = process.env.API_KEY;
+  if (key) {
+    ai = new GoogleGenAI({ apiKey: key });
+    return ai;
+  }
+  return null;
+};
 
 // --- Pre-defined Scripts for Instant Start (1 Minute Duration) ---
 const QUICK_SCRIPTS = [
@@ -64,7 +72,8 @@ const ratingSchema: Schema = {
 };
 
 export const rateLaughter = async (audioBase64: string, mimeType: string) => {
-  if (!apiKey || !ai) {
+  const ai = getAI();
+  if (!ai) {
     throw new Error("MISSING_GEMINI_KEY");
   }
 
@@ -106,7 +115,8 @@ export const rateLaughter = async (audioBase64: string, mimeType: string) => {
 // --- Chat Assistant Service ---
 
 export const getChatResponse = async (history: { role: string, parts: { text: string }[] }[], message: string) => {
-  if (!apiKey || !ai) {
+  const ai = getAI();
+  if (!ai) {
     throw new Error("MISSING_GEMINI_KEY");
   }
 
@@ -144,7 +154,8 @@ export const getChatResponse = async (history: { role: string, parts: { text: st
 // --- Laughter Joke Generator ---
 
 export const generateHumor = async (topic: string, type: 'story' | 'joke' = 'story') => {
-  if (!apiKey || !ai) throw new Error("MISSING_GEMINI_KEY");
+  const ai = getAI();
+  if (!ai) throw new Error("MISSING_GEMINI_KEY");
 
   // Refined prompts to encourage realistic prosody for TTS
   const prompt = type === 'story'
@@ -174,7 +185,8 @@ export const generateHumor = async (topic: string, type: 'story' | 'joke' = 'sto
 // --- Speech Generation (TTS) ---
 
 export const generateSpeech = async (text: string, voiceName: string = 'Kore') => {
-  if (!apiKey || !ai) {
+  const ai = getAI();
+  if (!ai) {
     throw new Error("MISSING_GEMINI_KEY");
   }
 
@@ -210,7 +222,8 @@ export const getGuidedSessionScript = async () => {
 
 // --- Voice Chat Query ---
 export const processVoiceQuery = async (audioBase64: string, mimeType: string) => {
-  if (!apiKey || !ai) throw new Error("MISSING_GEMINI_KEY");
+  const ai = getAI();
+  if (!ai) throw new Error("MISSING_GEMINI_KEY");
 
   try {
     // Step 1: Send Audio to Gemini to get a text response

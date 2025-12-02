@@ -153,6 +153,13 @@ export const LaughterCoach: React.FC = () => {
   };
 
   const handleQuickSession = async () => {
+    // 0. Check API Key
+    const apiKey = process.env.API_KEY;
+    if (!apiKey) {
+      setError(t('coach.live_unavailable'));
+      setIsMissingKey(true);
+      return;
+    }
     // 1. Immediate Feedback (Browser TTS)
     playImmediateGreeting("Starting your one minute laughter boost. Get ready!");
 
