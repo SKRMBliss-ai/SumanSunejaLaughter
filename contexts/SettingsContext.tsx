@@ -1,6 +1,5 @@
 ﻿import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-// ... (Types and Supported Languages remain unchanged)
 export type Language = 'en' | 'hi' | 'es' | 'ar' | 'fr' | 'de' | 'ja';
 export type Theme = 'light' | 'dark';
 export type ColorTheme = 'red_brick' | 'pastel';
@@ -31,7 +30,6 @@ interface SettingsContextType {
 }
 
 const translations: Record<Language, Record<string, string>> = {
-    // ... (keeping existing translations to save space)
     en: {
         'home.welcome': 'Ignite Your Inner Joy',
         'home.subtitle': 'Boost immunity & relieve stress with expert guidance from Suman Suneja.',
@@ -225,45 +223,36 @@ export interface ThemeColors {
 
 export const THEMES: Record<ColorTheme, ThemeColors> = {
     pastel: {
-        // Pastel Aesthetic (Purple/Teal/Grey) - Matches image_c35c5c.jpg
         HERO: "bg-[linear-gradient(to_right,#C2B2D6,#99A9C9)]",
         HERO_BUTTON: "bg-white text-[#7A8C99] shadow-sm hover:bg-gray-50 border-none",
-
         BUTTON: "bg-[#A8C8C0] text-white shadow-sm hover:brightness-105 border-none",
         BUTTON_SECONDARY: "bg-[#C0B8D0] text-white shadow-sm hover:brightness-105 border-none",
-
-        // Fun Games (Light Purple Card)
         GAMES: "bg-[#F3E5F5] text-[#5B5166] border-none shadow-sm hover:shadow-md",
         GAMES_ICON_BG: "bg-[#CE93D8] text-white p-3 rounded-full mb-1",
-
-        // Book Session (Light Teal Card)
         BOOK: "bg-[#E0F2F1] text-[#00695C] border-none shadow-sm hover:shadow-md",
         BOOK_ICON_BG: "bg-[#80CBC4] text-white p-3 rounded-full mb-1",
-
         TEXT_PRIMARY: "text-[#5B5166]",
         ICON_BG: "bg-[#E8DFF5]",
         ICON_COLOR: "text-[#9B86BD]",
-
         STAT_BG_1: "bg-[#FFF0E0] border border-orange-100",
         STAT_ICON_BG_1: "bg-white text-orange-400",
         STAT_BG_2: "bg-[#F0F0FF] border border-purple-100",
         STAT_ICON_BG_2: "bg-white text-purple-400",
-
         LIVE_CARD_BG: "bg-white border-2 border-purple-100",
         LIVE_BTN: "bg-[#A8C8C0] text-white hover:brightness-105 shadow-md",
 
         HEADER_BG: "bg-[#F7F9FC]",
         HEADER_TEXT: "text-[#5B5166]",
         HEADER_BORDER: "border-[#B8B8D0]/20",
+
+        // Pastel: Default is purple/grey button with white text
         SUBSCRIBE_BTN: "bg-[#C0B8D0] hover:bg-[#B0A8C0] text-white",
 
         MUSIC_BTN: "bg-white border-[#EDE8F8] text-[#C3B8D5] hover:border-[#A8C8C0] hover:text-[#A8C8C0]",
         MUSIC_BTN_ACTIVE: "bg-[#A8C8C0] border-white text-white",
         MUSIC_ICON: "text-[#A8C8C0]",
-
         MIC_BTN: "bg-[#C0B8D0] text-white hover:scale-110",
         MIC_RIPPLE: "bg-[#C0B8D0]/30",
-
         VIDEO_BG: "bg-[#F7F9FC]",
         INPUT_RING: "focus:ring-[#A8C8C0]",
         LOADING_SPINNER: "border-[#A8C8C0]",
@@ -271,31 +260,21 @@ export const THEMES: Record<ColorTheme, ThemeColors> = {
         VIDEO_RING_1: "bg-[#C0B8D0]/20",
         VIDEO_RING_2: "bg-[#C0B8D0]/40",
         VIDEO_BORDER: "border-[#C0B8D0]/50",
-
         APP_BG: "bg-[#F7F9FC]",
-
         SESSION_1_BG: "bg-[#E0F7FA]",
         SESSION_1_ACCENT: "text-[#006064]",
         SESSION_2_BG: "bg-[#F3E5F5]",
         SESSION_2_ACCENT: "text-[#4A148C]"
     },
     red_brick: {
-        // Brand Color Aesthetic (Red/Cream)
         HERO: "bg-[linear-gradient(110deg,#592E2E_0%,#8C4A4A_50%,#592E2E_100%)]",
         HERO_BUTTON: "bg-[#FFF8F0] text-[#8B3A3A] border-2 border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-[#FFF8F0] hover:border-[#FFF8F0] shadow-lg transition-colors",
-
         BUTTON: "bg-[#FFF8F0] text-[#8B3A3A] border-2 border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-[#FFF8F0] hover:border-[#FFF8F0] shadow-md transition-colors",
         BUTTON_SECONDARY: "bg-[#FFF8F0] text-[#8B3A3A] border-2 border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-[#FFF8F0] hover:border-[#FFF8F0] shadow-md transition-colors",
-
-        // --- UPDATED HERE: Fun Games matches Book Session styling ---
-        // Default: Cream bg, Red border/text. Hover: Red bg, Cream text.
         GAMES: "bg-[#FFF8F0] text-[#8B3A3A] border-2 border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-[#FFF8F0] hover:border-[#FFF8F0] transition-colors",
         GAMES_ICON_BG: "text-[#8B3A3A] group-hover:text-[#FFF8F0] mb-1",
-        // ------------------------------------------------------------
-
         BOOK: "bg-[#FFF8F0] text-[#8B3A3A] border-2 border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-[#FFF8F0] hover:border-[#FFF8F0] transition-colors",
         BOOK_ICON_BG: "text-[#8B3A3A] group-hover:text-[#FFF8F0] mb-1",
-
         TEXT_PRIMARY: "text-[#934139]",
         ICON_BG: "bg-pink-100",
         ICON_COLOR: "text-pink-500",
@@ -303,13 +282,14 @@ export const THEMES: Record<ColorTheme, ThemeColors> = {
         STAT_ICON_BG_1: "bg-white text-orange-500",
         STAT_BG_2: "bg-[#F8F0FF] border border-purple-100",
         STAT_ICON_BG_2: "bg-white text-purple-500",
-
         LIVE_CARD_BG: "bg-white/70 backdrop-blur-xl border-2 border-purple-300/50",
         LIVE_BTN: "bg-[#FFF8F0] text-[#8B3A3A] border-2 border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-[#FFF8F0] hover:border-[#FFF8F0] shadow-lg transition-colors",
 
         HEADER_BG: "bg-[#FEF4E6]",
         HEADER_TEXT: "text-[#783766]",
         HEADER_BORDER: "border-[#783766]/10",
+
+        // UPDATED: Text is Brick Red by default, White on Hover
         SUBSCRIBE_BTN: "bg-[#FFF8F0] text-[#8B3A3A] border-2 border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-[#FFF8F0] hover:border-[#FFF8F0] transition-colors",
 
         MUSIC_BTN: "bg-white border-[#EDE8F8] text-[#C3B8D5] hover:border-[#8B3A3A] hover:text-[#8B3A3A]",
@@ -324,9 +304,7 @@ export const THEMES: Record<ColorTheme, ThemeColors> = {
         VIDEO_RING_1: "bg-[#8B3A3A]/20",
         VIDEO_RING_2: "bg-[#8B3A3A]/40",
         VIDEO_BORDER: "border-[#8B3A3A]/50",
-
         APP_BG: "bg-[#FFF8F0]",
-
         SESSION_1_BG: "bg-pink-50",
         SESSION_1_ACCENT: "text-pink-500",
         SESSION_2_BG: "bg-violet-50",
