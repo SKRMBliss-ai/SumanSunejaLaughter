@@ -250,7 +250,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         </div>
       )}
 
-      {/* Stats Cards - Pop In */}
+      {/* Stats Cards */}
       <div className="flex flex-wrap gap-3 animate-pop-in delay-100">
         <div className={`flex-1 min-w-[140px] ${currentTheme.STAT_BG_1} dark:bg-slate-800 p-3 rounded-2xl flex items-center gap-3 shadow-sm`}>
           <div className={`${currentTheme.STAT_ICON_BG_1} dark:bg-orange-900 p-2 rounded-xl shadow-sm shrink-0`}>
@@ -304,7 +304,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
 
       {/* Main Welcome Card */}
       <div className={`${currentTheme.HERO} dark:from-indigo-900 dark:to-purple-900 rounded-[2rem] p-6 text-white shadow-2xl shadow-[#783766]/30 dark:shadow-none relative overflow-hidden group min-h-[240px] h-auto animate-fade-in-up delay-200 flex flex-col justify-center`}>
-        {/* Enhanced Glow Gradient behind the photo */}
+        {/* Glow Effects */}
         <div className="absolute top-[-10%] end-[-10%] w-[70%] h-[120%] bg-[radial-gradient(circle,rgba(255,255,255,0.2)_0%,rgba(255,255,255,0)_70%)] dark:bg-slate-800/50 rounded-full mix-blend-overlay filter blur-3xl opacity-100 transform translate-x-10 rtl:-translate-x-10 group-hover:scale-110 transition-transform duration-700 pointer-events-none"></div>
         <div className="absolute top-[10%] end-[5%] w-48 h-48 bg-white/10 rounded-full filter blur-[50px] mix-blend-overlay opacity-80 animate-pulse-slow pointer-events-none"></div>
 
@@ -323,7 +323,6 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             <Smile className="w-4 h-4 animate-spin-slow" />
             <span className="text-[0.6rem] font-bold uppercase tracking-widest">Wellness Partner</span>
           </div>
-          {/* Main Heading Text */}
           <h2 className="text-2xl font-bold mb-2 leading-tight text-white drop-shadow-sm whitespace-pre-wrap">Ignite Your Inner Joy</h2>
           <p className="text-white/90 text-xs mb-4 font-medium leading-relaxed drop-shadow-md text-shadow-sm max-w-[200px]">
             Boost immunity & relieve stress with expert guidance from Suman Suneja.
@@ -372,7 +371,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* Live Sessions */}
+      {/* Live Sessions - Updated with new Theme Keys */}
       <div className="space-y-4 animate-fade-in-up delay-400">
         <div className="flex items-center gap-2 px-2">
           <div className="p-1.5 bg-pink-100 rounded-lg">
