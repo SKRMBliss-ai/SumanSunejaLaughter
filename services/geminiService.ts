@@ -70,7 +70,7 @@ export const rateLaughter = async (audioBase64: string, mimeType: string) => {
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-2.0-flash-exp',
       contents: {
         parts: [
           {
@@ -112,7 +112,7 @@ export const getChatResponse = async (history: { role: string, parts: { text: st
 
   try {
     const chat = ai.chats.create({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-2.0-flash-exp',
       history: history,
       config: {
         systemInstruction: `You are the AI Assistant for Suman Suneja, the Laughter Yoga expert. 
@@ -162,7 +162,7 @@ export const generateHumor = async (topic: string, type: 'story' | 'joke' = 'sto
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-2.0-flash-exp',
       contents: prompt,
     });
     return response.text;
@@ -180,7 +180,7 @@ export const generateSpeech = async (text: string, voiceName: string = 'Kore') =
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-preview-tts",
+      model: "gemini-2.0-flash-exp",
       contents: [{ parts: [{ text }] }],
       config: {
         responseModalities: [Modality.AUDIO],
@@ -215,7 +215,7 @@ export const processVoiceQuery = async (audioBase64: string, mimeType: string) =
   try {
     // Step 1: Send Audio to Gemini to get a text response
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-2.0-flash-exp',
       contents: {
         parts: [
           {
