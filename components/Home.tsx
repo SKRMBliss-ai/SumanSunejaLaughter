@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Video, ArrowRight, Star, Bell, X, Sparkles, Smile, Globe, Calendar, Lock, Check, Clock, Trophy, Flame, Moon, Sun, Type, Palette, ChevronDown } from 'lucide-react';
+import { Video, ArrowRight, Star, Bell, X, Sparkles, Smile, Globe, Calendar, Lock, Check, Clock, Trophy, Flame, Moon, Sun, Type, Palette, ChevronDown, Info } from 'lucide-react';
 import { ViewState, RewardState } from '../types';
 import { getRewardState } from '../services/rewardService';
 import { useSettings, SUPPORTED_LANGUAGES, FontSize } from '../contexts/SettingsContext';
@@ -23,6 +23,9 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
 
+  // --- NEW: Tour State (0 = off, 1 = Dark Mode, 2 = Theme, 3 = Font, 4 = Lang) ---
+  const [tourStep, setTourStep] = useState(0);
+
   const [reminderMinutes, setReminderMinutes] = useState(() => {
     const saved = localStorage.getItem('zoomReminderMinutes');
     return saved ? parseInt(saved, 10) : 15;
@@ -44,6 +47,32 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
       clearInterval(interval);
     };
   }, []);
+
+  // --- NEW: Check for First Time Load & Start Tour ---
+  useEffect(() => {
+    const hasSeenTour = localStorage.getItem('suman_tour_completed_v1');
+    if (!hasSeenTour) {
+      // Start tour after a short delay
+      const timer = setTimeout(() => {
+        setTourStep(1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const handleNextStep = () => {
+    if (tourStep < 4) {
+      setTourStep(prev => prev + 1);
+    } else {
+      finishTour();
+    }
+  };
+
+  const finishTour = () => {
+    localStorage.setItem('suman_tour_completed_v1', 'true');
+    setTourStep(0);
+  };
+  // ------------------------------------
 
   useEffect(() => {
     localStorage.setItem('zoomReminderMinutes', reminderMinutes.toString());
@@ -108,31 +137,62 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
 
   // THEME CONFIGURATION
   const THEME_OPTIONS = [
-    { value: 'pastel' as const, label: 'Pastel' },
-    { value: 'red_brick' as const, label: 'Brand Color' }
+    { value: 'pastel' as const, label: 'Brand (Default)' },
+    { value: 'red_brick' as const, label: 'Red Brick' }
   ];
+
+  // --- Helper Component for Tooltip ---
+  const TourTooltip = ({ title, desc, isLast = false }: { title: string, desc: string, isLast?: boolean }) => (
+    <div className="absolute top-full right-0 mt-3 w-48 bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-2xl border-2 border-yellow-200 z-50 animate-in fade-in slide-in-from-top-2">
+      {/* Pointing Arrow */}
+      <div className="absolute -top-2 right-3 w-4 h-4 bg-white dark:bg-slate-800 border-t-2 border-l-2 border-yellow-200 transform rotate-45"></div>
+
+      <h4 className="font-bold text-sm text-gray-800 dark:text-white mb-1 flex items-center gap-1">
+        <Sparkles size={12} className="text-yellow-500" /> {title}
+      </h4>
+      <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-3 leading-snug font-medium">{desc}</p>
+
+      <div className="flex justify-between items-center">
+        <button onClick={finishTour} className="text-[10px] font-bold text-gray-400 hover:text-gray-600 underline decoration-dashed">Skip</button>
+        <button
+          onClick={handleNextStep}
+          className={`px-3 py-1.5 rounded-lg font-bold text-[10px] text-white shadow-md active:scale-95 transition-transform ${currentTheme.BUTTON}`}
+        >
+          {isLast ? "Finish" : "Next"}
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="p-4 space-y-6 pb-44 relative">
-      <div className="flex justify-end gap-2 mb-2 animate-in fade-in">
-        <button
-          onClick={toggleTheme}
-          className="p-2 bg-white/50 dark:bg-slate-700/50 backdrop-blur-md rounded-full border border-white/20 shadow-sm text-gray-600 dark:text-yellow-300 transition-transform active:scale-95 hover:bg-white/80 dark:hover:bg-slate-700"
-          title="Toggle Dark Mode"
-        >
-          {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
-        </button>
 
-        {/* Theme Dropdown */}
+      <div className="flex justify-end gap-2 mb-2 animate-in fade-in relative z-50">
+
+        {/* Step 1: Dark Mode */}
+        <div className="relative">
+          <button
+            onClick={toggleTheme}
+            className={`p-2 bg-white/50 dark:bg-slate-700/50 backdrop-blur-md rounded-full border border-white/20 shadow-sm text-gray-600 dark:text-yellow-300 transition-transform active:scale-95 hover:bg-white/80 dark:hover:bg-slate-700 ${tourStep === 1 ? 'ring-4 ring-yellow-200 scale-110 z-50 bg-white' : ''}`}
+            title="Toggle Dark Mode"
+          >
+            {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+          </button>
+          {tourStep === 1 && <TourTooltip title="Light / Dark" desc="Tap to switch between day and night modes!" />}
+        </div>
+
+        {/* Step 2: Color Theme */}
         <div className="relative">
           <button
             onClick={() => setIsThemeMenuOpen(!isThemeMenuOpen)}
-            className="p-2 bg-white/50 dark:bg-slate-700/50 backdrop-blur-md rounded-full border border-white/20 shadow-sm text-gray-600 dark:text-gray-200 flex items-center gap-1 active:scale-95 hover:bg-white/80 dark:hover:bg-slate-700"
+            className={`p-2 bg-white/50 dark:bg-slate-700/50 backdrop-blur-md rounded-full border border-white/20 shadow-sm text-gray-600 dark:text-gray-200 flex items-center gap-1 active:scale-95 hover:bg-white/80 dark:hover:bg-slate-700 ${tourStep === 2 ? 'ring-4 ring-yellow-200 scale-110 z-50 bg-white' : ''}`}
             title="Change Theme"
           >
             <Palette size={18} className={colorTheme === 'pastel' ? 'text-purple-500' : 'text-[#8B3A3A]'} />
             <ChevronDown size={14} />
           </button>
+          {tourStep === 2 && <TourTooltip title="Color Themes" desc="Switch between Brand Red and other fun themes!" />}
+
           {isThemeMenuOpen && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setIsThemeMenuOpen(false)}></div>
@@ -152,24 +212,32 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           )}
         </div>
 
-        <button
-          onClick={cycleFontSize}
-          className="p-2 bg-white/50 dark:bg-slate-700/50 backdrop-blur-md rounded-full border border-white/20 shadow-sm text-gray-600 dark:text-gray-200 transition-transform active:scale-95 hover:bg-white/80 dark:hover:bg-slate-700 relative group"
-          title="Change Font Size"
-        >
-          <Type size={18} />
-          <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-            <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${fontSize === 'normal' ? 'hidden' : 'bg-pink-500'}`}></span>
-            <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${fontSize === 'normal' ? 'hidden' : 'bg-pink-500'}`}></span>
-          </span>
-        </button>
+        {/* Step 3: Font Size */}
+        <div className="relative">
+          <button
+            onClick={cycleFontSize}
+            className={`p-2 bg-white/50 dark:bg-slate-700/50 backdrop-blur-md rounded-full border border-white/20 shadow-sm text-gray-600 dark:text-gray-200 transition-transform active:scale-95 hover:bg-white/80 dark:hover:bg-slate-700 relative group ${tourStep === 3 ? 'ring-4 ring-yellow-200 scale-110 z-50 bg-white' : ''}`}
+            title="Change Font Size"
+          >
+            <Type size={18} />
+            <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${fontSize === 'normal' ? 'hidden' : 'bg-pink-500'}`}></span>
+              <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${fontSize === 'normal' ? 'hidden' : 'bg-pink-500'}`}></span>
+            </span>
+          </button>
+          {tourStep === 3 && <TourTooltip title="Text Size" desc="Tap to make the text larger or smaller." />}
+        </div>
+
+        {/* Step 4: Language */}
         <div className="relative">
           <button
             onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-            className="p-2 bg-white/50 dark:bg-slate-700/50 backdrop-blur-md rounded-full border border-white/20 shadow-sm text-gray-600 dark:text-gray-200 flex items-center gap-1 active:scale-95 hover:bg-white/80 dark:hover:bg-slate-700"
+            className={`p-2 bg-white/50 dark:bg-slate-700/50 backdrop-blur-md rounded-full border border-white/20 shadow-sm text-gray-600 dark:text-gray-200 flex items-center gap-1 active:scale-95 hover:bg-white/80 dark:hover:bg-slate-700 ${tourStep === 4 ? 'ring-4 ring-yellow-200 scale-110 z-50 bg-white' : ''}`}
           >
             <Globe size={18} /> <span className="text-[0.65rem] font-bold uppercase">{SUPPORTED_LANGUAGES.find(l => l.code === language)?.label || language}</span>
           </button>
+          {tourStep === 4 && <TourTooltip title="Language" desc="Change the app language here!" isLast={true} />}
+
           {isLangMenuOpen && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setIsLangMenuOpen(false)}></div>
@@ -188,6 +256,11 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           )}
         </div>
       </div>
+
+      {/* Overlay Backdrop for Tour */}
+      {tourStep > 0 && (
+        <div className="fixed inset-0 bg-black/40 z-40 transition-opacity duration-500"></div>
+      )}
 
       {showReminderSettings && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm animate-pop-in">
@@ -250,7 +323,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         </div>
       )}
 
-      {/* Stats Cards */}
+      {/* Stats Cards - Pop In */}
       <div className="flex flex-wrap gap-3 animate-pop-in delay-100">
         <div className={`flex-1 min-w-[140px] ${currentTheme.STAT_BG_1} dark:bg-slate-800 p-3 rounded-2xl flex items-center gap-3 shadow-sm`}>
           <div className={`${currentTheme.STAT_ICON_BG_1} dark:bg-orange-900 p-2 rounded-xl shadow-sm shrink-0`}>
@@ -302,11 +375,11 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         </div>
       )}
 
-      {/* Main Welcome Card */}
+      {/* Main Welcome Card - Fade In Up - RTL Compatible */}
       <div className={`${currentTheme.HERO} dark:from-indigo-900 dark:to-purple-900 rounded-[2rem] p-6 text-white shadow-2xl shadow-[#783766]/30 dark:shadow-none relative overflow-hidden group min-h-[240px] h-auto animate-fade-in-up delay-200 flex flex-col justify-center`}>
-        {/* Glow Effects */}
-        <div className="absolute top-[-10%] end-[-10%] w-[70%] h-[120%] bg-[radial-gradient(circle,rgba(255,255,255,0.2)_0%,rgba(255,255,255,0)_70%)] dark:bg-slate-800/50 rounded-full mix-blend-overlay filter blur-3xl opacity-100 transform translate-x-10 rtl:-translate-x-10 group-hover:scale-110 transition-transform duration-700 pointer-events-none"></div>
-        <div className="absolute top-[10%] end-[5%] w-48 h-48 bg-white/10 rounded-full filter blur-[50px] mix-blend-overlay opacity-80 animate-pulse-slow pointer-events-none"></div>
+        {/* Enhanced Glow Gradient behind the photo */}
+        <div className="absolute top-[-10%] end-[-10%] w-[70%] h-[120%] bg-[radial-gradient(circle,rgba(167,139,250,0.4)_0%,rgba(167,139,250,0)_70%)] dark:bg-slate-800/50 rounded-full mix-blend-screen filter blur-3xl opacity-100 transform translate-x-10 rtl:-translate-x-10 group-hover:scale-110 transition-transform duration-700 pointer-events-none"></div>
+        <div className="absolute top-[10%] end-[5%] w-48 h-48 bg-indigo-400/30 rounded-full filter blur-[50px] mix-blend-screen opacity-80 animate-pulse-slow pointer-events-none"></div>
 
         {/* Image Positioned logically at END */}
         <div className="absolute end-0 bottom-0 w-40 h-56 md:w-52 md:h-64 z-0 translate-x-4 rtl:-translate-x-4 translate-y-4 pointer-events-none">
@@ -323,6 +396,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             <Smile className="w-4 h-4 animate-spin-slow" />
             <span className="text-[0.6rem] font-bold uppercase tracking-widest">Wellness Partner</span>
           </div>
+          {/* Main Heading Text */}
           <h2 className="text-2xl font-bold mb-2 leading-tight text-white drop-shadow-sm whitespace-pre-wrap">Ignite Your Inner Joy</h2>
           <p className="text-white/90 text-xs mb-4 font-medium leading-relaxed drop-shadow-md text-shadow-sm max-w-[200px]">
             Boost immunity & relieve stress with expert guidance from Suman Suneja.
@@ -331,14 +405,14 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             onClick={() => onNavigate(ViewState.COACH)}
             className={`${currentTheme.HERO_BUTTON} px-5 py-2.5 rounded-full text-xs font-bold active:scale-95 transition-all flex items-center gap-2 hover:scale-105`}
           >
-            <Star size={14} fill="currentColor" className={colorTheme === 'pastel' ? "text-[#934139]" : "text-yellow-300"} />
-            <span className="text-current">{t('home.test_laugh')}</span>
+            <Star size={14} fill="currentColor" className={colorTheme === 'pastel' ? "text-[#A9A9C6]" : "text-yellow-300"} />
+            <span className={colorTheme === 'pastel' ? "text-[#A9A9C6]" : "text-current"}>{t('home.test_laugh')}</span>
           </button>
         </div>
       </div>
 
-      {/* Live AI Interaction Card */}
-      <div className={`${currentTheme.LIVE_CARD_BG} dark:bg-slate-800/80 rounded-[24px] p-1 relative overflow-hidden group animate-fade-in-up delay-250 my-6 transform transition-all hover:scale-[1.02]`}>
+      {/* Live AI Interaction Card - Enhanced Standout Design */}
+      <div className={`${currentTheme.LIVE_CARD_BG} dark:bg-slate-800/80 shadow-[0_10px_40px_-10px_rgba(120,55,102,0.2)] rounded-[24px] p-1 relative overflow-hidden group animate-fade-in-up delay-250 my-6 transform transition-all hover:scale-[1.02] hover:shadow-[0_20px_50px_-10px_rgba(120,55,102,0.3)] hover:border-purple-300`}>
         <div className="rounded-[1.8rem] p-6 relative z-10 flex flex-col md:flex-row items-center gap-6 text-center md:text-start">
 
           <div className="relative shrink-0">
@@ -371,7 +445,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* Live Sessions - Updated with new Theme Keys */}
+      {/* Live Sessions */}
       <div className="space-y-4 animate-fade-in-up delay-400">
         <div className="flex items-center gap-2 px-2">
           <div className="p-1.5 bg-pink-100 rounded-lg">
