@@ -143,7 +143,18 @@ export const LaughterCoach: React.FC = () => {
 
   // --- ROBUST QUICK SESSION HANDLER (With Fallback) ---
   const handleQuickSession = async () => {
-    // 1. Cleanup Audio FIRST
+
+    // 0. Check API Key
+    const apiKey = process.env.API_KEY;
+    if (!apiKey) {
+      setError(t('coach.live_unavailable'));
+      setIsMissingKey(true);
+      return;
+    }
+    // 1. Immediate Feedback (Browser TTS)
+    playImmediateGreeting("Starting your one minute laughter boost. Get ready!");
+
+    // 2. Reset State
     cleanupAudio();
 
     // 2. Immediate feedback (Browser TTS)

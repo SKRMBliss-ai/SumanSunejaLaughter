@@ -70,6 +70,7 @@ const ratingSchema: Schema = {
 
 // Use gemini-2.5-flash for Analysis (Huge Quota!)
 export const rateLaughter = async (audioBase64: string, mimeType: string) => {
+
   if (!apiKey || !ai) throw new Error("MISSING_GEMINI_KEY");
 
   try {
@@ -100,8 +101,8 @@ export const rateLaughter = async (audioBase64: string, mimeType: string) => {
 // --- Chat Assistant Service ---
 // Use gemini-2.5-flash for Chat (Fast & Cheap)
 export const getChatResponse = async (history: { role: string, parts: { text: string }[] }[], message: string) => {
-  if (!apiKey || !ai) throw new Error("MISSING_GEMINI_KEY");
 
+  if (!apiKey || !ai) throw new Error("MISSING_GEMINI_KEY");
   try {
     const chat = ai.chats.create({
       model: MODELS.TEXT_GEN,
@@ -136,7 +137,8 @@ export const getChatResponse = async (history: { role: string, parts: { text: st
 // --- Laughter Joke Generator ---
 // Use gemini-2.5-flash for Text Generation
 export const generateHumor = async (topic: string, type: 'story' | 'joke' = 'story') => {
-  if (!apiKey || !ai) throw new Error("MISSING_GEMINI_KEY");
+  const ai = getAI();
+  if (!ai) throw new Error("MISSING_GEMINI_KEY");
 
   const prompt = type === 'story'
     ? `Write a very short, high-energy comedy monologue about "${topic}"... [Instructions]`
@@ -155,7 +157,8 @@ export const generateHumor = async (topic: string, type: 'story' | 'joke' = 'sto
 
 // --- Smart Speech Generation (TTS) with Failover ---
 export const generateSpeech = async (text: string, voiceName: string = 'Kore') => {
-  if (!apiKey || !ai) {
+  const ai = getAI();
+  if (!ai) {
     throw new Error("MISSING_GEMINI_KEY");
   }
 
@@ -201,7 +204,8 @@ export const getGuidedSessionScript = async () => {
 
 // --- Voice Chat Query ---
 export const processVoiceQuery = async (audioBase64: string, mimeType: string) => {
-  if (!apiKey || !ai) throw new Error("MISSING_GEMINI_KEY");
+  const ai = getAI();
+  if (!ai) throw new Error("MISSING_GEMINI_KEY");
 
   try {
     // 1. Audio -> Text (Using 2.5 Flash for understanding)

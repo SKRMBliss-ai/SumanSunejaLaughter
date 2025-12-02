@@ -157,7 +157,6 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         <button
           onClick={handleNextStep}
           className={`px-3 py-1.5 rounded-lg font-bold text-[10px] text-[#8B3A3A] shadow-md active:scale-95 transition-transform ${currentTheme.BUTTON}`}
-        >
           {isLast ? "Finish" : "Next"}
         </button>
       </div>
