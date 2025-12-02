@@ -302,11 +302,11 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         </div>
       )}
 
-      {/* Main Welcome Card - Fade In Up - RTL Compatible */}
+      {/* Main Welcome Card */}
       <div className={`${currentTheme.HERO} dark:from-indigo-900 dark:to-purple-900 rounded-[2rem] p-6 text-white shadow-2xl shadow-[#783766]/30 dark:shadow-none relative overflow-hidden group min-h-[240px] h-auto animate-fade-in-up delay-200 flex flex-col justify-center`}>
         {/* Enhanced Glow Gradient behind the photo */}
-        <div className="absolute top-[-10%] end-[-10%] w-[70%] h-[120%] bg-[radial-gradient(circle,rgba(167,139,250,0.4)_0%,rgba(167,139,250,0)_70%)] dark:bg-slate-800/50 rounded-full mix-blend-screen filter blur-3xl opacity-100 transform translate-x-10 rtl:-translate-x-10 group-hover:scale-110 transition-transform duration-700 pointer-events-none"></div>
-        <div className="absolute top-[10%] end-[5%] w-48 h-48 bg-indigo-400/30 rounded-full filter blur-[50px] mix-blend-screen opacity-80 animate-pulse-slow pointer-events-none"></div>
+        <div className="absolute top-[-10%] end-[-10%] w-[70%] h-[120%] bg-[radial-gradient(circle,rgba(255,255,255,0.2)_0%,rgba(255,255,255,0)_70%)] dark:bg-slate-800/50 rounded-full mix-blend-overlay filter blur-3xl opacity-100 transform translate-x-10 rtl:-translate-x-10 group-hover:scale-110 transition-transform duration-700 pointer-events-none"></div>
+        <div className="absolute top-[10%] end-[5%] w-48 h-48 bg-white/10 rounded-full filter blur-[50px] mix-blend-overlay opacity-80 animate-pulse-slow pointer-events-none"></div>
 
         {/* Image Positioned logically at END */}
         <div className="absolute end-0 bottom-0 w-40 h-56 md:w-52 md:h-64 z-0 translate-x-4 rtl:-translate-x-4 translate-y-4 pointer-events-none">
@@ -332,14 +332,14 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             onClick={() => onNavigate(ViewState.COACH)}
             className={`${currentTheme.HERO_BUTTON} px-5 py-2.5 rounded-full text-xs font-bold active:scale-95 transition-all flex items-center gap-2 hover:scale-105`}
           >
-            <Star size={14} fill="currentColor" className={colorTheme === 'pastel' ? "text-[#A9A9C6]" : "text-yellow-300"} />
-            <span className={colorTheme === 'pastel' ? "text-[#A9A9C6]" : "text-current"}>{t('home.test_laugh')}</span>
+            <Star size={14} fill="currentColor" className={colorTheme === 'pastel' ? "text-[#934139]" : "text-yellow-300"} />
+            <span className="text-current">{t('home.test_laugh')}</span>
           </button>
         </div>
       </div>
 
-      {/* Live AI Interaction Card - Enhanced Standout Design */}
-      <div className={`${currentTheme.LIVE_CARD_BG} dark:bg-slate-800/80 shadow-[0_10px_40px_-10px_rgba(120,55,102,0.2)] rounded-[24px] p-1 relative overflow-hidden group animate-fade-in-up delay-250 my-6 transform transition-all hover:scale-[1.02] hover:shadow-[0_20px_50px_-10px_rgba(120,55,102,0.3)] hover:border-purple-300`}>
+      {/* Live AI Interaction Card */}
+      <div className={`${currentTheme.LIVE_CARD_BG} dark:bg-slate-800/80 rounded-[24px] p-1 relative overflow-hidden group animate-fade-in-up delay-250 my-6 transform transition-all hover:scale-[1.02]`}>
         <div className="rounded-[1.8rem] p-6 relative z-10 flex flex-col md:flex-row items-center gap-6 text-center md:text-start">
 
           <div className="relative shrink-0">
@@ -383,12 +383,12 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Daily Session Card */}
-          <div className="bg-white dark:bg-slate-800 rounded-3xl p-5 shadow-lg shadow-pink-500/5 dark:shadow-none border-2 border-pink-50 dark:border-slate-700 relative overflow-hidden group hover:shadow-xl transition-all">
-            <div className="absolute top-0 end-0 w-24 h-24 bg-pink-50 rounded-es-[4rem] -me-4 -mt-4 transition-all group-hover:bg-pink-100 group-hover:scale-110"></div>
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-5 shadow-lg shadow-pink-500/5 dark:shadow-none border-2 border-gray-100 dark:border-slate-700 relative overflow-hidden group hover:shadow-xl transition-all">
+            <div className={`absolute top-0 end-0 w-24 h-24 ${currentTheme.SESSION_1_BG} rounded-es-[4rem] -me-4 -mt-4 transition-all group-hover:scale-110 opacity-50`}></div>
 
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-2">
-                <span className="bg-pink-100 text-pink-600 text-[0.65rem] font-bold px-2 py-1 rounded-md uppercase tracking-wider">
+                <span className={`${currentTheme.SESSION_1_BG} ${currentTheme.SESSION_1_ACCENT} text-[0.65rem] font-bold px-2 py-1 rounded-md uppercase tracking-wider`}>
                   {t('every_day')}
                 </span>
                 <button
@@ -407,16 +407,16 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
 
               <div className="space-y-1.5 mb-4">
                 <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
-                  <Globe size={14} className="text-pink-500 shrink-0" />
+                  <Globe size={14} className={`${currentTheme.SESSION_1_ACCENT} shrink-0`} />
                   <span>Dubai: <span className="text-gray-700 dark:text-gray-200 font-bold">6:00 - 7:00 AM</span></span>
                 </div>
                 <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
-                  <Globe size={14} className="text-pink-500 shrink-0" />
+                  <Globe size={14} className={`${currentTheme.SESSION_1_ACCENT} shrink-0`} />
                   <span>India: <span className="text-gray-700 dark:text-gray-200 font-bold">7:30 - 8:30 AM</span></span>
                 </div>
               </div>
 
-              <div className="bg-pink-50/50 dark:bg-slate-700/50 rounded-xl p-3 mb-4 space-y-1">
+              <div className={`${currentTheme.SESSION_1_BG}/50 dark:bg-slate-700/50 rounded-xl p-3 mb-4 space-y-1`}>
                 <div className="flex justify-between text-xs flex-wrap gap-1">
                   <span className="text-gray-400 font-bold">Meeting ID</span>
                   <span className="font-mono font-bold text-gray-600 dark:text-gray-300">341 527 2874</span>
@@ -439,12 +439,12 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           </div>
 
           {/* Traditional Yoga Card */}
-          <div className="bg-white dark:bg-slate-800 rounded-3xl p-5 shadow-lg shadow-violet-500/5 dark:shadow-none border-2 border-violet-50 dark:border-slate-700 relative overflow-hidden group hover:shadow-xl transition-all">
-            <div className="absolute top-0 end-0 w-24 h-24 bg-violet-50 rounded-es-[4rem] -me-4 -mt-4 transition-all group-hover:bg-violet-100 group-hover:scale-110"></div>
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-5 shadow-lg shadow-violet-500/5 dark:shadow-none border-2 border-gray-100 dark:border-slate-700 relative overflow-hidden group hover:shadow-xl transition-all">
+            <div className={`absolute top-0 end-0 w-24 h-24 ${currentTheme.SESSION_2_BG} rounded-es-[4rem] -me-4 -mt-4 transition-all group-hover:scale-110 opacity-50`}></div>
 
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-2">
-                <span className="bg-violet-100 text-violet-600 text-[0.65rem] font-bold px-2 py-1 rounded-md uppercase tracking-wider">
+                <span className={`${currentTheme.SESSION_2_BG} ${currentTheme.SESSION_2_ACCENT} text-[0.65rem] font-bold px-2 py-1 rounded-md uppercase tracking-wider`}>
                   {t('mon_fri')}
                 </span>
                 <button
@@ -463,26 +463,20 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
 
               <div className="space-y-1.5 mb-4">
                 <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
-                  <Globe size={14} className="text-violet-500 shrink-0" />
+                  <Globe size={14} className={`${currentTheme.SESSION_2_ACCENT} shrink-0`} />
                   <span>Dubai: <span className="text-gray-700 dark:text-gray-200 font-bold">6:45 - 7:45 AM</span></span>
                 </div>
                 <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
-                  <Globe size={14} className="text-violet-500 shrink-0" />
+                  <Globe size={14} className={`${currentTheme.SESSION_2_ACCENT} shrink-0`} />
                   <span>India: <span className="text-gray-700 dark:text-gray-200 font-bold">8:15 - 9:15 AM</span></span>
                 </div>
               </div>
 
-              <div className="bg-violet-50/50 dark:bg-slate-700/50 rounded-xl p-3 mb-4 space-y-1">
-                <div className="flex justify-between text-xs flex-wrap gap-1">
-                  <span className="text-gray-400 font-bold">Meeting ID</span>
-                  <span className="font-mono font-bold text-gray-600 dark:text-gray-300">341 527 2874</span>
-                </div>
-                <div className="flex justify-between text-xs flex-wrap gap-1">
-                  <span className="text-gray-400 font-bold">Passcode</span>
-                  <span className="font-mono font-bold text-gray-600 dark:text-gray-300 flex items-center gap-1">
-                    <Lock size={12} className="text-violet-400" /> 536805
-                  </span>
-                </div>
+              <div className={`${currentTheme.SESSION_2_BG}/50 dark:bg-slate-700/50 rounded-xl p-3 mb-4 flex items-center justify-between flex-wrap gap-1`}>
+                <span className="text-gray-400 font-bold text-xs">Passcode</span>
+                <span className="font-mono font-bold text-gray-600 dark:text-gray-300 flex items-center gap-1">
+                  <Lock size={12} className={`${currentTheme.SESSION_2_ACCENT}`} /> 536805
+                </span>
               </div>
 
               <a
@@ -504,45 +498,33 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
 
         {/* Fun Games Button Wrapper */}
         <div className="relative group">
-          {/* Glow Effect */}
-          <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-[2rem] blur-2xl opacity-0 group-hover:opacity-5 transition-opacity duration-900 ${colorTheme === 'pastel' ? 'bg-purple-300' : 'bg-[#8B3A3A]'} animate-pulse`}></div>
+          {/* Glow Effect - Made larger with -inset-1 so it peeks out */}
+          <div className={`absolute -inset-1 bg-gradient-to-r ${colorTheme === 'pastel' ? 'from-purple-300 to-pink-300' : 'from-[#8B3A3A] to-[#B85C5C]'} rounded-[2.2rem] blur-2xl opacity-0 group-hover:opacity-15 transition duration-500 group-hover:duration-200 animate-pulse`}></div>
 
           <button
             onClick={() => onNavigate(ViewState.GAMES)}
-            className={`relative z-10 w-full ${colorTheme === 'pastel'
-              ? currentTheme.GAMES // Pastel
-              : 'bg-[#FFF8F0] border-2 border-[#FFF8F0] text-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-white' // Brand (Light Style)
-              } dark:bg-slate-800 p-4 rounded-[2rem] flex flex-col items-center justify-center text-center gap-2 transition-all shadow-lg hover:scale-[1.02] h-full min-h-[100px]`}
+            className={`relative z-10 w-full ${currentTheme.GAMES} dark:bg-slate-800 p-4 rounded-[2rem] flex flex-col items-center justify-center text-center gap-2 transition-all shadow-sm hover:shadow-md h-full min-h-[100px]`}
           >
-            <div className={`${colorTheme === 'pastel'
-              ? currentTheme.GAMES_ICON_BG
-              : 'text-[#8B3A3A] group-hover:text-white mb-1' // Brand Icon
-              } rounded-full flex items-center justify-center`}>
+            <div className={`${currentTheme.GAMES_ICON_BG} rounded-full flex items-center justify-center`}>
               <Star size={24} fill="currentColor" className="group-hover:rotate-12 transition-transform" />
             </div>
-            <span className={`font-bold text-base leading-tight ${colorTheme === 'pastel' ? 'text-[#5B5166]' : 'text-current'}`}>{t('fun_games')}</span>
+            <span className={`font-bold text-base leading-tight text-current`}>{t('fun_games')}</span>
           </button>
         </div>
 
         {/* Book Session Button Wrapper */}
         <div className="relative group">
-          {/* Glow Effect */}
-          <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-[2rem] blur-2xl opacity-0 group-hover:opacity-15 transition-opacity duration-500 ${colorTheme === 'pastel' ? 'bg-pink-300' : 'bg-[#8B3A3A]'} animate-pulse`}></div>
+          {/* Glow Effect - Made larger with -inset-1 so it peeks out */}
+          <div className={`absolute -inset-1 bg-gradient-to-r ${colorTheme === 'pastel' ? 'from-teal-200 to-emerald-200' : 'from-[#8B3A3A] to-[#934139]'} rounded-[2.2rem] blur-2xl opacity-0 group-hover:opacity-15 transition duration-500 group-hover:duration-200 animate-pulse`}></div>
 
           <button
             onClick={() => onNavigate(ViewState.CONTACT)}
-            className={`relative z-10 w-full ${colorTheme === 'pastel'
-              ? currentTheme.BOOK
-              : currentTheme.BOOK // Brand (Dark Style)
-              } dark:bg-slate-800 p-4 rounded-[2rem] flex flex-col items-center justify-center text-center gap-2 hover:brightness-110 dark:hover:bg-slate-700 transition-all shadow-lg hover:scale-[1.02] h-full min-h-[100px]`}
+            className={`relative z-10 w-full ${currentTheme.BOOK} dark:bg-slate-800 p-4 rounded-[2rem] flex flex-col items-center justify-center text-center gap-2 hover:brightness-110 dark:hover:bg-slate-700 transition-all shadow-sm hover:shadow-md h-full min-h-[100px]`}
           >
-            <div className={`${colorTheme === 'pastel'
-              ? currentTheme.BOOK_ICON_BG
-              : currentTheme.BOOK_ICON_BG // Brand Icon
-              } rounded-full flex items-center justify-center`}>
+            <div className={`${currentTheme.BOOK_ICON_BG} rounded-full flex items-center justify-center`}>
               <Calendar size={24} className="group-hover:-rotate-12 transition-transform" />
             </div>
-            <span className={`font-bold text-base leading-tight ${colorTheme === 'pastel' ? 'text-[#5B5166]' : 'text-current'}`}>{t('book_session')}</span>
+            <span className={`font-bold text-base leading-tight text-current`}>{t('book_session')}</span>
           </button>
         </div>
       </div>
