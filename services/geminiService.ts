@@ -79,7 +79,7 @@ export const rateLaughter = async (audioBase64: string, mimeType: string) => {
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash-exp',
+      model: 'gemini-2.0-flash', // Switched to High-RPM model for analysis
       contents: {
         parts: [
           {
@@ -122,7 +122,7 @@ export const getChatResponse = async (history: { role: string, parts: { text: st
 
   try {
     const chat = ai.chats.create({
-      model: 'gemini-2.0-flash-exp',
+      model: 'gemini-2.0-flash', // Switched to High-RPM model for chat
       history: history,
       config: {
         systemInstruction: `You are the AI Assistant for Suman Suneja, the Laughter Yoga expert. 
@@ -173,7 +173,7 @@ export const generateHumor = async (topic: string, type: 'story' | 'joke' = 'sto
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash-exp',
+      model: 'gemini-2.0-flash', // Switched to High-RPM model for text gen
       contents: prompt,
     });
     return response.text;
@@ -190,9 +190,10 @@ export const generateSpeech = async (text: string, voiceName: string = 'Kore') =
     throw new Error("MISSING_GEMINI_KEY");
   }
 
-  try {
+  // Helper function to try a specific model
+  const tryGenerate = async (modelName: string) => {
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash-exp",
+      model: modelName,
       contents: [{ parts: [{ text }] }],
       config: {
         responseModalities: [Modality.AUDIO],
@@ -203,15 +204,27 @@ export const generateSpeech = async (text: string, voiceName: string = 'Kore') =
         },
       },
     });
+    return response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+  };
 
-    const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-    if (!base64Audio) throw new Error("No audio data returned");
+  try {
+    // 1. Try Primary Model (Exp)
+    console.log("TTS: Trying gemini-2.0-flash-exp");
+    const audioData = await tryGenerate("gemini-2.0-flash-exp");
+    if (audioData) return audioData;
+  } catch (error: any) {
+    console.warn("TTS: gemini-2.0-flash-exp failed, trying backup...", error.message);
 
-    return base64Audio;
-  } catch (error) {
-    console.error("TTS Error:", error);
-    throw error;
+    // 2. Try Secondary Model (if available/valid)
+    try {
+      console.log("TTS: Trying gemini-2.5-flash-tts (Retry)");
+      const audioData = await tryGenerate("gemini-2.5-flash-tts");
+      if (audioData) return audioData;
+    } catch (backupError) {
+      throw backupError;
+    }
   }
+  throw new Error("TTS Generation failed");
 };
 
 export const getGuidedSessionScript = async () => {
@@ -228,7 +241,7 @@ export const processVoiceQuery = async (audioBase64: string, mimeType: string) =
   try {
     // Step 1: Send Audio to Gemini to get a text response
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash-exp',
+      model: 'gemini-2.0-flash', // Switched to High-RPM model for transcription
       contents: {
         parts: [
           {
