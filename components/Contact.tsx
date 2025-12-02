@@ -126,7 +126,7 @@ export const Contact: React.FC = () => {
                     rel="noopener noreferrer"
                     className={`flex items-center justify-center gap-2 ${currentTheme.TEXT_PRIMARY} text-sm font-bold hover:${currentTheme.TEXT_ACCENT} transition-colors py-2`}
                 >
-                    <Globe size={16} /> Visit Official Website
+                    <Globe size={20} /> Visit Official Website
                 </a>
             </div>
 
@@ -139,7 +139,7 @@ export const Contact: React.FC = () => {
                         className={`w-full h-full object-contain p-2 ${currentTheme.ICON_BG} dark:bg-slate-800`}
                     />
                 </div>
-                <p className={`text-[10px] ${currentTheme.TEXT_PRIMARY} dark:text-slate-500 font-bold tracking-wide`}>
+                <p className={`text-[16px] ${currentTheme.TEXT_PRIMARY} dark:text-slate-500 font-bold tracking-wide`}>
                     App Developed by <a href="http://skrmblissai.in/" target="_blank" rel="noopener noreferrer" className={`${currentTheme.TEXT_ACCENT} hover:underline`}>SKRMBliss.ai Studio</a>
                 </p>
             </div>
