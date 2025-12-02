@@ -328,18 +328,11 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           <p className="text-white/90 text-xs mb-4 font-medium leading-relaxed drop-shadow-md text-shadow-sm max-w-[200px]">
             Boost immunity & relieve stress with expert guidance from Suman Suneja.
           </p>
-
-
           <button
             onClick={() => onNavigate(ViewState.COACH)}
             className={`${currentTheme.HERO_BUTTON} px-5 py-2.5 rounded-full text-xs font-bold active:scale-95 transition-all flex items-center gap-2 hover:scale-105`}
           >
             <Star size={14} fill="currentColor" className={colorTheme === 'pastel' ? "text-[#A9A9C6]" : "text-yellow-300"} />
-
-            {/* [-] OLD LINE: Forced white text (invisible on cream background) */}
-            {/* <span className={colorTheme === 'pastel' ? "text-[#A9A9C6]" : "text-white"}>{t('home.test_laugh')}</span> */}
-
-            {/* [+] NEW LINE: Uses 'text-current' to inherit the red/white swap from the parent button */}
             <span className={colorTheme === 'pastel' ? "text-[#A9A9C6]" : "text-current"}>{t('home.test_laugh')}</span>
           </button>
         </div>
@@ -508,25 +501,50 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
 
       {/* Fun Games & Book Session - Pill Style */}
       <div className="grid grid-cols-2 gap-4 animate-fade-in-up delay-300">
-        <button
-          onClick={() => onNavigate(ViewState.GAMES)}
-          className={`${currentTheme.GAMES} dark:bg-slate-800 p-4 rounded-[2rem] flex flex-col items-center justify-center text-center gap-2 transition-all shadow-lg group hover:scale-[1.02] h-full min-h-[100px]`}
-        >
-          <div className={`${currentTheme.GAMES_ICON_BG} rounded-full flex items-center justify-center`}>
-            <Star size={24} fill="currentColor" className="group-hover:rotate-12 transition-transform" />
-          </div>
-          <span className={`font-bold text-base leading-tight ${colorTheme === 'pastel' ? 'text-[#5B5166]' : 'text-current'}`}>{t('fun_games')}</span>
-        </button>
 
-        <button
-          onClick={() => onNavigate(ViewState.CONTACT)}
-          className={`${currentTheme.BOOK} dark:bg-slate-800 p-4 rounded-[2rem] flex flex-col items-center justify-center text-center gap-2 hover:brightness-110 dark:hover:bg-slate-700 transition-all shadow-lg group hover:scale-[1.02] h-full min-h-[100px]`}
-        >
-          <div className={`${currentTheme.BOOK_ICON_BG} rounded-full flex items-center justify-center`}>
-            <Calendar size={24} className="group-hover:-rotate-12 transition-transform" />
-          </div>
-          <span className={`font-bold text-base leading-tight ${colorTheme === 'pastel' ? 'text-[#5B5166]' : 'text-5B5166'}`}>{t('book_session')}</span>
-        </button>
+        {/* Fun Games Button Wrapper */}
+        <div className="relative group">
+          {/* Glow Effect */}
+          <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-[2rem] blur-2xl opacity-0 group-hover:opacity-5 transition-opacity duration-900 ${colorTheme === 'pastel' ? 'bg-purple-300' : 'bg-[#8B3A3A]'} animate-pulse`}></div>
+
+          <button
+            onClick={() => onNavigate(ViewState.GAMES)}
+            className={`relative z-10 w-full ${colorTheme === 'pastel'
+              ? currentTheme.GAMES // Pastel
+              : 'bg-[#FFF8F0] border-2 border-[#FFF8F0] text-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-white' // Brand (Light Style)
+              } dark:bg-slate-800 p-4 rounded-[2rem] flex flex-col items-center justify-center text-center gap-2 transition-all shadow-lg hover:scale-[1.02] h-full min-h-[100px]`}
+          >
+            <div className={`${colorTheme === 'pastel'
+              ? currentTheme.GAMES_ICON_BG
+              : 'text-[#8B3A3A] group-hover:text-white mb-1' // Brand Icon
+              } rounded-full flex items-center justify-center`}>
+              <Star size={24} fill="currentColor" className="group-hover:rotate-12 transition-transform" />
+            </div>
+            <span className={`font-bold text-base leading-tight ${colorTheme === 'pastel' ? 'text-[#5B5166]' : 'text-current'}`}>{t('fun_games')}</span>
+          </button>
+        </div>
+
+        {/* Book Session Button Wrapper */}
+        <div className="relative group">
+          {/* Glow Effect */}
+          <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-[2rem] blur-2xl opacity-0 group-hover:opacity-15 transition-opacity duration-500 ${colorTheme === 'pastel' ? 'bg-pink-300' : 'bg-[#8B3A3A]'} animate-pulse`}></div>
+
+          <button
+            onClick={() => onNavigate(ViewState.CONTACT)}
+            className={`relative z-10 w-full ${colorTheme === 'pastel'
+              ? currentTheme.BOOK
+              : currentTheme.BOOK // Brand (Dark Style)
+              } dark:bg-slate-800 p-4 rounded-[2rem] flex flex-col items-center justify-center text-center gap-2 hover:brightness-110 dark:hover:bg-slate-700 transition-all shadow-lg hover:scale-[1.02] h-full min-h-[100px]`}
+          >
+            <div className={`${colorTheme === 'pastel'
+              ? currentTheme.BOOK_ICON_BG
+              : currentTheme.BOOK_ICON_BG // Brand Icon
+              } rounded-full flex items-center justify-center`}>
+              <Calendar size={24} className="group-hover:-rotate-12 transition-transform" />
+            </div>
+            <span className={`font-bold text-base leading-tight ${colorTheme === 'pastel' ? 'text-[#5B5166]' : 'text-current'}`}>{t('book_session')}</span>
+          </button>
+        </div>
       </div>
 
     </div>
