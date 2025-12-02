@@ -153,40 +153,60 @@ export const LaughterCoach: React.FC = () => {
   };
 
   const handleQuickSession = async () => {
-    if (!introBufferRef.current) { playImmediateGreeting("Starting quick session"); }
-    cleanupAudio(); setIsSessionLoading(true); setIsSessionActive(true); setSessionType('QUICK'); setError(null); setUsingOfflineVoice(false); setIsMissingKey(false);
+    // 1. Immediate Feedback (Browser TTS)
+    playImmediateGreeting("Starting your one minute laughter boost. Get ready!");
+
+    // 2. Reset State
+    cleanupAudio();
+    setIsSessionLoading(true);
+    setIsSessionActive(true);
+    setSessionType('QUICK');
+    setError(null);
+    setUsingOfflineVoice(false);
+    setIsMissingKey(false);
+
     try {
+      // 3. Get Script
       const script = await getGuidedSessionScript();
-      const sentences = script.match(/[^.!?]+[.!?]+(\s|$)/g) || [script];
-      if (!audioContextRef.current) { audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)(); }
-      if (audioContextRef.current.state === 'suspended') { await audioContextRef.current.resume(); }
-      let currentSentenceIndex = 0; let isPlaying = false; const audioQueue: AudioBuffer[] = [];
-      if (introBufferRef.current) {
-        const introSource = audioContextRef.current.createBufferSource(); introSource.buffer = introBufferRef.current; introSource.connect(audioContextRef.current.destination); isPlaying = true; sourceRef.current = introSource;
-        introSource.onended = () => { playNextInQueue(); }; introSource.start(0);
+
+      // 4. Generate Audio for the WHOLE script at once (No chunking)
+      // This ensures continuous playback without gaps
+      const audioBase64 = await generateSpeech(script, 'Kore');
+
+      // 5. Prepare Audio Context
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
       }
-      const playNextInQueue = () => {
-        if (audioQueue.length > 0 && audioContextRef.current) {
-          isPlaying = true; const buffer = audioQueue.shift()!; const source = audioContextRef.current.createBufferSource(); source.buffer = buffer; source.connect(audioContextRef.current.destination);
-          source.onended = () => { playNextInQueue(); }; sourceRef.current = source; source.start(0);
-        } else {
-          isPlaying = false; if (currentSentenceIndex >= sentences.length) { stopSession(); }
+      if (audioContextRef.current.state === 'suspended') {
+        await audioContextRef.current.resume();
+      }
+
+      // 6. Decode and Play
+      if (audioContextRef.current) {
+        const audioBuffer = createAudioBufferFromPCM(audioContextRef.current, audioBase64);
+        const source = audioContextRef.current.createBufferSource();
+        source.buffer = audioBuffer;
+        source.connect(audioContextRef.current.destination);
+
+        source.onended = () => {
+          stopSession();
+        };
+
+        // Stop the greeting TTS if it's still going
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
         }
-      };
-      const fetchAndQueueAudio = async (index: number) => {
-        if (index >= sentences.length) return;
-        try {
-          const text = sentences[index].trim(); if (!text) { fetchAndQueueAudio(index + 1); return; }
-          const audioBase64 = await generateSpeech(text, 'Kore');
-          if (!audioContextRef.current) return;
-          const audioBuffer = createAudioBufferFromPCM(audioContextRef.current, audioBase64);
-          audioQueue.push(audioBuffer);
-          if (!isPlaying) { setIsSessionLoading(false); playNextInQueue(); }
-          currentSentenceIndex++; fetchAndQueueAudio(currentSentenceIndex);
-        } catch (err) { console.warn("Error fetching chunk:", err); currentSentenceIndex++; fetchAndQueueAudio(currentSentenceIndex); }
-      };
-      fetchAndQueueAudio(0); if (introBufferRef.current) { setIsSessionLoading(false); }
-    } catch (e: any) { console.error(e); setError(t('coach.session_error')); stopSession(); }
+
+        sourceRef.current = source;
+        source.start(0);
+        setIsSessionLoading(false);
+      }
+
+    } catch (e: any) {
+      console.error(e);
+      setError(t('coach.session_error'));
+      stopSession();
+    }
   };
 
   const stopSession = () => {
