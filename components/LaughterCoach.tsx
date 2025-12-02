@@ -15,6 +15,7 @@ interface HistoryItem {
   energyLevel: string;
 }
 
+// --- Audio Helpers ---
 function createBlob(data: Float32Array): { data: string; mimeType: string } {
   const l = data.length;
   const int16 = new Int16Array(l);
@@ -183,7 +184,11 @@ export const LaughterCoach: React.FC = () => {
 
   // --- UPDATED RECORDING LOGIC ---
   const startRecording = async () => {
-    setError(null); setScoreData(null); setIsMissingKey(false); if (isSessionActive) stopSession();
+    setError(null);
+    setScoreData(null);
+    setIsMissingKey(false);
+    if (isSessionActive) stopSession();
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream);
@@ -194,39 +199,44 @@ export const LaughterCoach: React.FC = () => {
         if (e.data.size > 0) chunksRef.current.push(e.data);
       };
 
-      // Critical: Set onstop here
       mediaRecorder.onstop = async () => {
+        console.log("Recording stopped, processing audio...");
         const audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
         const reader = new FileReader();
         reader.readAsDataURL(audioBlob);
         reader.onloadend = async () => {
           const base64String = reader.result as string;
-          // IMPORTANT: Some browsers include data:audio/webm;base64, prefix, some don't or have different types
-          // This safe split handles the prefix if present
           const base64Data = base64String.includes(',') ? base64String.split(',')[1] : base64String;
           analyzeAudio(base64Data, audioBlob.type || 'audio/webm');
         };
+        // Stop all tracks to release microphone
         stream.getTracks().forEach(track => track.stop());
       };
 
       mediaRecorder.start();
       setIsRecording(true);
-    } catch (err) { console.error(err); setError(t('coach.mic_permission')); }
+      console.log("Recording started");
+    } catch (err) {
+      console.error("Microphone error:", err);
+      setError(t('coach.mic_permission'));
+    }
   };
 
   const stopRecording = () => {
+    console.log("Stopping recording...");
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
       setIsAnalyzing(true);
     } else {
-      // Fallback if state is weird
+      console.warn("MediaRecorder not active or undefined");
       setIsRecording(false);
     }
   };
 
   const analyzeAudio = async (base64: string, mimeType: string) => {
     try {
+      console.log("Analyzing audio...");
       const result = await rateLaughter(base64, mimeType);
       setScoreData(result);
       if (result.score > 0) {
@@ -235,6 +245,7 @@ export const LaughterCoach: React.FC = () => {
         addPoints(15, t('coach.laughter_analyzed'), 'COACH');
       }
     } catch (err: any) {
+      console.error("Analysis failed:", err);
       if (err.message === "MISSING_GEMINI_KEY") {
         setScoreData({ score: 85, feedback: "Even without my AI brain, I can tell that was joyful! (AI Offline Mode)", energyLevel: "High" });
         setUsingOfflineVoice(true);
@@ -281,6 +292,15 @@ export const LaughterCoach: React.FC = () => {
             </div>
             <button onClick={() => setShowFeedback(false)} className="mt-6 text-xs font-bold text-gray-400 underline decoration-dashed">{t('coach.skip_feedback')}</button>
           </div>
+        </div>
+      )}
+
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-100 border border-red-200 text-red-600 px-4 py-3 rounded-xl animate-fade-in-up flex items-center gap-2 max-w-sm w-full text-sm z-20">
+          <WifiOff size={16} />
+          <span className="flex-1">{error}</span>
+          <button onClick={() => setError(null)} className="ml-auto hover:bg-red-200 rounded-full p-1"><X size={14} /></button>
         </div>
       )}
 
