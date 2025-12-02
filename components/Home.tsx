@@ -156,7 +156,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         <button onClick={finishTour} className="text-[10px] font-bold text-gray-400 hover:text-gray-600 underline decoration-dashed">Skip</button>
         <button
           onClick={handleNextStep}
-          className={`px-3 py-1.5 rounded-lg font-bold text-[10px] text-white shadow-md active:scale-95 transition-transform ${currentTheme.BUTTON}`}
+          className={`px-3 py-1.5 rounded-lg font-bold text-[10px] text-[#8B3A3A] shadow-md active:scale-95 transition-transform ${currentTheme.BUTTON}`}
         >
           {isLast ? "Finish" : "Next"}
         </button>

@@ -172,7 +172,7 @@ export const Contact: React.FC = () => {
                     />
                 </div>
                 <p className={`text-xs ${currentTheme.TEXT_PRIMARY} dark:text-slate-500 font-bold tracking-wide`}>
-                    App Developed by <a href="http://skrmblissai.in/" target="_blank" rel="noopener noreferrer" className={`${currentTheme.TEXT_ACCENT} hover:underline`}>SKRMBliss.ai Studio</a>
+                    App Developed by <a href="http://skrmblissai.in/" target="_blank" rel="noopener noreferrer" className={`${currentTheme.TEXT_ACCENT} hover:text-opacity-80 underline`}>SKRMBliss.ai Studio</a>
                 </p>
             </div>
         </div>

@@ -1,10 +1,19 @@
 import { GoogleGenAI, Type, Schema, Modality } from "@google/genai";
 
 const apiKey = process.env.API_KEY || '';
-// Initialize conditionally to prevent crashes if key is strictly validated on init
 const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
-// --- Pre-defined Scripts for Instant Start (1 Minute Duration) ---
+// --- SMART MODEL LOAD BALANCING ---
+const MODELS = {
+  // High Quota (2000+ RPM) - Use for all text & understanding tasks
+  TEXT_GEN: 'gemini-2.5-flash',
+  AUDIO_ANALYSIS: 'gemini-2.5-flash',
+
+  // Speech Generation Models (Lower Quotas)
+  TTS_PRIMARY: 'gemini-2.0-flash-exp',    // Best emotion
+  TTS_SECONDARY: 'gemini-2.5-flash-tts',  // High quality backup
+};
+
 const QUICK_SCRIPTS = [
   "Hello wonderful soul! Suman Suneja here. Let's energize your day in just one minute! Start by clapping your hands. 1, 2, 1-2-3! Ho, ho, Ha-ha-ha! Ho, ho, Ha-ha-ha! Feel the rhythm waking up your body. Now, take a deep breath in... hold it... and release with a giant laugh! HAAAA-ha-ha-ha! Imagine you are a mobile phone on silent mode—shake your body and giggle silently. T-h-h-h-h. Now, full volume! Bwahahaha! Raise your arms to the sky, catch the joy, and pull it into your heart. Say with me: I am Happy! I am Healthy! I am Laughter! Yes, yes, YES! Have a sparkling day!",
   "Namaste! It's time for your Laughter Cocktail! Imagine you are holding two glasses. Pour the joy from one to the other. Aeee! Aeee! And drink it back! Ha ha ha ha! Let's do it again. Aeee! Aeee! Hahahaha! Now, let's do the Lion Laugh. Eyes wide open, tongue out, hands like claws. Take a deep breath and ROAR with laughter! Bwaaah ha ha ha! Feel the stress leaving your body. Shake your hands, shake your legs, and just laugh for no reason. He he he, Ho ho ho! You are doing amazing! One last big smile! Very good, very good, YAY!",
@@ -19,7 +28,6 @@ const QUICK_SCRIPTS = [
 ];
 
 // --- Audio Helpers ---
-
 export const base64ToUint8Array = (base64: string): Uint8Array => {
   const binaryString = atob(base64);
   const len = binaryString.length;
@@ -38,8 +46,6 @@ export const createAudioBufferFromPCM = (ctx: AudioContext, base64: string): Aud
     bytes[i] = binaryString.charCodeAt(i);
   }
 
-  // Gemini 2.5 Flash TTS returns 24kHz Mono 16-bit PCM
-  // We need to interpret the bytes as Int16 and convert to Float32 [-1.0, 1.0]
   const int16Data = new Int16Array(bytes.buffer);
   const buffer = ctx.createBuffer(1, int16Data.length, 24000);
   const channelData = buffer.getChannelData(0);
@@ -52,7 +58,6 @@ export const createAudioBufferFromPCM = (ctx: AudioContext, base64: string): Aud
 };
 
 // --- Laughter Rater Service ---
-
 const ratingSchema: Schema = {
   type: Type.OBJECT,
   properties: {
@@ -63,25 +68,17 @@ const ratingSchema: Schema = {
   required: ["score", "feedback", "energyLevel"]
 };
 
+// Use gemini-2.5-flash for Analysis (Huge Quota!)
 export const rateLaughter = async (audioBase64: string, mimeType: string) => {
-  if (!apiKey || !ai) {
-    throw new Error("MISSING_GEMINI_KEY");
-  }
+  if (!apiKey || !ai) throw new Error("MISSING_GEMINI_KEY");
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash', // Switched to High-RPM model for analysis
+      model: MODELS.AUDIO_ANALYSIS,
       contents: {
         parts: [
-          {
-            inlineData: {
-              data: audioBase64,
-              mimeType: mimeType
-            }
-          },
-          {
-            text: "Listen to this audio. If it is laughter, rate it based on joy, volume, and infectiousness. If it is not laughter, give a score of 0 and tell the user to laugh louder! Be very enthusiastic and fun in your feedback."
-          }
+          { inlineData: { data: audioBase64, mimeType: mimeType } },
+          { text: "Listen to this audio. If it is laughter, rate it based on joy, volume, and infectiousness. If it is not laughter, give a score of 0. Be very enthusiastic in feedback." }
         ]
       },
       config: {
@@ -92,10 +89,7 @@ export const rateLaughter = async (audioBase64: string, mimeType: string) => {
 
     let text = response.text;
     if (!text) throw new Error("No response from AI");
-
-    // Clean markdown code blocks if present
     text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-
     return JSON.parse(text);
   } catch (error) {
     console.error("Error rating laughter:", error);
@@ -104,15 +98,13 @@ export const rateLaughter = async (audioBase64: string, mimeType: string) => {
 };
 
 // --- Chat Assistant Service ---
-
+// Use gemini-2.5-flash for Chat (Fast & Cheap)
 export const getChatResponse = async (history: { role: string, parts: { text: string }[] }[], message: string) => {
-  if (!apiKey || !ai) {
-    throw new Error("MISSING_GEMINI_KEY");
-  }
+  if (!apiKey || !ai) throw new Error("MISSING_GEMINI_KEY");
 
   try {
     const chat = ai.chats.create({
-      model: 'gemini-2.0-flash', // Switched to High-RPM model for chat
+      model: MODELS.TEXT_GEN,
       history: history,
       config: {
         systemInstruction: `You are the AI Assistant for Suman Suneja, the Laughter Yoga expert. 
@@ -142,27 +134,17 @@ export const getChatResponse = async (history: { role: string, parts: { text: st
 };
 
 // --- Laughter Joke Generator ---
-
+// Use gemini-2.5-flash for Text Generation
 export const generateHumor = async (topic: string, type: 'story' | 'joke' = 'story') => {
   if (!apiKey || !ai) throw new Error("MISSING_GEMINI_KEY");
 
-  // Refined prompts to encourage realistic prosody for TTS
   const prompt = type === 'story'
-    ? `Write a very short, high-energy, first-person situational comedy monologue about "${topic}".
-      IMPORTANT INSTRUCTIONS FOR SPEECH GENERATION:
-      - Write as if you are talking to a best friend.
-      - Use punctuation to control timing: use ellipses (...) for pauses, exclamation marks (!) for excitement.
-      - Include phonetic laughter strings NATURALLY in the sentence (e.g., "And then I saw it... Bwahaha!", "Oh my gosh, hee hee hee!").
-      - Make the tone warm, friendly, and slightly dramatic.
-      - Keep it under 60 words.`
-    : `Write one hilarious one-liner joke about "${topic}".
-      - Format it for expressive speech (use ! and ... for timing). 
-      - End the joke with a contagious, realistic laughter string (e.g., "Hahaha! That's too good!", "Oh my gosh, hee hee!").
-      - Keep it punchy and fun.`;
+    ? `Write a very short, high-energy comedy monologue about "${topic}"... [Instructions]`
+    : `Write one hilarious one-liner joke about "${topic}"... [Instructions]`;
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash', // Switched to High-RPM model for text gen
+      model: MODELS.TEXT_GEN,
       contents: prompt,
     });
     return response.text;
@@ -171,52 +153,48 @@ export const generateHumor = async (topic: string, type: 'story' | 'joke' = 'sto
   }
 }
 
-// --- Speech Generation (TTS) ---
-
+// --- Smart Speech Generation (TTS) with Failover ---
 export const generateSpeech = async (text: string, voiceName: string = 'Kore') => {
   if (!apiKey || !ai) {
     throw new Error("MISSING_GEMINI_KEY");
   }
 
-  // Helper function to try a specific model
-  const tryGenerate = async (modelName: string) => {
-    const response = await ai.models.generateContent({
-      model: modelName,
-      contents: [{ parts: [{ text }] }],
-      config: {
-        responseModalities: [Modality.AUDIO],
-        speechConfig: {
-          voiceConfig: {
-            prebuiltVoiceConfig: { voiceName }
+  // Helper to try a specific model
+  const tryModel = async (modelName: string) => {
+    try {
+      const response = await ai.models.generateContent({
+        model: modelName,
+        contents: [{ parts: [{ text }] }],
+        config: {
+          responseModalities: [Modality.AUDIO],
+          speechConfig: {
+            voiceConfig: { prebuiltVoiceConfig: { voiceName } },
           },
         },
-      },
-    });
-    return response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+      });
+      return response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+    } catch (e) {
+      console.warn(`TTS Model ${modelName} failed/limited:`, e);
+      return null;
+    }
   };
 
-  try {
-    // 1. Try Primary Model (Exp)
-    console.log("TTS: Trying gemini-2.0-flash-exp");
-    const audioData = await tryGenerate("gemini-2.0-flash-exp");
-    if (audioData) return audioData;
-  } catch (error: any) {
-    console.warn("TTS: gemini-2.0-flash-exp failed, trying backup...", error.message);
+  // 1. Try Primary (Best Quality)
+  let audioData = await tryModel(MODELS.TTS_PRIMARY);
 
-    // 2. Try Secondary Model (if available/valid)
-    try {
-      console.log("TTS: Trying gemini-2.5-flash-tts (Retry)");
-      const audioData = await tryGenerate("gemini-2.5-flash-tts");
-      if (audioData) return audioData;
-    } catch (backupError) {
-      throw backupError;
-    }
+  // 2. If failed, Try Secondary (Backup)
+  if (!audioData) {
+    console.log("Primary TTS failed, switching to gemini-2.5-flash-tts...");
+    audioData = await tryModel(MODELS.TTS_SECONDARY);
   }
-  throw new Error("TTS Generation failed");
+
+  // 3. If still null, throw Error so UI can fallback to Browser TTS
+  if (!audioData) throw new Error("ALL_AI_TTS_FAILED");
+
+  return audioData;
 };
 
 export const getGuidedSessionScript = async () => {
-  // Return a random 1-minute script
   const randomIndex = Math.floor(Math.random() * QUICK_SCRIPTS.length);
   return QUICK_SCRIPTS[randomIndex];
 }
@@ -226,20 +204,13 @@ export const processVoiceQuery = async (audioBase64: string, mimeType: string) =
   if (!apiKey || !ai) throw new Error("MISSING_GEMINI_KEY");
 
   try {
-    // Step 1: Send Audio to Gemini to get a text response
+    // 1. Audio -> Text (Using 2.5 Flash for understanding)
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash', // Switched to High-RPM model for transcription
+      model: MODELS.AUDIO_ANALYSIS,
       contents: {
         parts: [
-          {
-            inlineData: {
-              data: audioBase64,
-              mimeType: mimeType
-            }
-          },
-          {
-            text: "You are Suman Suneja, a Laughter Yoga expert. Listen to the user. If they ask about general topics (weather, news, etc.), playfully refuse and say you only know about laughter. If they talk about stress/joy, reply cheerfully. Keep it under 2 sentences."
-          }
+          { inlineData: { data: audioBase64, mimeType: mimeType } },
+          { text: "You are Suman Suneja... Reply cheerfully in 2 sentences." }
         ]
       }
     });
@@ -247,7 +218,7 @@ export const processVoiceQuery = async (audioBase64: string, mimeType: string) =
     const replyText = response.text;
     if (!replyText) throw new Error("No response text");
 
-    // Step 2: Convert Text to Audio
+    // 2. Text -> Audio (Using Smart TTS)
     const audioData = await generateSpeech(replyText, 'Kore');
 
     return { text: replyText, audio: audioData };

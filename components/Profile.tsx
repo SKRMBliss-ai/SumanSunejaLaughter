@@ -347,7 +347,7 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
               </button>
               <div className="mt-6 text-center">
                 <p className="text-[14px] text-[#AABBCC] dark:text-slate-500 font-bold tracking-wide">
-                  {t('app.developed_by')} <a href="http://skrmblissai.in/" target="_blank" rel="noopener noreferrer" className={`${currentTheme.TEXT_ACCENT} hover:underline`}>SKRMBliss.ai Studio</a>
+                  App Developed by <a href="http://skrmblissai.in/" target="_blank" rel="noopener noreferrer" className={`${currentTheme.TEXT_ACCENT} hover:text-opacity-80 underline`}>SKRMBliss.ai Studio</a>
                 </p>
               </div>
             </div>

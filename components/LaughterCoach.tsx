@@ -95,22 +95,10 @@ export const LaughterCoach: React.FC = () => {
     }
     window.speechSynthesis.cancel();
     if (liveSessionRef.current) liveSessionRef.current = null;
-    if (inputProcessorRef.current) {
-      try { inputProcessorRef.current.disconnect(); } catch (e) { }
-      inputProcessorRef.current = null;
-    }
-    if (mediaStreamRef.current) {
-      try { mediaStreamRef.current.getTracks().forEach(track => track.stop()); } catch (e) { }
-      mediaStreamRef.current = null;
-    }
-    if (liveInputContextRef.current) {
-      try { liveInputContextRef.current.close(); } catch (e) { }
-      liveInputContextRef.current = null;
-    }
-    if (audioContextRef.current) {
-      try { audioContextRef.current.close(); } catch (e) { }
-      audioContextRef.current = null;
-    }
+    if (inputProcessorRef.current) { try { inputProcessorRef.current.disconnect(); } catch (e) { } inputProcessorRef.current = null; }
+    if (mediaStreamRef.current) { try { mediaStreamRef.current.getTracks().forEach(track => track.stop()); } catch (e) { } mediaStreamRef.current = null; }
+    if (liveInputContextRef.current) { try { liveInputContextRef.current.close(); } catch (e) { } liveInputContextRef.current = null; }
+    if (audioContextRef.current) { try { audioContextRef.current.close(); } catch (e) { } audioContextRef.current = null; }
   };
 
   const handleFeedback = (rating: 'up' | 'down') => { console.log(`User rated session: ${rating}`); addPoints(5, t('coach.thanks_feedback'), 'COACH'); setShowFeedback(false); };
@@ -146,18 +134,21 @@ export const LaughterCoach: React.FC = () => {
   });
 
   const startLiveSession = async () => {
+    cleanupAudio();
     playImmediateGreeting("Live laughter session");
     const apiKey = process.env.API_KEY;
     if (!apiKey) { setError(t('coach.live_unavailable')); setIsMissingKey(true); return; }
     setSessionType('LIVE'); setIsSessionActive(true); startLiveSessionLowLatency(apiKey);
   };
 
+  // --- ROBUST QUICK SESSION HANDLER (With Fallback) ---
   const handleQuickSession = async () => {
-    // 1. Immediate Feedback (Browser TTS)
-    playImmediateGreeting("Starting your one minute laughter boost. Get ready!");
-
-    // 2. Reset State
+    // 1. Cleanup Audio FIRST
     cleanupAudio();
+
+    // 2. Immediate feedback (Browser TTS)
+    playImmediateGreeting("Starting your quick laughter session. Get ready to smile!");
+
     setIsSessionLoading(true);
     setIsSessionActive(true);
     setSessionType('QUICK');
@@ -169,41 +160,61 @@ export const LaughterCoach: React.FC = () => {
       // 3. Get Script
       const script = await getGuidedSessionScript();
 
-      // 4. Generate Audio for the WHOLE script at once (No chunking)
-      // This ensures continuous playback without gaps
-      const audioBase64 = await generateSpeech(script, 'Kore');
+      let audioBase64 = null;
 
-      // 5. Prepare Audio Context
-      if (!audioContextRef.current) {
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-      }
-      if (audioContextRef.current.state === 'suspended') {
-        await audioContextRef.current.resume();
+      // 4. Try AI Generation first
+      try {
+        audioBase64 = await generateSpeech(script, 'Kore');
+      } catch (ttsErr: any) {
+        console.warn("AI TTS Failed/Rate Limited, switching to Browser TTS:", ttsErr);
       }
 
-      // 6. Decode and Play
-      if (audioContextRef.current) {
+      if (audioBase64) {
+        // --- AI AUDIO PATH ---
+        if (!audioContextRef.current) {
+          audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        }
+        if (audioContextRef.current.state === 'suspended') {
+          await audioContextRef.current.resume();
+        }
+
         const audioBuffer = createAudioBufferFromPCM(audioContextRef.current, audioBase64);
         const source = audioContextRef.current.createBufferSource();
         source.buffer = audioBuffer;
         source.connect(audioContextRef.current.destination);
 
-        source.onended = () => {
-          stopSession();
-        };
+        source.onended = () => stopSession();
 
-        // Stop the greeting TTS if it's still going
-        if ('speechSynthesis' in window) {
-          window.speechSynthesis.cancel();
-        }
-
+        window.speechSynthesis.cancel(); // Stop greeting
         sourceRef.current = source;
         source.start(0);
         setIsSessionLoading(false);
+
+      } else {
+        // --- FALLBACK BROWSER TTS PATH ---
+        setUsingOfflineVoice(true);
+        window.speechSynthesis.cancel(); // Stop greeting
+
+        const utterance = new SpeechSynthesisUtterance(script);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.1; // Slightly cheerful pitch
+
+        const voices = window.speechSynthesis.getVoices();
+        const femaleVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Google US English'));
+        if (femaleVoice) utterance.voice = femaleVoice;
+
+        utterance.onstart = () => setIsSessionLoading(false);
+        utterance.onend = () => stopSession();
+        utterance.onerror = (e) => {
+          console.error("Browser TTS failed", e);
+          stopSession();
+        };
+
+        window.speechSynthesis.speak(utterance);
       }
 
     } catch (e: any) {
-      console.error(e);
+      console.error("Critical Session Error:", e);
       setError(t('coach.session_error'));
       stopSession();
     }
@@ -211,24 +222,28 @@ export const LaughterCoach: React.FC = () => {
 
   const stopSession = () => {
     if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); }
-    if (sessionTypeRef.current === 'LIVE') {
-      try { stopLiveSessionLowLatency(false); } catch (e) { console.error("Error stopping live session:", e); }
-    }
-    try { cleanupAudio(); } catch (e) { console.error("Error cleaning up audio:", e); }
 
-    const wasActive = isSessionActive;
+    const completedSessionType = sessionTypeRef.current;
+    if (!completedSessionType && !isSessionActive) return;
+
+    sessionTypeRef.current = null; // Break loop
+
+    if (completedSessionType === 'LIVE') {
+      try { stopLiveSessionLowLatency(); } catch (e) { }
+    }
+
+    cleanupAudio();
     setIsSessionActive(false);
     setIsSessionLoading(false);
-    const completedSessionType = sessionTypeRef.current;
     setSessionType(null);
 
-    if (completedSessionType && wasActive) {
+    if (completedSessionType) {
       addPoints(completedSessionType === 'LIVE' ? 30 : 20, t('coach.session_completed'), 'COACH');
       setTimeout(() => setShowFeedback(true), 500);
     }
   };
 
-  // --- UPDATED RECORDING LOGIC ---
+  // --- RECORDING LOGIC ---
   const startRecording = async () => {
     setError(null);
     setScoreData(null);
@@ -246,7 +261,6 @@ export const LaughterCoach: React.FC = () => {
       };
 
       mediaRecorder.onstop = async () => {
-        console.log("Recording stopped, processing audio...");
         const audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
         const reader = new FileReader();
         reader.readAsDataURL(audioBlob);
@@ -255,13 +269,11 @@ export const LaughterCoach: React.FC = () => {
           const base64Data = base64String.includes(',') ? base64String.split(',')[1] : base64String;
           analyzeAudio(base64Data, audioBlob.type || 'audio/webm');
         };
-        // Stop all tracks to release microphone
         stream.getTracks().forEach(track => track.stop());
       };
 
       mediaRecorder.start();
       setIsRecording(true);
-      console.log("Recording started");
     } catch (err) {
       console.error("Microphone error:", err);
       setError(t('coach.mic_permission'));
@@ -269,20 +281,17 @@ export const LaughterCoach: React.FC = () => {
   };
 
   const stopRecording = () => {
-    console.log("Stopping recording...");
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
       setIsAnalyzing(true);
     } else {
-      console.warn("MediaRecorder not active or undefined");
       setIsRecording(false);
     }
   };
 
   const analyzeAudio = async (base64: string, mimeType: string) => {
     try {
-      console.log("Analyzing audio...");
       const result = await rateLaughter(base64, mimeType);
       setScoreData(result);
       if (result.score > 0) {
@@ -291,12 +300,17 @@ export const LaughterCoach: React.FC = () => {
         addPoints(15, t('coach.laughter_analyzed'), 'COACH');
       }
     } catch (err: any) {
-      console.error("Analysis failed:", err);
-      if (err.message === "MISSING_GEMINI_KEY") {
-        setScoreData({ score: 85, feedback: "Even without my AI brain, I can tell that was joyful! (AI Offline Mode)", energyLevel: "High" });
+      // Handle Quota/Error Fallback
+      const errorMsg = err.message || "";
+      if (errorMsg.includes("MISSING_GEMINI_KEY") || errorMsg.includes("429") || errorMsg.includes("Quota") || errorMsg.includes("RESOURCE_EXHAUSTED")) {
+        setScoreData({
+          score: 85,
+          feedback: "Even without my AI brain (Quota Limit/Offline), I can tell that was joyful! Keep laughing!",
+          energyLevel: "High"
+        });
         setUsingOfflineVoice(true);
       } else {
-        setError(`${t('coach.analyze_error')} (${err.message})`);
+        setError(t('coach.analyze_error'));
       }
     } finally {
       setIsAnalyzing(false);
@@ -305,6 +319,7 @@ export const LaughterCoach: React.FC = () => {
 
   const clearHistory = () => { if (window.confirm(t('coach.clear_confirm'))) { setHistory([]); } };
 
+  // --- BUTTON STYLING HELPERS ---
   const getOutlineButtonStyle = () => {
     if (colorTheme === 'pastel') {
       return "bg-white text-[#5B5166] border-2 border-[#B8B8D0] hover:bg-[#B8B8D0] hover:text-white hover:border-[#B8B8D0]";
@@ -340,7 +355,7 @@ export const LaughterCoach: React.FC = () => {
         </div>
       )}
 
-      {/* Error Message */}
+      {/* Error Message (Dismissible) */}
       {error && (
         <div className="bg-red-100 border border-red-200 text-red-600 px-4 py-3 rounded-xl animate-fade-in-up flex items-center gap-2 max-w-sm w-full text-sm z-20">
           <WifiOff size={16} />
@@ -396,7 +411,9 @@ export const LaughterCoach: React.FC = () => {
               <h3 className="font-bold">
                 {isSessionActive && sessionType === 'QUICK' ? 'Stop Session' : t('coach.quick_laugh')}
               </h3>
-              <p className={`text-xs ${isSessionActive && sessionType === 'QUICK' ? 'opacity-80' : 'text-gray-500'}`}>{t('coach.guided_boost')}</p>
+              <p className={`text-xs ${isSessionActive && sessionType === 'QUICK' ? 'opacity-80' : 'text-gray-500'}`}>
+                {usingOfflineVoice ? 'Using Offline Voice (Data Saver)' : t('coach.guided_boost')}
+              </p>
             </div>
           </div>
         </button>
