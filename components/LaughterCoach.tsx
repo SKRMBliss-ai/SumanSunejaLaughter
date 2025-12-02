@@ -90,13 +90,27 @@ export const LaughterCoach: React.FC = () => {
   }, [isSessionActive]);
 
   const cleanupAudio = () => {
-    if (sourceRef.current) sourceRef.current.stop();
+    if (sourceRef.current) {
+      try { sourceRef.current.stop(); } catch (e) { }
+    }
     window.speechSynthesis.cancel();
     if (liveSessionRef.current) liveSessionRef.current = null;
-    if (inputProcessorRef.current) { inputProcessorRef.current.disconnect(); inputProcessorRef.current = null; }
-    if (mediaStreamRef.current) { mediaStreamRef.current.getTracks().forEach(track => track.stop()); mediaStreamRef.current = null; }
-    if (liveInputContextRef.current) { liveInputContextRef.current.close(); liveInputContextRef.current = null; }
-    if (audioContextRef.current) { audioContextRef.current.close(); audioContextRef.current = null; }
+    if (inputProcessorRef.current) {
+      try { inputProcessorRef.current.disconnect(); } catch (e) { }
+      inputProcessorRef.current = null;
+    }
+    if (mediaStreamRef.current) {
+      try { mediaStreamRef.current.getTracks().forEach(track => track.stop()); } catch (e) { }
+      mediaStreamRef.current = null;
+    }
+    if (liveInputContextRef.current) {
+      try { liveInputContextRef.current.close(); } catch (e) { }
+      liveInputContextRef.current = null;
+    }
+    if (audioContextRef.current) {
+      try { audioContextRef.current.close(); } catch (e) { }
+      audioContextRef.current = null;
+    }
   };
 
   const handleFeedback = (rating: 'up' | 'down') => { console.log(`User rated session: ${rating}`); addPoints(5, t('coach.thanks_feedback'), 'COACH'); setShowFeedback(false); };
@@ -177,9 +191,21 @@ export const LaughterCoach: React.FC = () => {
 
   const stopSession = () => {
     if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); }
-    if (sessionTypeRef.current === 'LIVE') { stopLiveSessionLowLatency(); }
-    cleanupAudio(); const wasActive = isSessionActive; setIsSessionActive(false); setIsSessionLoading(false); const completedSessionType = sessionTypeRef.current; setSessionType(null);
-    if (completedSessionType && wasActive) { addPoints(completedSessionType === 'LIVE' ? 30 : 20, t('coach.session_completed'), 'COACH'); setTimeout(() => setShowFeedback(true), 500); }
+    if (sessionTypeRef.current === 'LIVE') {
+      try { stopLiveSessionLowLatency(); } catch (e) { console.error("Error stopping live session:", e); }
+    }
+    try { cleanupAudio(); } catch (e) { console.error("Error cleaning up audio:", e); }
+
+    const wasActive = isSessionActive;
+    setIsSessionActive(false);
+    setIsSessionLoading(false);
+    const completedSessionType = sessionTypeRef.current;
+    setSessionType(null);
+
+    if (completedSessionType && wasActive) {
+      addPoints(completedSessionType === 'LIVE' ? 30 : 20, t('coach.session_completed'), 'COACH');
+      setTimeout(() => setShowFeedback(true), 500);
+    }
   };
 
   // --- UPDATED RECORDING LOGIC ---

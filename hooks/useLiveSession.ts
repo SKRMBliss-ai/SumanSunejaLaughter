@@ -64,7 +64,11 @@ export const useLiveSession = ({ onSessionEnd, onError, onAudioStart }: UseLiveS
 
     const cleanupAudio = useCallback(() => {
         if (currentSourceRef.current) {
-            currentSourceRef.current.stop();
+            try {
+                currentSourceRef.current.stop();
+            } catch (e) {
+                // Ignore errors if already stopped or not started
+            }
             currentSourceRef.current = null;
         }
 
@@ -74,22 +78,30 @@ export const useLiveSession = ({ onSessionEnd, onError, onAudioStart }: UseLiveS
         }
 
         if (inputProcessorRef.current) {
-            inputProcessorRef.current.disconnect();
+            try {
+                inputProcessorRef.current.disconnect();
+            } catch (e) { }
             inputProcessorRef.current = null;
         }
 
         if (mediaStreamRef.current) {
-            mediaStreamRef.current.getTracks().forEach(track => track.stop());
+            try {
+                mediaStreamRef.current.getTracks().forEach(track => track.stop());
+            } catch (e) { }
             mediaStreamRef.current = null;
         }
 
         if (liveInputContextRef.current) {
-            liveInputContextRef.current.close();
+            try {
+                liveInputContextRef.current.close();
+            } catch (e) { }
             liveInputContextRef.current = null;
         }
 
         if (audioContextRef.current) {
-            audioContextRef.current.close();
+            try {
+                audioContextRef.current.close();
+            } catch (e) { }
             audioContextRef.current = null;
         }
     }, []);
