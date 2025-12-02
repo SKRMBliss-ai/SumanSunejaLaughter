@@ -3,7 +3,7 @@ import { Phone, Mail, Globe, Youtube, MessageCircle, Briefcase, Users, User, Map
 import { useSettings } from '../contexts/SettingsContext';
 
 export const Contact: React.FC = () => {
-    const { currentTheme } = useSettings();
+    const { currentTheme, colorTheme } = useSettings();
     const handleWhatsApp = () => {
         const text = encodeURIComponent("Hi Suman! I'm interested in Laughter Yoga and want to know more.");
         window.open(`https://wa.me/918217581238?text=${text}`, '_blank');
@@ -13,19 +13,35 @@ export const Contact: React.FC = () => {
         window.location.href = "mailto:Enquiry@sumansuneja.com?subject=Laughter%20Yoga%20Enquiry&body=Hi%20Suman%2C%20I%20would%20love%20to%20book%20a%20session.";
     };
 
+    // Helper for card styles based on theme
+    const getCardStyle = (type: 'primary' | 'secondary' | 'tertiary' | 'quaternary') => {
+        if (colorTheme === 'pastel') {
+            switch (type) {
+                case 'primary': return "bg-[#E8DFF5] border-purple-100 text-[#5B5166]"; // Light Purple
+                case 'secondary': return "bg-[#E0F2F1] border-teal-100 text-[#00695C]"; // Light Teal
+                case 'tertiary': return "bg-[#FFF3E0] border-orange-100 text-orange-800"; // Light Orange
+                case 'quaternary': return "bg-[#FCE4EC] border-pink-100 text-pink-800"; // Light Pink
+            }
+        } else {
+            // Red Brick Theme: Uniform Cream/Red
+            return "bg-[#FFF8F0] border-[#8B3A3A]/30 text-[#934139]";
+        }
+        return "";
+    };
+
     return (
         <div className="p-4 space-y-8 pb-44 animate-in slide-in-from-bottom-4 duration-700">
 
             {/* Fun Header */}
             <div className="text-center space-y-2 mt-4 relative">
-                <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 ${currentTheme.BUTTON_SECONDARY} rounded-full blur-3xl opacity-20 animate-pulse`}></div>
+                <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 ${currentTheme.HERO} rounded-full blur-3xl opacity-20 animate-pulse`}></div>
                 <div className="relative inline-block">
                     <div className="bg-white dark:bg-slate-800 p-3 rounded-full shadow-lg inline-block mb-2 animate-bounce-gentle">
                         <Smile className={`${currentTheme.TEXT_ACCENT} w-10 h-10 fill-[#EDE8F8] dark:fill-slate-700`} />
                     </div>
                     <h2 className={`text-4xl font-fredoka font-bold ${currentTheme.TEXT_PRIMARY} dark:text-gray-100 leading-tight`}>
                         Let's Make <br />
-                        <span className={`text-transparent bg-clip-text bg-gradient-to-r ${currentTheme.TEXT_ACCENT} to-[#C3B8D5]`}>Magic Happen!</span>
+                        <span className={`text-transparent bg-clip-text bg-gradient-to-r ${colorTheme === 'pastel' ? 'from-purple-400 to-pink-400' : 'from-[#8B3A3A] to-[#B85C5C]'}`}>Magic Happen!</span>
                     </h2>
                 </div>
                 <p className={`${currentTheme.TEXT_PRIMARY} font-medium text-sm max-w-xs mx-auto`}>
@@ -33,45 +49,54 @@ export const Contact: React.FC = () => {
                 </p>
             </div>
 
-            {/* Primary Action Buttons (Big & Tappable) */}
+            {/* Primary Action Buttons */}
             <div className="grid grid-cols-1 gap-4">
-                {/* Pastel WhatsApp Button - Softer Green */}
+                {/* WhatsApp Button */}
                 <button
                     onClick={handleWhatsApp}
-                    className="group relative overflow-hidden bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-300 border-2 border-green-200 dark:border-green-800 p-6 rounded-3xl shadow-xl shadow-green-100/50 dark:shadow-none flex items-center justify-between transition-all hover:-translate-y-1 hover:shadow-2xl active:scale-95 hover:bg-green-200 dark:hover:bg-green-900/60"
+                    className={`group relative overflow-hidden p-6 rounded-3xl shadow-xl flex items-center justify-between transition-all hover:-translate-y-1 hover:shadow-2xl active:scale-95 border-2
+                        ${colorTheme === 'pastel'
+                            ? 'bg-[#E0F2F1] border-[#B2DFDB] text-[#00695C] hover:bg-[#B2DFDB]'
+                            : 'bg-[#FFF8F0] border-[#8B3A3A] text-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-white'
+                        }`}
                 >
-                    <div className="absolute -right-6 -top-6 w-24 h-24 bg-white/40 dark:bg-white/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                    <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full group-hover:scale-150 transition-transform duration-500 ${colorTheme === 'pastel' ? 'bg-white/40' : 'bg-white/10'}`}></div>
                     <div className="flex items-center gap-4 z-10">
-                        <div className="bg-white dark:bg-slate-800 p-3 rounded-2xl shadow-sm text-green-700 dark:text-green-400">
+                        <div className={`p-3 rounded-2xl shadow-sm ${colorTheme === 'pastel' ? 'bg-white text-[#00695C]' : 'bg-[#8B3A3A]/10 text-[#8B3A3A] group-hover:bg-white group-hover:text-[#8B3A3A]'}`}>
                             <MessageCircle size={28} fill="currentColor" strokeWidth={1.5} />
                         </div>
                         <div className="text-left">
                             <span className="block font-black text-xl tracking-tight">WhatsApp Us</span>
-                            <span className="text-green-800/80 dark:text-green-400/80 text-xs font-bold uppercase tracking-wider">Instant Reply</span>
+                            <span className="text-xs font-bold uppercase tracking-wider opacity-80">Instant Reply</span>
                         </div>
                     </div>
-                    <div className="z-10 bg-white dark:bg-slate-800 p-2 rounded-full text-green-700 dark:text-green-400 shadow-sm">
+                    <div className={`z-10 p-2 rounded-full shadow-sm ${colorTheme === 'pastel' ? 'bg-white text-[#00695C]' : 'bg-[#8B3A3A]/10 text-[#8B3A3A] group-hover:bg-white group-hover:text-[#8B3A3A]'}`}>
                         <ArrowRight size={20} />
                     </div>
                 </button>
 
+                {/* Email Button */}
                 <button
                     onClick={handleEmail}
-                    className={`group relative overflow-hidden bg-white dark:bg-slate-800 ${currentTheme.TEXT_PRIMARY} dark:text-gray-200 border-2 ${currentTheme.VIDEO_BORDER} dark:border-slate-700 p-6 rounded-3xl shadow-lg flex items-center justify-between transition-all hover:border-[#ABCEC9] hover:shadow-[#ABCEC9]/20 active:scale-95`}
+                    className={`group relative overflow-hidden p-6 rounded-3xl shadow-lg flex items-center justify-between transition-all border-2 active:scale-95
+                         ${colorTheme === 'pastel'
+                            ? 'bg-white border-[#E8DFF5] text-[#5B5166] hover:border-[#C3B8D5]'
+                            : 'bg-white border-[#8B3A3A]/20 text-[#934139] hover:border-[#8B3A3A]'
+                        }`}
                 >
                     <div className="flex items-center gap-4 z-10">
-                        <div className={`${currentTheme.ICON_BG} dark:bg-slate-700 p-3 rounded-2xl ${currentTheme.TEXT_ACCENT} group-hover:bg-[#C3B8D5] group-hover:text-white transition-colors`}>
+                        <div className={`p-3 rounded-2xl transition-colors ${colorTheme === 'pastel' ? 'bg-[#F3E5F5] text-[#9B86BD]' : 'bg-[#FFF8F0] text-[#8B3A3A] group-hover:bg-[#8B3A3A] group-hover:text-white'}`}>
                             <Mail size={28} strokeWidth={2} />
                         </div>
                         <div className="text-left">
                             <span className="block font-black text-xl tracking-tight">Send Email</span>
-                            <span className={`${currentTheme.TEXT_PRIMARY} text-xs font-bold uppercase tracking-wider`}>For Enquiries</span>
+                            <span className="text-xs font-bold uppercase tracking-wider opacity-70">For Enquiries</span>
                         </div>
                     </div>
                 </button>
             </div>
 
-            {/* Offerings Carousel Look */}
+            {/* Offerings Grid */}
             <div>
                 <div className="flex items-center gap-2 mb-4 px-2">
                     <Star className={`${currentTheme.TEXT_ACCENT} fill-current animate-spin-slow`} size={18} />
@@ -79,54 +104,61 @@ export const Contact: React.FC = () => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                    <div className={`${currentTheme.ICON_BG}/50 dark:bg-slate-800/50 p-4 rounded-2xl border ${currentTheme.VIDEO_BORDER} dark:border-slate-700`}>
-                        <User className={`${currentTheme.TEXT_ACCENT} mb-2`} size={24} />
-                        <div className="font-bold text-gray-700 dark:text-gray-200">1-on-1</div>
-                        <div className={`text-xs ${currentTheme.TEXT_ACCENT} font-medium`}>Personal Coaching</div>
+                    <div className={`p-4 rounded-2xl border ${getCardStyle('primary')}`}>
+                        <User className="mb-2 opacity-80" size={24} />
+                        <div className="font-bold">1-on-1</div>
+                        <div className="text-xs font-medium opacity-70">Personal Coaching</div>
                     </div>
-                    <div className={`${currentTheme.ICON_BG}/50 dark:bg-slate-800/50 p-4 rounded-2xl border ${currentTheme.VIDEO_BORDER} dark:border-slate-700`}>
-                        <Briefcase className={`${currentTheme.TEXT_PRIMARY} mb-2`} size={24} />
-                        <div className="font-bold text-gray-700 dark:text-gray-200">Corporate</div>
-                        <div className={`text-xs ${currentTheme.TEXT_PRIMARY} font-medium`}>Stress Relief</div>
+                    <div className={`p-4 rounded-2xl border ${getCardStyle('secondary')}`}>
+                        <Briefcase className="mb-2 opacity-80" size={24} />
+                        <div className="font-bold">Corporate</div>
+                        <div className="text-xs font-medium opacity-70">Stress Relief</div>
                     </div>
-                    <div className={`${currentTheme.ICON_BG}/50 dark:bg-slate-800/50 p-4 rounded-2xl border ${currentTheme.VIDEO_BORDER} dark:border-slate-700`}>
-                        <Users className={`${currentTheme.TEXT_PRIMARY} mb-2`} size={24} />
-                        <div className="font-bold text-gray-700 dark:text-gray-200">Groups</div>
-                        <div className={`text-xs ${currentTheme.TEXT_PRIMARY} font-medium`}>Workshops</div>
+                    <div className={`p-4 rounded-2xl border ${getCardStyle('tertiary')}`}>
+                        <Users className="mb-2 opacity-80" size={24} />
+                        <div className="font-bold">Groups</div>
+                        <div className="text-xs font-medium opacity-70">Workshops</div>
                     </div>
-                    <div className="bg-yellow-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-yellow-100 dark:border-slate-700">
-                        <Heart className="text-yellow-400 mb-2" size={24} />
-                        <div className="font-bold text-gray-700 dark:text-gray-200">Retreats</div>
-                        <div className="text-xs text-yellow-500 font-medium">Wellness Days</div>
+                    <div className={`p-4 rounded-2xl border ${getCardStyle('quaternary')}`}>
+                        <Heart className="mb-2 opacity-80" size={24} />
+                        <div className="font-bold">Retreats</div>
+                        <div className="text-xs font-medium opacity-70">Wellness Days</div>
                     </div>
                 </div>
             </div>
 
             {/* Social Links Stack */}
             <div className="space-y-3">
-                {/* Pastel YouTube Button - Softer Red */}
                 <a
                     href="https://www.youtube.com/@sumansunejaofficial"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-100 dark:border-red-900/30 p-1.5 pr-4 pl-1.5 rounded-full shadow-lg shadow-red-50 dark:shadow-none hover:shadow-red-100 hover:bg-red-100 dark:hover:bg-red-900/30 hover:-translate-y-0.5 transition-all group"
+                    className={`flex items-center gap-4 border p-1.5 pr-4 pl-1.5 rounded-full shadow-lg transition-all group hover:-translate-y-0.5
+                        ${colorTheme === 'pastel'
+                            ? 'bg-red-50 text-red-700 border-red-100 hover:bg-red-100'
+                            : 'bg-[#FFF8F0] text-[#8B3A3A] border-[#8B3A3A]/30 hover:border-[#8B3A3A]'
+                        }`}
                 >
-                    <div className="bg-white dark:bg-slate-800 text-[#C62828] p-3 rounded-full shadow-md">
+                    <div className={`p-3 rounded-full shadow-md ${colorTheme === 'pastel' ? 'bg-white text-[#C62828]' : 'bg-[#8B3A3A] text-white'}`}>
                         <Youtube size={20} fill="currentColor" />
                     </div>
                     <div className="flex-1">
                         <div className="text-sm font-bold">Watch on YouTube</div>
                     </div>
-                    <div className="text-[10px] font-bold bg-white dark:bg-slate-800 text-[#C62828] border border-red-200 dark:border-red-900 px-3 py-1 rounded-md uppercase group-hover:bg-[#EF5350] group-hover:text-white transition-colors">Subscribe</div>
+                    <div className={`text-[10px] font-bold px-3 py-1 rounded-md uppercase transition-colors border
+                        ${colorTheme === 'pastel'
+                            ? 'bg-white text-[#C62828] border-red-200 group-hover:bg-[#EF5350] group-hover:text-white'
+                            : 'bg-white text-[#8B3A3A] border-[#8B3A3A] group-hover:bg-[#8B3A3A] group-hover:text-white'
+                        }`}>Subscribe</div>
                 </a>
 
                 <a
                     href="https://sumansuneja.com/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`flex items-center justify-center gap-2 ${currentTheme.TEXT_PRIMARY} text-sm font-bold hover:${currentTheme.TEXT_ACCENT} transition-colors py-2`}
+                    className={`flex items-center justify-center gap-2 ${currentTheme.TEXT_PRIMARY} text-sm font-bold hover:opacity-80 transition-colors py-2`}
                 >
-                    <Globe size={20} /> Visit Official Website
+                    <Globe size={16} /> Visit Official Website
                 </a>
             </div>
 
@@ -139,7 +171,7 @@ export const Contact: React.FC = () => {
                         className={`w-full h-full object-contain p-2 ${currentTheme.ICON_BG} dark:bg-slate-800`}
                     />
                 </div>
-                <p className={`text-[16px] ${currentTheme.TEXT_PRIMARY} dark:text-slate-500 font-bold tracking-wide`}>
+                <p className={`text-xs ${currentTheme.TEXT_PRIMARY} dark:text-slate-500 font-bold tracking-wide`}>
                     App Developed by <a href="http://skrmblissai.in/" target="_blank" rel="noopener noreferrer" className={`${currentTheme.TEXT_ACCENT} hover:underline`}>SKRMBliss.ai Studio</a>
                 </p>
             </div>
