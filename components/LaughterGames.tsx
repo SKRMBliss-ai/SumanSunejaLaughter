@@ -24,7 +24,7 @@ const JOKE_PRESETS = [
 
 
 export const LaughterGames: React.FC = () => {
-  const { currentTheme, colorTheme } = useSettings();
+  const { currentTheme } = useSettings();
   const [activeTab, setActiveTab] = useState<'GENERATOR' | 'MOOD' | 'JOKES'>('GENERATOR');
   const [topic, setTopic] = useState('');
   const [currentText, setCurrentText] = useState<string | null>(null);
@@ -457,14 +457,10 @@ export const LaughterGames: React.FC = () => {
                         setTopic(preset);
                         handleGenerate(activeTab === 'JOKES' ? 'joke' : 'story', preset);
                       }}
-                      className={`p-3 rounded-xl text-sm font-bold transition-all duration-300 active:scale-95 border-2 ${colorTheme === 'red_brick'
-                          ? (isRed
-                            ? 'bg-[#8B3A3A] text-white border-[#FFC1C1]/30 shadow-[0_4px_14px_0_rgba(139,58,58,0.4)] hover:bg-[#FFF8F0] hover:text-[#8B3A3A] hover:border-[#8B3A3A] hover:shadow-[0_0_20px_rgba(139,58,58,0.4)]'
-                            : 'bg-[#FFF8F0] text-[#8B3A3A] border-[#8B3A3A]/20 shadow-[0_4px_14px_0_rgba(0,0,0,0.05)] hover:bg-[#8B3A3A] hover:text-white hover:border-[#FFC1C1]/30 hover:shadow-[0_0_20px_rgba(139,58,58,0.4)]')
-                          : (isRed
-                            ? 'bg-purple-200 text-purple-900 border-purple-300 shadow-[0_4px_14px_0_rgba(147,51,234,0.2)] hover:bg-purple-100 hover:text-purple-800 hover:border-purple-400 hover:shadow-[0_0_20px_rgba(147,51,234,0.3)]'
-                            : 'bg-pink-100 text-pink-800 border-pink-200 shadow-[0_4px_14px_0_rgba(236,72,153,0.1)] hover:bg-pink-200 hover:text-pink-900 hover:border-pink-300 hover:shadow-[0_0_20px_rgba(236,72,153,0.3)]')
-                        } hover:-translate-y-0.5`}
+                      className={`p-3 rounded-xl text-sm font-bold transition-all active:scale-95 shadow-sm border-2 ${isRed
+                        ? 'bg-[#8B3A3A] text-white border-[#8B3A3A] hover:bg-[#FFF8F0] hover:text-[#8B3A3A] hover:border-[#8B3A3A]'
+                        : 'bg-[#FFF8F0] text-[#8B3A3A] border-[#FFF8F0] hover:bg-[#8B3A3A] hover:text-white hover:border-[#8B3A3A]'
+                        } opacity-90 hover:opacity-100`}
                     >
                       {preset}
                     </button>
@@ -477,32 +473,20 @@ export const LaughterGames: React.FC = () => {
 
         {activeTab === 'MOOD' && (
           <div className="grid grid-cols-2 gap-3 animate-fade-in-up delay-300">
-            {/* Button 1: Primary (Red/Purple) */}
-            <button onClick={() => handleMood("pure joy")} className={`p-4 rounded-2xl font-bold active:scale-95 transition-all duration-300 text-sm hover:-translate-y-0.5 border-2 ${colorTheme === 'red_brick'
-                ? 'bg-[#8B3A3A] text-white border-[#FFC1C1]/30 shadow-[0_4px_14px_0_rgba(139,58,58,0.4)] hover:bg-[#FFF8F0] hover:text-[#8B3A3A] hover:border-[#8B3A3A] hover:shadow-[0_0_20px_rgba(139,58,58,0.4)]'
-                : 'bg-purple-200 text-purple-900 border-purple-300 shadow-[0_4px_14px_0_rgba(147,51,234,0.2)] hover:bg-purple-100 hover:text-purple-800 hover:border-purple-400 hover:shadow-[0_0_20px_rgba(147,51,234,0.3)]'
-              }`}>
+            {/* Red Button */}
+            <button onClick={() => handleMood("pure joy")} className={`bg-[#8B3A3A] text-white border-2 border-[#8B3A3A] hover:bg-[#FFF8F0] hover:text-[#8B3A3A] hover:border-[#8B3A3A] p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-105`}>
               Giggle Fit 🤭
             </button>
-            {/* Button 2: Secondary (Cream/Pink) */}
-            <button onClick={() => handleMood("relief")} className={`p-4 rounded-2xl font-bold active:scale-95 transition-all duration-300 text-sm hover:-translate-y-0.5 border-2 ${colorTheme === 'red_brick'
-                ? 'bg-[#FFF8F0] text-[#8B3A3A] border-[#8B3A3A]/20 shadow-[0_4px_14px_0_rgba(0,0,0,0.05)] hover:bg-[#8B3A3A] hover:text-white hover:border-[#FFC1C1]/30 hover:shadow-[0_0_20px_rgba(139,58,58,0.4)]'
-                : 'bg-pink-100 text-pink-800 border-pink-200 shadow-[0_4px_14px_0_rgba(236,72,153,0.1)] hover:bg-pink-200 hover:text-pink-900 hover:border-pink-300 hover:shadow-[0_0_20px_rgba(236,72,153,0.3)]'
-              }`}>
+            {/* Cream Button */}
+            <button onClick={() => handleMood("relief")} className={`bg-[#FFF8F0] text-[#8B3A3A] border-2 border-[#FFF8F0] hover:bg-[#8B3A3A] hover:text-white hover:border-[#8B3A3A] p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-105`}>
               Belly Laugh 😂
             </button>
-            {/* Button 3: Secondary (Cream/Pink) */}
-            <button onClick={() => handleMood("silly")} className={`p-4 rounded-2xl font-bold active:scale-95 transition-all duration-300 text-sm hover:-translate-y-0.5 border-2 ${colorTheme === 'red_brick'
-                ? 'bg-[#FFF8F0] text-[#8B3A3A] border-[#8B3A3A]/20 shadow-[0_4px_14px_0_rgba(0,0,0,0.05)] hover:bg-[#8B3A3A] hover:text-white hover:border-[#FFC1C1]/30 hover:shadow-[0_0_20px_rgba(139,58,58,0.4)]'
-                : 'bg-pink-100 text-pink-800 border-pink-200 shadow-[0_4px_14px_0_rgba(236,72,153,0.1)] hover:bg-pink-200 hover:text-pink-900 hover:border-pink-300 hover:shadow-[0_0_20px_rgba(236,72,153,0.3)]'
-              }`}>
+            {/* Cream Button */}
+            <button onClick={() => handleMood("silly")} className={`bg-[#FFF8F0] text-[#8B3A3A] border-2 border-[#FFF8F0] hover:bg-[#8B3A3A] hover:text-white hover:border-[#8B3A3A] p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-105`}>
               Snort Laugh 🐽
             </button>
-            {/* Button 4: Primary (Red/Purple) */}
-            <button onClick={() => handleMood("evil plan")} className={`p-4 rounded-2xl font-bold active:scale-95 transition-all duration-300 text-sm hover:-translate-y-0.5 border-2 ${colorTheme === 'red_brick'
-                ? 'bg-[#8B3A3A] text-white border-[#FFC1C1]/30 shadow-[0_4px_14px_0_rgba(139,58,58,0.4)] hover:bg-[#FFF8F0] hover:text-[#8B3A3A] hover:border-[#8B3A3A] hover:shadow-[0_0_20px_rgba(139,58,58,0.4)]'
-                : 'bg-purple-200 text-purple-900 border-purple-300 shadow-[0_4px_14px_0_rgba(147,51,234,0.2)] hover:bg-purple-100 hover:text-purple-800 hover:border-purple-400 hover:shadow-[0_0_20px_rgba(147,51,234,0.3)]'
-              }`}>
+            {/* Red Button */}
+            <button onClick={() => handleMood("evil plan")} className={`bg-[#8B3A3A] text-white border-2 border-[#8B3A3A] hover:bg-[#FFF8F0] hover:text-[#8B3A3A] hover:border-[#8B3A3A] p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-105`}>
               Witchy Cackle 🧙‍♀️
             </button>
           </div>

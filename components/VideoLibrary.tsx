@@ -177,7 +177,7 @@ export const VideoLibrary: React.FC = () => {
                 onClick={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
                 className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors border ${selectedCategory === cat ? `${currentTheme.BUTTON} border-transparent` : 'bg-white dark:bg-slate-800 text-gray-500 dark:text-gray-300 border-gray-200 dark:border-slate-700'}`}
               >
-                {getCategoryTranslation(cat)}
+                {getCategoryTranslation(cat as string)}
               </button>
             ))}
           </div>

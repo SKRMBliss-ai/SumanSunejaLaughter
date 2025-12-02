@@ -112,23 +112,6 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
     { value: 'red_brick' as const, label: 'Brand Color' }
   ];
 
-  // Checkerboard Styles
-  const primaryCardClass = colorTheme === 'red_brick'
-    ? 'bg-[#8B3A3A] text-white border-[#FFC1C1]/30 shadow-[0_4px_14px_0_rgba(139,58,58,0.4)] hover:shadow-[0_0_20px_rgba(139,58,58,0.4)]'
-    : 'bg-purple-200 text-purple-900 border-purple-300 shadow-[0_4px_14px_0_rgba(147,51,234,0.2)] hover:shadow-[0_0_20px_rgba(147,51,234,0.3)]';
-
-  const secondaryCardClass = colorTheme === 'red_brick'
-    ? 'bg-[#FFF8F0] text-[#8B3A3A] border-[#8B3A3A]/20 shadow-[0_4px_14px_0_rgba(0,0,0,0.05)] hover:shadow-[0_0_20px_rgba(139,58,58,0.4)]'
-    : 'bg-pink-100 text-pink-800 border-pink-200 shadow-[0_4px_14px_0_rgba(236,72,153,0.1)] hover:shadow-[0_0_20px_rgba(236,72,153,0.3)]';
-
-  const primaryBtnClass = colorTheme === 'red_brick'
-    ? 'bg-[#8B3A3A] text-white hover:bg-[#A04444]'
-    : 'bg-purple-500 text-white hover:bg-purple-600';
-
-  const secondaryBtnClass = colorTheme === 'red_brick'
-    ? 'bg-[#FFF8F0] text-[#8B3A3A] hover:bg-[#F0E8E0]'
-    : 'bg-pink-50 text-pink-600 hover:bg-pink-100';
-
   return (
     <div className="p-4 space-y-6 pb-44 relative">
       <div className="flex justify-end gap-2 mb-2 animate-in fade-in">
@@ -345,12 +328,19 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           <p className="text-white/90 text-xs mb-4 font-medium leading-relaxed drop-shadow-md text-shadow-sm max-w-[200px]">
             Boost immunity & relieve stress with expert guidance from Suman Suneja.
           </p>
+
+
           <button
             onClick={() => onNavigate(ViewState.COACH)}
             className={`${currentTheme.HERO_BUTTON} px-5 py-2.5 rounded-full text-xs font-bold active:scale-95 transition-all flex items-center gap-2 hover:scale-105`}
           >
             <Star size={14} fill="currentColor" className={colorTheme === 'pastel' ? "text-[#A9A9C6]" : "text-yellow-300"} />
-            <span className={colorTheme === 'pastel' ? "text-[#A9A9C6]" : "text-white"}>{t('home.test_laugh')}</span>
+
+            {/* [-] OLD LINE: Forced white text (invisible on cream background) */}
+            {/* <span className={colorTheme === 'pastel' ? "text-[#A9A9C6]" : "text-white"}>{t('home.test_laugh')}</span> */}
+
+            {/* [+] NEW LINE: Uses 'text-current' to inherit the red/white swap from the parent button */}
+            <span className={colorTheme === 'pastel' ? "text-[#A9A9C6]" : "text-current"}>{t('home.test_laugh')}</span>
           </button>
         </div>
       </div>
@@ -399,13 +389,13 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Daily Session Card (Primary) */}
-          <div className={`${primaryCardClass} rounded-3xl p-5 border-2 relative overflow-hidden group transition-all duration-300`}>
-            <div className="absolute top-0 end-0 w-24 h-24 bg-white/10 rounded-es-[4rem] -me-4 -mt-4 transition-all group-hover:bg-white/20 group-hover:scale-110"></div>
+          {/* Daily Session Card */}
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-5 shadow-lg shadow-pink-500/5 dark:shadow-none border-2 border-pink-50 dark:border-slate-700 relative overflow-hidden group hover:shadow-xl transition-all">
+            <div className="absolute top-0 end-0 w-24 h-24 bg-pink-50 rounded-es-[4rem] -me-4 -mt-4 transition-all group-hover:bg-pink-100 group-hover:scale-110"></div>
 
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-2">
-                <span className="bg-white/20 text-current text-[0.65rem] font-bold px-2 py-1 rounded-md uppercase tracking-wider backdrop-blur-sm">
+                <span className="bg-pink-100 text-pink-600 text-[0.65rem] font-bold px-2 py-1 rounded-md uppercase tracking-wider">
                   {t('every_day')}
                 </span>
                 <button
@@ -413,34 +403,34 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                     e.preventDefault();
                     setShowReminderSettings('daily');
                   }}
-                  className={`p-2 rounded-full transition-colors hover:bg-white/20 text-current`}
+                  className={`p-2 rounded-full transition-colors ${remindersEnabled.daily ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-500' : 'bg-gray-50 dark:bg-slate-700 text-gray-300 dark:text-gray-500 hover:bg-gray-100'}`}
                   title="Set Reminder"
                 >
                   <Bell size={18} fill={remindersEnabled.daily ? "currentColor" : "none"} className={remindersEnabled.daily ? "animate-wiggle" : ""} />
                 </button>
               </div>
 
-              <h4 className={`font-fredoka font-bold text-xl mb-2 leading-tight`}>{t('daily_session')}</h4>
+              <h4 className={`font-fredoka font-bold text-xl ${currentTheme.TEXT_PRIMARY} dark:text-gray-100 mb-2 leading-tight`}>{t('daily_session')}</h4>
 
               <div className="space-y-1.5 mb-4">
-                <div className="flex items-center gap-2 text-sm font-medium opacity-90">
-                  <Globe size={14} className="shrink-0" />
-                  <span>Dubai: <span className="font-bold">6:00 - 7:00 AM</span></span>
+                <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+                  <Globe size={14} className="text-pink-500 shrink-0" />
+                  <span>Dubai: <span className="text-gray-700 dark:text-gray-200 font-bold">6:00 - 7:00 AM</span></span>
                 </div>
-                <div className="flex items-center gap-2 text-sm font-medium opacity-90">
-                  <Globe size={14} className="shrink-0" />
-                  <span>India: <span className="font-bold">7:30 - 8:30 AM</span></span>
+                <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+                  <Globe size={14} className="text-pink-500 shrink-0" />
+                  <span>India: <span className="text-gray-700 dark:text-gray-200 font-bold">7:30 - 8:30 AM</span></span>
                 </div>
               </div>
 
-              <div className="bg-white/10 rounded-xl p-3 mb-4 space-y-1 backdrop-blur-sm">
+              <div className="bg-pink-50/50 dark:bg-slate-700/50 rounded-xl p-3 mb-4 space-y-1">
                 <div className="flex justify-between text-xs flex-wrap gap-1">
-                  <span className="opacity-80 font-bold">Meeting ID</span>
-                  <span className="font-mono font-bold">341 527 2874</span>
+                  <span className="text-gray-400 font-bold">Meeting ID</span>
+                  <span className="font-mono font-bold text-gray-600 dark:text-gray-300">341 527 2874</span>
                 </div>
                 <div className="flex justify-between text-xs flex-wrap gap-1">
-                  <span className="opacity-80 font-bold">Passcode</span>
-                  <span className="font-mono font-bold">12345</span>
+                  <span className="text-gray-400 font-bold">Passcode</span>
+                  <span className="font-mono font-bold text-gray-600 dark:text-gray-300">12345</span>
                 </div>
               </div>
 
@@ -448,20 +438,20 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 href="https://zoom.us/j/3415272874"
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`w-full ${secondaryBtnClass} font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 text-sm hover:scale-[1.02]`}
+                className={`w-full ${currentTheme.BUTTON} font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 text-sm hover:scale-[1.02]`}
               >
                 {t('join_session')} <ArrowRight size={16} className="rtl:rotate-180" />
               </a>
             </div>
           </div>
 
-          {/* Traditional Yoga Card (Secondary) */}
-          <div className={`${secondaryCardClass} rounded-3xl p-5 border-2 relative overflow-hidden group transition-all duration-300`}>
-            <div className="absolute top-0 end-0 w-24 h-24 bg-black/5 rounded-es-[4rem] -me-4 -mt-4 transition-all group-hover:bg-black/10 group-hover:scale-110"></div>
+          {/* Traditional Yoga Card */}
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-5 shadow-lg shadow-violet-500/5 dark:shadow-none border-2 border-violet-50 dark:border-slate-700 relative overflow-hidden group hover:shadow-xl transition-all">
+            <div className="absolute top-0 end-0 w-24 h-24 bg-violet-50 rounded-es-[4rem] -me-4 -mt-4 transition-all group-hover:bg-violet-100 group-hover:scale-110"></div>
 
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-2">
-                <span className="bg-white/40 text-current text-[0.65rem] font-bold px-2 py-1 rounded-md uppercase tracking-wider backdrop-blur-sm">
+                <span className="bg-violet-100 text-violet-600 text-[0.65rem] font-bold px-2 py-1 rounded-md uppercase tracking-wider">
                   {t('mon_fri')}
                 </span>
                 <button
@@ -469,38 +459,44 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                     e.preventDefault();
                     setShowReminderSettings('traditional');
                   }}
-                  className={`p-2 rounded-full transition-colors hover:bg-white/20 text-current`}
+                  className={`p-2 rounded-full transition-colors ${remindersEnabled.traditional ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-500' : 'bg-gray-50 dark:bg-slate-700 text-gray-300 dark:text-gray-500 hover:bg-gray-100'}`}
                   title="Set Reminder"
                 >
                   <Bell size={18} fill={remindersEnabled.traditional ? "currentColor" : "none"} className={remindersEnabled.traditional ? "animate-wiggle" : ""} />
                 </button>
               </div>
 
-              <h4 className={`font-fredoka font-bold text-xl mb-2 leading-tight`}>{t('traditional_yoga')}</h4>
+              <h4 className={`font-fredoka font-bold text-xl ${currentTheme.TEXT_PRIMARY} dark:text-gray-100 mb-2 leading-tight`}>{t('traditional_yoga')}</h4>
 
               <div className="space-y-1.5 mb-4">
-                <div className="flex items-center gap-2 text-sm font-medium opacity-90">
-                  <Globe size={14} className="shrink-0" />
-                  <span>Dubai: <span className="font-bold">6:45 - 7:45 AM</span></span>
+                <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+                  <Globe size={14} className="text-violet-500 shrink-0" />
+                  <span>Dubai: <span className="text-gray-700 dark:text-gray-200 font-bold">6:45 - 7:45 AM</span></span>
                 </div>
-                <div className="flex items-center gap-2 text-sm font-medium opacity-90">
-                  <Globe size={14} className="shrink-0" />
-                  <span>India: <span className="font-bold">8:15 - 9:15 AM</span></span>
+                <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+                  <Globe size={14} className="text-violet-500 shrink-0" />
+                  <span>India: <span className="text-gray-700 dark:text-gray-200 font-bold">8:15 - 9:15 AM</span></span>
                 </div>
               </div>
 
-              <div className="bg-black/5 rounded-xl p-3 mb-4 flex items-center justify-between flex-wrap gap-1 backdrop-blur-sm">
-                <span className="opacity-80 font-bold text-xs">Passcode</span>
-                <span className="font-mono font-bold flex items-center gap-1">
-                  <Lock size={12} /> 536805
-                </span>
+              <div className="bg-violet-50/50 dark:bg-slate-700/50 rounded-xl p-3 mb-4 space-y-1">
+                <div className="flex justify-between text-xs flex-wrap gap-1">
+                  <span className="text-gray-400 font-bold">Meeting ID</span>
+                  <span className="font-mono font-bold text-gray-600 dark:text-gray-300">341 527 2874</span>
+                </div>
+                <div className="flex justify-between text-xs flex-wrap gap-1">
+                  <span className="text-gray-400 font-bold">Passcode</span>
+                  <span className="font-mono font-bold text-gray-600 dark:text-gray-300 flex items-center gap-1">
+                    <Lock size={12} className="text-violet-400" /> 536805
+                  </span>
+                </div>
               </div>
 
               <a
                 href="https://zoom.us/join"
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`w-full ${primaryBtnClass} font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 text-sm hover:scale-[1.02]`}
+                className={`w-full ${currentTheme.BUTTON_SECONDARY} font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 text-sm hover:scale-[1.02]`}
               >
                 {t('join_yoga')} <ArrowRight size={16} className="rtl:rotate-180" />
               </a>
@@ -512,26 +508,24 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
 
       {/* Fun Games & Book Session - Pill Style */}
       <div className="grid grid-cols-2 gap-4 animate-fade-in-up delay-300">
-        {/* Fun Games (Secondary) */}
         <button
           onClick={() => onNavigate(ViewState.GAMES)}
-          className={`${secondaryCardClass} p-4 rounded-[2rem] flex flex-col items-center justify-center text-center gap-2 transition-all duration-300 shadow-lg group hover:scale-[1.02] h-full min-h-[100px] border-2`}
+          className={`${currentTheme.GAMES} dark:bg-slate-800 p-4 rounded-[2rem] flex flex-col items-center justify-center text-center gap-2 transition-all shadow-lg group hover:scale-[1.02] h-full min-h-[100px]`}
         >
-          <div className={`bg-white/20 rounded-full flex items-center justify-center p-2`}>
+          <div className={`${currentTheme.GAMES_ICON_BG} rounded-full flex items-center justify-center`}>
             <Star size={24} fill="currentColor" className="group-hover:rotate-12 transition-transform" />
           </div>
-          <span className={`font-bold text-base leading-tight`}>{t('fun_games')}</span>
+          <span className={`font-bold text-base leading-tight ${colorTheme === 'pastel' ? 'text-[#5B5166]' : 'text-current'}`}>{t('fun_games')}</span>
         </button>
 
-        {/* Book Session (Primary) */}
         <button
           onClick={() => onNavigate(ViewState.CONTACT)}
-          className={`${primaryCardClass} p-4 rounded-[2rem] flex flex-col items-center justify-center text-center gap-2 transition-all duration-300 shadow-lg group hover:scale-[1.02] h-full min-h-[100px] border-2`}
+          className={`${currentTheme.BOOK} dark:bg-slate-800 p-4 rounded-[2rem] flex flex-col items-center justify-center text-center gap-2 hover:brightness-110 dark:hover:bg-slate-700 transition-all shadow-lg group hover:scale-[1.02] h-full min-h-[100px]`}
         >
-          <div className={`bg-white/20 rounded-full flex items-center justify-center p-2`}>
+          <div className={`${currentTheme.BOOK_ICON_BG} rounded-full flex items-center justify-center`}>
             <Calendar size={24} className="group-hover:-rotate-12 transition-transform" />
           </div>
-          <span className={`font-bold text-base leading-tight`}>{t('book_session')}</span>
+          <span className={`font-bold text-base leading-tight ${colorTheme === 'pastel' ? 'text-[#5B5166]' : 'text-5B5166'}`}>{t('book_session')}</span>
         </button>
       </div>
 

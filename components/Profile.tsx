@@ -12,7 +12,7 @@ interface ProfileProps {
 
 export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
   const user = auth.currentUser;
-  const { theme, toggleTheme, language, setLanguage, fontSize, setFontSize, t } = useSettings();
+  const { theme, toggleTheme, currentTheme, language, setLanguage, fontSize, setFontSize, t } = useSettings();
   const [displayName, setDisplayName] = useState(user?.displayName || 'Suman Suneja Fan');
   const [photoURL, setPhotoURL] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -124,7 +124,7 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
   ];
 
   return (
-    <div className="p-6 pb-44 animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
+    <div className={`p-6 pb-44 animate-in fade-in slide-in-from-bottom-4 duration-500 relative ${currentTheme.VIDEO_BG} dark:bg-slate-900`}>
 
       {onNavigate && (
         <button
@@ -136,7 +136,7 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
       )}
 
       <div className="text-center mb-8 pt-4">
-        <h2 className="text-3xl font-fredoka font-bold text-gray-700 dark:text-gray-100">{t('profile.title')}</h2>
+        <h2 className={`text-3xl font-fredoka font-bold ${currentTheme.HEADER_TEXT} dark:text-gray-100`}>{t('profile.title')}</h2>
         <p className="text-[#AABBCC] font-medium text-sm">{t('profile.subtitle')}</p>
       </div>
 
@@ -167,7 +167,7 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
                     <button
                       key={lang.code}
                       onClick={() => { setLanguage(lang.code); setIsLangMenuOpen(false); }}
-                      className={`w-full text-start px-3 py-2 text-xs font-bold rounded-lg transition-colors ${language === lang.code ? 'bg-[#ABCEC9] text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-600'}`}
+                      className={`w-full text-start px-3 py-2 text-xs font-bold rounded-lg transition-colors ${language === lang.code ? `${currentTheme.BUTTON} shadow-md` : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-600'}`}
                     >
                       {lang.label}
                     </button>
@@ -178,24 +178,24 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
           </div>
         </div>
 
-        <div className="h-32 bg-gradient-to-r from-[#C3B8D5] to-[#ABCEC9] dark:from-indigo-900 dark:to-purple-900 relative">
+        <div className={`h-32 ${currentTheme.HERO} relative`}>
           <div className="absolute top-0 start-0 w-full h-full bg-white opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #fff 2px, transparent 2px)', backgroundSize: '20px 20px' }}></div>
         </div>
 
         <div className="px-6 pb-8 relative">
           <div className="relative -mt-16 mb-6 flex justify-center">
             <div className="relative group">
-              <div className="w-32 h-32 rounded-full border-4 border-white dark:border-slate-700 shadow-lg bg-[#EDE8F8] dark:bg-slate-700 flex items-center justify-center overflow-hidden">
+              <div className={`w-32 h-32 rounded-full border-4 border-white dark:border-slate-700 shadow-lg ${currentTheme.HEADER_BG} dark:bg-slate-700 flex items-center justify-center overflow-hidden`}>
                 {photoURL ? (
                   <img src={photoURL} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
-                  <User size={48} className="text-[#C3B8D5]" />
+                  <User size={48} className={`${currentTheme.ICON_COLOR}`} />
                 )}
               </div>
 
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute bottom-0 end-0 bg-[#ABCEC9] text-white p-2.5 rounded-full shadow-md hover:bg-[#9BBDB8] transition-colors hover:scale-110 active:scale-95 border-2 border-white dark:border-slate-700"
+                className={`absolute bottom-0 end-0 ${currentTheme.BUTTON} p-2.5 rounded-full shadow-md hover:brightness-110 transition-all hover:scale-110 active:scale-95 border-2 border-white dark:border-slate-700`}
                 title="Upload Photo"
               >
                 <Camera size={18} />
@@ -228,7 +228,7 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
             ) : (
               <div className="flex items-center justify-center gap-2 mb-1 group cursor-pointer" onClick={handleStartEdit}>
                 <h2 className="text-2xl font-bold text-gray-800 dark:text-white">{displayName}</h2>
-                <Edit2 size={16} className="text-gray-300 group-hover:text-purple-500 transition-colors" />
+                <Edit2 size={16} className={`text-gray-300 group-hover:${currentTheme.TEXT_ACCENT} transition-colors`} />
               </div>
             )}
             <div className="text-sm text-gray-500 font-medium bg-gray-100 dark:bg-slate-700 px-3 py-1 rounded-full inline-block">
@@ -263,20 +263,20 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
           </div>
 
           <div className="grid grid-cols-3 gap-3 mb-6">
-            <div className="bg-[#F5F3FA] dark:bg-slate-700/50 p-3 rounded-2xl flex flex-col items-center justify-center border border-[#EDE8F8] dark:border-slate-600 shadow-sm relative overflow-hidden group hover:border-[#C3B8D5] transition-colors min-h-[5rem]">
-              <TrendingUp className="text-[#C3B8D5] mb-1 z-10" size={20} />
+            <div className={`${currentTheme.STAT_BG_1} dark:bg-slate-700/50 p-3 rounded-2xl flex flex-col items-center justify-center shadow-sm relative overflow-hidden group hover:brightness-95 transition-all min-h-[5rem]`}>
+              <TrendingUp className={`${currentTheme.TEXT_ACCENT} mb-1 z-10`} size={20} />
               <span className="text-xl font-black text-gray-700 dark:text-gray-100 leading-none z-10 break-all">{rewards.level}</span>
               <span className="text-[0.65rem] font-bold text-gray-400 uppercase tracking-tight z-10 text-center leading-tight break-words w-full">{t('level')}</span>
             </div>
-            <div className="bg-teal-50 dark:bg-slate-700/50 p-3 rounded-2xl flex flex-col items-center justify-center border border-teal-100 dark:border-slate-600 shadow-sm relative overflow-hidden hover:border-teal-200 transition-colors min-h-[5rem]">
-              <Zap className="text-teal-500 mb-1 z-10" size={20} fill="currentColor" />
+            <div className={`${currentTheme.STAT_BG_2} dark:bg-slate-700/50 p-3 rounded-2xl flex flex-col items-center justify-center shadow-sm relative overflow-hidden hover:brightness-95 transition-all min-h-[5rem]`}>
+              <Zap className={`${currentTheme.TEXT_ACCENT} mb-1 z-10`} size={20} fill="currentColor" />
               <span className="text-xl font-black text-gray-700 dark:text-gray-100 leading-none z-10 break-all">{rewards.points}</span>
-              <span className="text-[0.65rem] font-bold text-teal-400 uppercase tracking-tight z-10 text-center leading-tight break-words w-full">{t('points')}</span>
+              <span className="text-[0.65rem] font-bold text-gray-400 uppercase tracking-tight z-10 text-center leading-tight break-words w-full">{t('points')}</span>
             </div>
-            <div className="bg-purple-50 dark:bg-slate-700/50 p-3 rounded-2xl flex flex-col items-center justify-center border border-purple-100 dark:border-slate-600 shadow-sm relative overflow-hidden hover:border-purple-200 transition-colors min-h-[5rem]">
-              <Calendar className="text-purple-400 mb-1 z-10" size={20} />
+            <div className={`${currentTheme.STAT_BG_1} dark:bg-slate-700/50 p-3 rounded-2xl flex flex-col items-center justify-center shadow-sm relative overflow-hidden hover:brightness-95 transition-all min-h-[5rem]`}>
+              <Calendar className={`${currentTheme.TEXT_ACCENT} mb-1 z-10`} size={20} />
               <span className="text-xs font-black text-gray-700 dark:text-gray-100 leading-none z-10 mt-1 break-words text-center">{t('today')}</span>
-              <span className="text-[0.65rem] font-bold text-purple-400 uppercase tracking-tight z-10 mt-0.5 text-center leading-tight">{rewards.lastActiveDate === new Date().toDateString() ? 'Active' : '...'}</span>
+              <span className="text-[0.65rem] font-bold text-gray-400 uppercase tracking-tight z-10 mt-0.5 text-center leading-tight">{rewards.lastActiveDate === new Date().toDateString() ? 'Active' : '...'}</span>
             </div>
           </div>
 
@@ -287,12 +287,12 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
               <label className="block text-xs font-bold text-[#AABBCC] uppercase tracking-wider mb-2 ms-2 text-start flex items-center gap-1">
                 <Type size={14} /> {t('settings.font_size')}
               </label>
-              <div className="flex bg-[#F5F3FA] dark:bg-slate-700 p-1 rounded-2xl border border-gray-100 dark:border-slate-600">
+              <div className={`flex ${currentTheme.HEADER_BG} dark:bg-slate-700 p-1 rounded-2xl border border-gray-100 dark:border-slate-600`}>
                 {fontSizes.map((size) => (
                   <button
                     key={size.id}
                     onClick={() => setFontSize(size.id)}
-                    className={`flex-1 py-3 rounded-xl font-bold transition-all shadow-sm flex flex-col items-center justify-center gap-0.5 ${fontSize === size.id ? 'bg-[#ABCEC9] text-white shadow-md' : 'text-gray-400 hover:bg-white dark:hover:bg-slate-600'}`}
+                    className={`flex-1 py-3 rounded-xl font-bold transition-all shadow-sm flex flex-col items-center justify-center gap-0.5 ${fontSize === size.id ? `${currentTheme.BUTTON} shadow-md` : 'text-gray-400 hover:bg-white dark:hover:bg-slate-600'}`}
                   >
                     <span style={{ fontSize: size.px }} className="leading-none">A</span>
                     <span className="text-[0.65rem] opacity-70">{size.label}</span>
@@ -303,15 +303,15 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
 
             <div>
               <label className="block text-xs font-bold text-[#AABBCC] uppercase tracking-wider mb-1 ms-2 text-start">{t('profile.display_name')}</label>
-              <div className="w-full bg-[#F5F3FA] dark:bg-slate-700 border-2 border-transparent rounded-xl p-4 text-gray-700 dark:text-white font-bold text-start flex justify-between items-center">
+              <div className={`w-full ${currentTheme.HEADER_BG} dark:bg-slate-700 border-2 border-transparent rounded-xl p-4 text-gray-700 dark:text-white font-bold text-start flex justify-between items-center`}>
                 {displayName}
-                <button onClick={handleStartEdit} className="text-[#ABCEC9] hover:text-[#9BBDB8]"><Edit2 size={16} /></button>
+                <button onClick={handleStartEdit} className={`${currentTheme.TEXT_ACCENT} hover:brightness-110`}><Edit2 size={16} /></button>
               </div>
             </div>
 
             <div>
               <label className="block text-xs font-bold text-[#AABBCC] uppercase tracking-wider mb-1 ms-2 text-start">{t('profile.phone_number')}</label>
-              <div className="w-full bg-gray-50 dark:bg-slate-700 border border-gray-100 dark:border-slate-600 rounded-xl p-4 text-gray-500 dark:text-gray-300 font-medium flex items-center gap-3">
+              <div className={`w-full ${currentTheme.HEADER_BG} dark:bg-slate-700 border border-gray-100 dark:border-slate-600 rounded-xl p-4 text-gray-500 dark:text-gray-300 font-medium flex items-center gap-3`}>
                 <Phone size={18} className="text-gray-300" />
                 {linkedPhoneNumber || t('profile.no_number')}
               </div>
@@ -327,7 +327,7 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="w-full bg-[#ABCEC9] hover:bg-[#9BBDB8] text-white font-bold py-4 rounded-xl shadow-lg shadow-[#ABCEC9]/20 transition-all active:scale-95 flex items-center justify-center gap-2"
+              className={`w-full ${currentTheme.BUTTON} font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2`}
             >
               {isSaving ? (
                 <span className="animate-pulse">Saving...</span>
@@ -347,7 +347,7 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
               </button>
               <div className="mt-6 text-center">
                 <p className="text-[10px] text-[#AABBCC] dark:text-slate-500 font-bold tracking-wide">
-                  {t('app.developed_by')} <a href="http://skrmblissai.in/" target="_blank" rel="noopener noreferrer" className="text-[#ABCEC9] hover:underline">SKRMBliss.ai Studio</a>
+                  {t('app.developed_by')} <a href="http://skrmblissai.in/" target="_blank" rel="noopener noreferrer" className={`${currentTheme.TEXT_ACCENT} hover:underline`}>SKRMBliss.ai Studio</a>
                 </p>
               </div>
             </div>
