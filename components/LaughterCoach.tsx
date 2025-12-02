@@ -15,7 +15,6 @@ interface HistoryItem {
   energyLevel: string;
 }
 
-// ... (Audio helpers createBlob and decode remain the same, omitting for brevity)
 function createBlob(data: Float32Array): { data: string; mimeType: string } {
   const l = data.length;
   const int16 = new Int16Array(l);
@@ -48,7 +47,6 @@ function decode(base64: string) {
 export const LaughterCoach: React.FC = () => {
   const { t, currentTheme, colorTheme } = useSettings();
 
-  // ... (All state variables remain the same)
   const [isRecording, setIsRecording] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [scoreData, setScoreData] = useState<LaughterScore | null>(null);
@@ -81,7 +79,6 @@ export const LaughterCoach: React.FC = () => {
     }
   });
 
-  // ... (All useEffects and helper functions like cleanupAudio, handleFeedback, playImmediateGreeting, prefetchIntro, startLiveSession, handleQuickSession, stopSession, startRecording, stopRecording, analyzeAudio, clearHistory remain exactly the same. I will assume they are present.)
   useEffect(() => { return () => { cleanupAudio(); }; }, []);
   useEffect(() => { sessionTypeRef.current = sessionType; }, [sessionType]);
   useEffect(() => { localStorage.setItem('laughterHistory', JSON.stringify(history)); }, [history]);
@@ -184,30 +181,69 @@ export const LaughterCoach: React.FC = () => {
     if (completedSessionType && wasActive) { addPoints(completedSessionType === 'LIVE' ? 30 : 20, t('coach.session_completed'), 'COACH'); setTimeout(() => setShowFeedback(true), 500); }
   };
 
+  // --- UPDATED RECORDING LOGIC ---
   const startRecording = async () => {
     setError(null); setScoreData(null); setIsMissingKey(false); if (isSessionActive) stopSession();
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream); mediaRecorderRef.current = mediaRecorder; chunksRef.current = [];
-      mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      chunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
+      };
+
+      // Critical: Set onstop here
       mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' }); const reader = new FileReader(); reader.readAsDataURL(audioBlob);
-        reader.onloadend = async () => { const base64String = reader.result as string; const base64Data = base64String.split(',')[1]; analyzeAudio(base64Data, audioBlob.type || 'audio/webm'); };
+        const audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        const reader = new FileReader();
+        reader.readAsDataURL(audioBlob);
+        reader.onloadend = async () => {
+          const base64String = reader.result as string;
+          // IMPORTANT: Some browsers include data:audio/webm;base64, prefix, some don't or have different types
+          // This safe split handles the prefix if present
+          const base64Data = base64String.includes(',') ? base64String.split(',')[1] : base64String;
+          analyzeAudio(base64Data, audioBlob.type || 'audio/webm');
+        };
         stream.getTracks().forEach(track => track.stop());
       };
-      mediaRecorder.start(); setIsRecording(true);
+
+      mediaRecorder.start();
+      setIsRecording(true);
     } catch (err) { console.error(err); setError(t('coach.mic_permission')); }
   };
 
-  const stopRecording = () => { if (mediaRecorderRef.current && isRecording) { mediaRecorderRef.current.stop(); setIsRecording(false); setIsAnalyzing(true); } };
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      setIsAnalyzing(true);
+    } else {
+      // Fallback if state is weird
+      setIsRecording(false);
+    }
+  };
 
   const analyzeAudio = async (base64: string, mimeType: string) => {
     try {
-      const result = await rateLaughter(base64, mimeType); setScoreData(result);
-      if (result.score > 0) { const newItem: HistoryItem = { id: Date.now(), timestamp: Date.now(), score: result.score, energyLevel: result.energyLevel }; setHistory(prev => [newItem, ...prev]); addPoints(15, t('coach.laughter_analyzed'), 'COACH'); }
+      const result = await rateLaughter(base64, mimeType);
+      setScoreData(result);
+      if (result.score > 0) {
+        const newItem: HistoryItem = { id: Date.now(), timestamp: Date.now(), score: result.score, energyLevel: result.energyLevel };
+        setHistory(prev => [newItem, ...prev]);
+        addPoints(15, t('coach.laughter_analyzed'), 'COACH');
+      }
     } catch (err: any) {
-      if (err.message === "MISSING_GEMINI_KEY") { setScoreData({ score: 85, feedback: "Even without my AI brain, I can tell that was joyful! (AI Offline Mode)", energyLevel: "High" }); setUsingOfflineVoice(true); } else { setError(t('coach.analyze_error')); }
-    } finally { setIsAnalyzing(false); }
+      if (err.message === "MISSING_GEMINI_KEY") {
+        setScoreData({ score: 85, feedback: "Even without my AI brain, I can tell that was joyful! (AI Offline Mode)", energyLevel: "High" });
+        setUsingOfflineVoice(true);
+      } else {
+        setError(t('coach.analyze_error'));
+      }
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const clearHistory = () => { if (window.confirm(t('coach.clear_confirm'))) { setHistory([]); } };
@@ -215,10 +251,8 @@ export const LaughterCoach: React.FC = () => {
   // --- BUTTON STYLING HELPERS ---
   const getOutlineButtonStyle = () => {
     if (colorTheme === 'pastel') {
-      // Pastel: Purple/Grey outline, fills on hover
       return "bg-white text-[#5B5166] border-2 border-[#B8B8D0] hover:bg-[#B8B8D0] hover:text-white hover:border-[#B8B8D0]";
     } else {
-      // Red Brick: Red outline, fills on hover
       return "bg-white text-[#8B3A3A] border-2 border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-white hover:border-[#8B3A3A]";
     }
   };
@@ -277,7 +311,7 @@ export const LaughterCoach: React.FC = () => {
           </div>
         </button>
 
-        {/* Quick Laugh Button - UPDATED to use same outline style as Live Session */}
+        {/* Quick Laugh Button */}
         <button
           onMouseEnter={prefetchIntro}
           onClick={() => isSessionActive && sessionType === 'QUICK' ? stopSession() : handleQuickSession()}
