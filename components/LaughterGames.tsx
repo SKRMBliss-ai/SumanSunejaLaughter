@@ -22,9 +22,7 @@ const JOKE_PRESETS = [
   "Teenagers", "Retirement"
 ];
 
-
 export const LaughterGames: React.FC = () => {
-  // Destructure colorTheme to determine glow color
   const { currentTheme, colorTheme } = useSettings();
   const [activeTab, setActiveTab] = useState<'GENERATOR' | 'MOOD' | 'JOKES'>('GENERATOR');
   const [topic, setTopic] = useState('');
@@ -456,11 +454,12 @@ export const LaughterGames: React.FC = () => {
 
             {/* Main Action Button with Glow */}
             <div className="relative group w-full mt-4">
+              <div className={`absolute -inset-0.5 bg-gradient-to-r ${colorTheme === 'pastel' ? 'from-purple-300 to-pink-300' : 'from-[#8B3A3A] to-[#B85C5C]'} rounded-2xl blur opacity-0 group-hover:opacity-40 transition duration-200 animate-pulse`}></div>
 
               <button
                 onClick={() => isPlaying ? stopAudio() : handleGenerate(activeTab === 'JOKES' ? 'joke' : 'story')}
                 disabled={isLoading || (!topic.trim() && !isPlaying)}
-                className={`relative z-10 w-full font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-transform disabled:opacity-50 disabled:scale-100 flex items-center justify-center gap-2 hover:scale-[1.02] ${isPlaying
+                className={`relative z-10 w-full font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-transform disabled:opacity-50 disabled:scale-100 flex items-center justify-center gap-2 hover:scale-[1.01] ${isPlaying
                   ? 'bg-red-100 text-red-600 border-2 border-red-200 hover:bg-red-200'
                   : currentTheme.BUTTON
                   }`}
@@ -488,7 +487,10 @@ export const LaughterGames: React.FC = () => {
                       setTopic(preset);
                       handleGenerate(activeTab === 'JOKES' ? 'joke' : 'story', preset);
                     }}
-                    className={`p-3 rounded-xl text-sm font-bold transition-all active:scale-95 shadow-sm border ${currentTheme.BUTTON_SECONDARY} hover:opacity-100`}
+                    className={`p-3 rounded-xl text-sm font-bold transition-all active:scale-95 shadow-sm ${colorTheme === 'pastel'
+                      ? 'bg-[#F3E5F5] border-2 border-[#C0B8D0] text-[#5B5166] hover:bg-[#C0B8D0] hover:text-white'
+                      : `border ${currentTheme.BUTTON_SECONDARY} hover:opacity-100`
+                      }`}
                   >
                     {preset}
                   </button>
@@ -503,32 +505,32 @@ export const LaughterGames: React.FC = () => {
           <div className="grid grid-cols-2 gap-3 animate-fade-in-up delay-300">
             {/* Mood Button 1 */}
             <div className="relative group">
-              <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-2xl blur-2xl opacity-0 group-hover:opacity-15 transition-opacity duration-500 ${colorTheme === 'pastel' ? 'bg-purple-300' : 'bg-[#8B3A3A]'} animate-pulse`}></div>
-              <button onClick={() => handleMood("pure joy")} className={`relative z-10 w-full ${currentTheme.BUTTON} p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-105`}>
+              <div className={`absolute -inset-0.5 bg-gradient-to-r ${colorTheme === 'pastel' ? 'from-purple-300 to-pink-300' : 'from-[#8B3A3A] to-[#B85C5C]'} rounded-2xl blur opacity-0 group-hover:opacity-40 transition duration-200 animate-pulse`}></div>
+              <button onClick={() => handleMood("pure joy")} className={`relative z-10 w-full ${currentTheme.BUTTON} p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-[1.02]`}>
                 Giggle Fit 🤭
               </button>
             </div>
 
             {/* Mood Button 2 */}
             <div className="relative group">
-              <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-2xl blur-2xl opacity-0 group-hover:opacity-15 transition-opacity duration-500 ${colorTheme === 'pastel' ? 'bg-purple-300' : 'bg-[#8B3A3A]'} animate-pulse`}></div>
-              <button onClick={() => handleMood("relief")} className={`relative z-10 w-full ${currentTheme.BUTTON_SECONDARY} p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-105`}>
+              <div className={`absolute -inset-0.5 bg-gradient-to-r ${colorTheme === 'pastel' ? 'from-purple-300 to-pink-300' : 'from-[#8B3A3A] to-[#B85C5C]'} rounded-2xl blur opacity-0 group-hover:opacity-40 transition duration-200 animate-pulse`}></div>
+              <button onClick={() => handleMood("relief")} className={`relative z-10 w-full ${currentTheme.BUTTON_SECONDARY} p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-[1.02]`}>
                 Belly Laugh 😂
               </button>
             </div>
 
             {/* Mood Button 3 */}
             <div className="relative group">
-              <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-2xl blur-2xl opacity-0 group-hover:opacity-15 transition-opacity duration-500 ${colorTheme === 'pastel' ? 'bg-purple-300' : 'bg-[#8B3A3A]'} animate-pulse`}></div>
-              <button onClick={() => handleMood("silly")} className={`relative z-10 w-full ${currentTheme.BUTTON} p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-105`}>
+              <div className={`absolute -inset-0.5 bg-gradient-to-r ${colorTheme === 'pastel' ? 'from-purple-300 to-pink-300' : 'from-[#8B3A3A] to-[#B85C5C]'} rounded-2xl blur opacity-0 group-hover:opacity-40 transition duration-200 animate-pulse`}></div>
+              <button onClick={() => handleMood("silly")} className={`relative z-10 w-full ${currentTheme.BUTTON} p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-[1.02]`}>
                 Snort Laugh 🐽
               </button>
             </div>
 
             {/* Mood Button 4 */}
             <div className="relative group">
-              <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-2xl blur-2xl opacity-0 group-hover:opacity-15 transition-opacity duration-500 ${colorTheme === 'pastel' ? 'bg-purple-300' : 'bg-[#8B3A3A]'} animate-pulse`}></div>
-              <button onClick={() => handleMood("evil plan")} className={`relative z-10 w-full ${currentTheme.BUTTON_SECONDARY} p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm border-2 border-white dark:border-slate-600 hover:scale-105`}>
+              <div className={`absolute -inset-0.5 bg-gradient-to-r ${colorTheme === 'pastel' ? 'from-purple-300 to-pink-300' : 'from-[#8B3A3A] to-[#B85C5C]'} rounded-2xl blur opacity-0 group-hover:opacity-40 transition duration-200 animate-pulse`}></div>
+              <button onClick={() => handleMood("evil plan")} className={`relative z-10 w-full ${currentTheme.BUTTON_SECONDARY} p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm border-2 border-white dark:border-slate-600 hover:scale-[1.02]`}>
                 Witchy Cackle 🧙‍♀️
               </button>
             </div>
