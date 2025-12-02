@@ -106,12 +106,12 @@ export const useLiveSession = ({ onSessionEnd, onError, onAudioStart }: UseLiveS
         }
     }, []);
 
-    const stopSession = useCallback(() => {
+    const stopSession = useCallback((notify = true) => {
         cleanupAudio();
         setIsSessionActive(false);
         setIsLoading(false);
         setVolumeLevel(0);
-        if (onSessionEnd) onSessionEnd();
+        if (notify && onSessionEnd) onSessionEnd();
     }, [cleanupAudio, onSessionEnd]);
 
     const startSession = useCallback(async (apiKey: string, customSystemInstruction?: string) => {

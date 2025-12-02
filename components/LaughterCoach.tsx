@@ -192,7 +192,7 @@ export const LaughterCoach: React.FC = () => {
   const stopSession = () => {
     if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); }
     if (sessionTypeRef.current === 'LIVE') {
-      try { stopLiveSessionLowLatency(); } catch (e) { console.error("Error stopping live session:", e); }
+      try { stopLiveSessionLowLatency(false); } catch (e) { console.error("Error stopping live session:", e); }
     }
     try { cleanupAudio(); } catch (e) { console.error("Error cleaning up audio:", e); }
 
