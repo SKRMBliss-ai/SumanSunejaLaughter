@@ -503,6 +503,7 @@ export const LaughterGames: React.FC = () => {
           <div className="grid grid-cols-2 gap-3 animate-fade-in-up delay-300">
             {/* Mood Button 1 */}
             <div className="relative group">
+              <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-2xl blur-2xl opacity-0 group-hover:opacity-15 transition-opacity duration-500 ${colorTheme === 'pastel' ? 'bg-purple-300' : 'bg-[#8B3A3A]'} animate-pulse`}></div>
               <button onClick={() => handleMood("pure joy")} className={`relative z-10 w-full ${currentTheme.BUTTON} p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-105`}>
                 Giggle Fit 🤭
               </button>
@@ -510,6 +511,7 @@ export const LaughterGames: React.FC = () => {
 
             {/* Mood Button 2 */}
             <div className="relative group">
+              <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-2xl blur-2xl opacity-0 group-hover:opacity-15 transition-opacity duration-500 ${colorTheme === 'pastel' ? 'bg-purple-300' : 'bg-[#8B3A3A]'} animate-pulse`}></div>
               <button onClick={() => handleMood("relief")} className={`relative z-10 w-full ${currentTheme.BUTTON_SECONDARY} p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-105`}>
                 Belly Laugh 😂
               </button>
@@ -517,6 +519,7 @@ export const LaughterGames: React.FC = () => {
 
             {/* Mood Button 3 */}
             <div className="relative group">
+              <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-2xl blur-2xl opacity-0 group-hover:opacity-15 transition-opacity duration-500 ${colorTheme === 'pastel' ? 'bg-purple-300' : 'bg-[#8B3A3A]'} animate-pulse`}></div>
               <button onClick={() => handleMood("silly")} className={`relative z-10 w-full ${currentTheme.BUTTON} p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-105`}>
                 Snort Laugh 🐽
               </button>
@@ -524,6 +527,7 @@ export const LaughterGames: React.FC = () => {
 
             {/* Mood Button 4 */}
             <div className="relative group">
+              <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-2xl blur-2xl opacity-0 group-hover:opacity-15 transition-opacity duration-500 ${colorTheme === 'pastel' ? 'bg-purple-300' : 'bg-[#8B3A3A]'} animate-pulse`}></div>
               <button onClick={() => handleMood("evil plan")} className={`relative z-10 w-full ${currentTheme.BUTTON_SECONDARY} p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm border-2 border-white dark:border-slate-600 hover:scale-105`}>
                 Witchy Cackle 🧙‍♀️
               </button>
