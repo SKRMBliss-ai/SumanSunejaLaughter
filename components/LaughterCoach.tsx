@@ -250,7 +250,7 @@ export const LaughterCoach: React.FC = () => {
         setScoreData({ score: 85, feedback: "Even without my AI brain, I can tell that was joyful! (AI Offline Mode)", energyLevel: "High" });
         setUsingOfflineVoice(true);
       } else {
-        setError(t('coach.analyze_error'));
+        setError(`${t('coach.analyze_error')} (${err.message})`);
       }
     } finally {
       setIsAnalyzing(false);
@@ -259,7 +259,6 @@ export const LaughterCoach: React.FC = () => {
 
   const clearHistory = () => { if (window.confirm(t('coach.clear_confirm'))) { setHistory([]); } };
 
-  // --- BUTTON STYLING HELPERS ---
   const getOutlineButtonStyle = () => {
     if (colorTheme === 'pastel') {
       return "bg-white text-[#5B5166] border-2 border-[#B8B8D0] hover:bg-[#B8B8D0] hover:text-white hover:border-[#B8B8D0]";
