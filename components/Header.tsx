@@ -55,9 +55,11 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
             href="https://www.youtube.com/@sumansunejaofficial"
             target="_blank"
             rel="noopener noreferrer"
-            className={`hidden sm:flex ${currentTheme.SUBSCRIBE_BTN} text-white text-[0.7rem] px-4 py-2 rounded-full font-bold transition-all hover:scale-105 items-center gap-1 shadow-md shadow-orange-900/20`}
+            // REMOVED 'text-white' class to allow theme text color to apply
+            className={`hidden sm:flex ${currentTheme.SUBSCRIBE_BTN} text-[0.7rem] px-4 py-2 rounded-full font-bold transition-all hover:scale-105 items-center gap-1 shadow-md shadow-orange-900/20`}
           >
-            <Youtube size={16} fill="currentColor" className="text-white" /> Subscribe
+            {/* UPDATED icon to 'text-current' to match parent button text */}
+            <Youtube size={16} fill="currentColor" className="text-current" /> Subscribe
           </a>
 
           <button
