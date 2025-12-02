@@ -90,8 +90,12 @@ export const rateLaughter = async (audioBase64: string, mimeType: string) => {
       }
     });
 
-    const text = response.text;
+    let text = response.text;
     if (!text) throw new Error("No response from AI");
+
+    // Clean markdown code blocks if present
+    text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
     return JSON.parse(text);
   } catch (error) {
     console.error("Error rating laughter:", error);
