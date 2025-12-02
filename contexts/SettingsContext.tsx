@@ -176,6 +176,11 @@ const translations: Record<Language, Record<string, string>> = {
         'coach.session_error': 'Unable to start session.',
         'coach.connection_lost': 'Connection lost.',
         'coach.live_unavailable': 'API Key missing. Live session unavailable.',
+        'coach.close': 'Close',
+        'coach.try_again': 'Try Again',
+        'coach.history': 'History',
+        'coach.clear_history': 'Clear History',
+        'coach.no_history': 'No history yet. Start laughing!',
     },
     hi: {}, es: {}, ar: {}, fr: {}, de: {}, ja: {}
 };
