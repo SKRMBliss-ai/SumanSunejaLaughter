@@ -34,6 +34,7 @@
     body {
       font-family: 'Lato', sans-serif;
       background-color: #FEF4E6;
+      overscroll-behavior-y: none;
     }
 
     h1,
@@ -168,6 +169,10 @@
     .hover-scale-bounce:hover {
       transform: scale(1.05);
       transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .pb-safe {
+      padding-bottom: env(safe-area-inset-bottom);
     }
   </style>
   <script type="importmap">

@@ -2,6 +2,7 @@ import { GoogleGenAI, Type, Schema, Modality } from "@google/genai";
 
 const apiKey = process.env.API_KEY || '';
 const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
+const getAI = () => ai;
 
 // --- SMART MODEL LOAD BALANCING ---
 const MODELS = {
