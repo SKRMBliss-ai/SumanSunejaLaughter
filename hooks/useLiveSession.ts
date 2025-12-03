@@ -130,6 +130,10 @@ export const useLiveSession = ({ onSessionEnd, onError, onAudioStart }: UseLiveS
             mediaStreamRef.current = stream;
 
             // 3. Connect to Gemini Live
+            console.log("Attempting to connect to Gemini Live...");
+            console.log("Current Page URL (window.location.href):", window.location.href);
+            console.log("Document Referrer (document.referrer):", document.referrer);
+
             const ai = new GoogleGenAI({ apiKey });
 
             const defaultInstruction = `You are Suman Suneja, an energetic, warm, and highly interactive Laughter Yoga Coach. 
