@@ -6,7 +6,7 @@ export const Contact: React.FC = () => {
     const { currentTheme, colorTheme, t } = useSettings();
     const handleWhatsApp = () => {
         const text = encodeURIComponent(t('contact.whatsapp_msg'));
-        window.open(`https://wa.me/918217581238?text=${text}`, '_blank');
+        window.open(`https://wa.me/918217581238?text=${text}`, '_blank', 'noopener,noreferrer');
     };
 
     const handleEmail = () => {

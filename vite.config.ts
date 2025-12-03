@@ -18,6 +18,12 @@ export default defineConfig(({ mode }) => {
           enabled: true
         },
         includeAssets: ['icon.svg'],
+        workbox: {
+          skipWaiting: true,
+          clientsClaim: true,
+          cleanupOutdatedCaches: true,
+          globPatterns: ['**/*.{js,css,html,ico,png,svg}']
+        },
         manifest: {
           name: 'Suman Suneja Laughter Hub',
           short_name: 'LaughterHub',

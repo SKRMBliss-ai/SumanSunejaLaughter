@@ -20,6 +20,7 @@ import { ViewState } from './types';
 import { Loader2 } from 'lucide-react';
 import { SettingsProvider, useSettings } from './contexts/SettingsContext';
 import { LiveWidgetProvider } from './contexts/LiveWidgetContext';
+import { IOSInstallPrompt } from './components/IOSInstallPrompt';
 
 const AppContent: React.FC = () => {
   const [currentView, setView] = useState<ViewState>(ViewState.HOME);
@@ -126,6 +127,7 @@ const AppContent: React.FC = () => {
       <HomeLiveWidget visible={currentView === ViewState.HOME} />
       <Navigation currentView={currentView} setView={handleNavigate} />
       <RewardPopup />
+      <IOSInstallPrompt />
     </div>
   );
 };
