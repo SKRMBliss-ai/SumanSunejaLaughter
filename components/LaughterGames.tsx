@@ -23,7 +23,7 @@ const JOKE_PRESETS = [
 ];
 
 export const LaughterGames: React.FC = () => {
-  const { currentTheme, colorTheme } = useSettings();
+  const { currentTheme, colorTheme, t } = useSettings();
   const [activeTab, setActiveTab] = useState<'GENERATOR' | 'MOOD' | 'JOKES'>('GENERATOR');
   const [topic, setTopic] = useState('');
   const [currentText, setCurrentText] = useState<string | null>(null);
@@ -206,7 +206,7 @@ export const LaughterGames: React.FC = () => {
     utterance.onerror = (e) => {
       console.error("Browser TTS Error", e);
       setIsPlaying(false);
-    }
+    };
 
     // Set active immediately
     setIsPlaying(true);
@@ -229,7 +229,7 @@ export const LaughterGames: React.FC = () => {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(
-          activeTab === 'JOKES' ? "Let me think of a funny one..." : "Brewing some joy..."
+          activeTab === 'JOKES' ? t('games.thinking_joke') : t('games.thinking_story')
         );
         utterance.rate = 1.2;
         const voices = window.speechSynthesis.getVoices();
@@ -260,13 +260,13 @@ export const LaughterGames: React.FC = () => {
       console.error(e);
       // Fallback for text generation error or network error
       if (e instanceof Error && e.message === "MISSING_GEMINI_KEY") {
-        setError("Using offline mode (API Key missing)");
-        const offlineText = "I can't access my comedy brain right now, but I can still laugh! Ha ha ha! Bwahaha!";
+        setError(t('games.offline_error'));
+        const offlineText = t('games.offline_story');
         setCurrentText(offlineText);
         fallbackSpeak(offlineText);
       } else {
-        setError("Connection issue. Try again!");
-        setCurrentText("Oops! Something went wrong. But keep smiling!");
+        setError(t('games.connection_error'));
+        setCurrentText(t('games.generic_error'));
       }
     } finally {
       setIsLoading(false);
@@ -288,7 +288,7 @@ export const LaughterGames: React.FC = () => {
       // IMMEDIATE FEEDBACK
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(`Feeling ${mood}? Let's change that!`);
+        const utterance = new SpeechSynthesisUtterance(t('games.mood_change').replace('{mood}', mood));
         utterance.rate = 1.2;
         const voices = window.speechSynthesis.getVoices();
         const femaleVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Google US English'));
@@ -313,12 +313,12 @@ export const LaughterGames: React.FC = () => {
     } catch (e) {
       console.error(e);
       if (e instanceof Error && e.message === "MISSING_GEMINI_KEY") {
-        setError("Using offline mode");
-        const offlineText = "Ha ha ha! Hee hee hee! Laughter is the best medicine, even offline!";
+        setError(t('games.offline_error'));
+        const offlineText = t('games.offline_mood');
         setCurrentText(offlineText);
         fallbackSpeak(offlineText);
       } else {
-        setCurrentText("Failed to generate mood laugh.");
+        setCurrentText(t('games.mood_error'));
       }
     } finally {
       setIsLoading(false);
@@ -332,9 +332,9 @@ export const LaughterGames: React.FC = () => {
         <div className={`inline-block mb-2 transition-colors ${currentTheme.GAMES_ICON_BG}`}>
           <Bot size={32} className="text-current" />
         </div>
-        <h2 className={`text-3xl font-fredoka font-bold ${currentTheme.TEXT_PRIMARY}`}>AI Laughter Lab</h2>
+        <h2 className={`text-3xl font-fredoka font-bold ${currentTheme.TEXT_PRIMARY}`}>{t('games.title')}</h2>
         <p className="text-[#AABBCC] font-medium text-sm">
-          {activeTab === 'JOKES' ? 'One-Liner Joke Generator' : 'Experimental Joy Generator'}
+          {activeTab === 'JOKES' ? t('games.subtitle_jokes') : t('games.subtitle_joy')}
         </p>
       </div>
 
@@ -344,19 +344,19 @@ export const LaughterGames: React.FC = () => {
           onClick={() => setActiveTab('GENERATOR')}
           className={`flex-1 py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-all ${activeTab === 'GENERATOR' ? `${currentTheme.BUTTON}` : 'text-gray-400 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'}`}
         >
-          <Wand2 size={14} /> Story
+          <Wand2 size={14} /> {t('games.tab_story')}
         </button>
         <button
           onClick={() => setActiveTab('JOKES')}
           className={`flex-1 py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-all ${activeTab === 'JOKES' ? `${currentTheme.BUTTON}` : 'text-gray-400 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'}`}
         >
-          <Smile size={14} /> Jokes
+          <Smile size={14} /> {t('games.tab_jokes')}
         </button>
         <button
           onClick={() => setActiveTab('MOOD')}
           className={`flex-1 py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-all ${activeTab === 'MOOD' ? `${currentTheme.BUTTON}` : 'text-gray-400 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'}`}
         >
-          <Zap size={14} /> Moods
+          <Zap size={14} /> {t('games.tab_moods')}
         </button>
       </div>
 
@@ -375,7 +375,7 @@ export const LaughterGames: React.FC = () => {
             ) : (
               <div className={`flex flex-col items-center justify-center gap-2 ${currentTheme.TEXT_ACCENT} animate-[pulse_1s_infinite]`}>
                 <Volume2 size={48} />
-                <span className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-300">Speaking...</span>
+                <span className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-300">{t('games.speaking')}</span>
               </div>
             )
           ) : (
@@ -391,7 +391,7 @@ export const LaughterGames: React.FC = () => {
             <div className="flex flex-col items-center gap-2">
               <Loader2 size={32} className={`animate-spin ${currentTheme.TEXT_ACCENT}`} />
               <span className="text-xs font-bold text-gray-400 animate-pulse">
-                {activeTab === 'JOKES' ? "Writing a zinger..." : "Brewing Laughter..."}
+                {activeTab === 'JOKES' ? t('games.writing_joke') : t('games.brewing_laughter')}
               </span>
             </div>
           ) : currentText ? (
@@ -400,28 +400,28 @@ export const LaughterGames: React.FC = () => {
 
               <div className="flex flex-wrap justify-center gap-2 mt-1">
                 <span className="text-[0.65rem] font-bold text-[#AABBCC] uppercase tracking-widest bg-white/50 px-2 py-1 rounded-md">
-                  {activeTab === 'JOKES' ? 'Funny Mode' : 'AI Mode'}
+                  {activeTab === 'JOKES' ? t('games.funny_mode') : t('games.ai_mode')}
                 </span>
                 {currentAudio && !isPlaying && (
                   <button
                     onClick={() => playAudio(currentAudio)}
                     className={`${currentTheme.BUTTON_SECONDARY} text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-sm transition-transform active:scale-95 animate-pop-in border border-white/20`}
                   >
-                    <Play size={10} fill="currentColor" /> Play Real Laughter 🗣️
+                    <Play size={10} fill="currentColor" /> {t('games.play_real_laughter')}
                   </button>
                 )}
                 {usingFallbackVoice && (
                   <span className="text-[0.65rem] bg-orange-100 text-orange-600 px-2 py-1 rounded-full font-bold border border-orange-200">
-                    Offline Voice
+                    {t('games.offline_voice')}
                   </span>
                 )}
               </div>
             </div>
           ) : (
             <p className="text-gray-400 font-medium text-sm px-8">
-              {activeTab === 'GENERATOR' ? "Enter a situation (e.g. 'Traffic Jam') to turn it into a laugh!" :
-                activeTab === 'JOKES' ? "Enter a topic (e.g. 'Pizza') for a funny one-liner + laugh!" :
-                  "Select a mood to hear different laughter styles."}
+              {activeTab === 'GENERATOR' ? t('games.input_placeholder_story') :
+                activeTab === 'JOKES' ? t('games.input_placeholder_joke') :
+                  t('games.input_placeholder_mood')}
             </p>
           )}
         </div>
@@ -443,7 +443,7 @@ export const LaughterGames: React.FC = () => {
                 type="text"
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
-                placeholder={activeTab === 'JOKES' ? "Topic (e.g. Cats, Boss, Coffee)" : "Situation (e.g. Missed Alarm)"}
+                placeholder={activeTab === 'JOKES' ? t('games.input_placeholder_joke') : t('games.input_placeholder_story')}
                 className={`w-full bg-white dark:bg-slate-800 border-2 rounded-2xl py-4 pl-4 pr-14 text-gray-700 dark:text-white font-bold shadow-sm focus:outline-none focus:ring-4 transition-all ${currentTheme.INPUT_RING} border-gray-100 dark:border-slate-700`}
                 onKeyDown={(e) => e.key === 'Enter' && handleGenerate(activeTab === 'JOKES' ? 'joke' : 'story')}
               />
@@ -466,10 +466,10 @@ export const LaughterGames: React.FC = () => {
               >
                 {isPlaying ? (
                   <>
-                    <Pause size={20} /> Stop Audio
+                    <Pause size={20} /> {t('games.stop_audio')}
                   </>
                 ) : (
-                  activeTab === 'JOKES' ? "Tell Me a Joke & Laugh!" : "Generate Joy Story"
+                  activeTab === 'JOKES' ? t('games.btn_joke') : t('games.btn_story')
                 )}
               </button>
             </div>
@@ -477,7 +477,7 @@ export const LaughterGames: React.FC = () => {
             {/* Presets Grid */}
             <div className="mt-6">
               <p className="text-sm font-bold text-gray-400 mb-3 uppercase tracking-wider text-center">
-                Or Pick a {activeTab === 'JOKES' ? 'Topic' : 'Theme'}
+                {t('games.pick_a')} {activeTab === 'JOKES' ? t('games.topic') : t('games.theme')}
               </p>
               <div className="grid grid-cols-2 gap-3">
                 {(activeTab === 'JOKES' ? JOKE_PRESETS : STORY_PRESETS).map((preset) => (
@@ -507,7 +507,7 @@ export const LaughterGames: React.FC = () => {
             <div className="relative group">
               <div className={`absolute -inset-0.5 bg-gradient-to-r ${colorTheme === 'pastel' ? 'from-purple-300 to-pink-300' : 'from-[#8B3A3A] to-[#B85C5C]'} rounded-2xl blur opacity-0 group-hover:opacity-40 transition duration-200 animate-pulse`}></div>
               <button onClick={() => handleMood("pure joy")} className={`relative z-10 w-full ${currentTheme.BUTTON} p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-[1.02]`}>
-                Giggle Fit 🤭
+                {t('games.mood_giggle')}
               </button>
             </div>
 
@@ -515,7 +515,7 @@ export const LaughterGames: React.FC = () => {
             <div className="relative group">
               <div className={`absolute -inset-0.5 bg-gradient-to-r ${colorTheme === 'pastel' ? 'from-purple-300 to-pink-300' : 'from-[#8B3A3A] to-[#B85C5C]'} rounded-2xl blur opacity-0 group-hover:opacity-40 transition duration-200 animate-pulse`}></div>
               <button onClick={() => handleMood("relief")} className={`relative z-10 w-full ${currentTheme.BUTTON_SECONDARY} p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-[1.02]`}>
-                Belly Laugh 😂
+                {t('games.mood_belly')}
               </button>
             </div>
 
@@ -523,7 +523,7 @@ export const LaughterGames: React.FC = () => {
             <div className="relative group">
               <div className={`absolute -inset-0.5 bg-gradient-to-r ${colorTheme === 'pastel' ? 'from-purple-300 to-pink-300' : 'from-[#8B3A3A] to-[#B85C5C]'} rounded-2xl blur opacity-0 group-hover:opacity-40 transition duration-200 animate-pulse`}></div>
               <button onClick={() => handleMood("silly")} className={`relative z-10 w-full ${currentTheme.BUTTON} p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm hover:scale-[1.02]`}>
-                Snort Laugh 🐽
+                {t('games.mood_snort')}
               </button>
             </div>
 
@@ -531,7 +531,7 @@ export const LaughterGames: React.FC = () => {
             <div className="relative group">
               <div className={`absolute -inset-0.5 bg-gradient-to-r ${colorTheme === 'pastel' ? 'from-purple-300 to-pink-300' : 'from-[#8B3A3A] to-[#B85C5C]'} rounded-2xl blur opacity-0 group-hover:opacity-40 transition duration-200 animate-pulse`}></div>
               <button onClick={() => handleMood("evil plan")} className={`relative z-10 w-full ${currentTheme.BUTTON_SECONDARY} p-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all text-sm border-2 border-white dark:border-slate-600 hover:scale-[1.02]`}>
-                Witchy Cackle 🧙‍♀️
+                {t('games.mood_cackle')}
               </button>
             </div>
           </div>

@@ -135,7 +135,7 @@ export const LaughterCoach: React.FC = () => {
 
   const startLiveSession = async () => {
     cleanupAudio();
-    playImmediateGreeting("Live laughter session");
+    playImmediateGreeting(t('coach.live_session_start'));
     const apiKey = process.env.API_KEY;
     if (!apiKey) { setError(t('coach.live_unavailable')); setIsMissingKey(true); return; }
     setSessionType('LIVE'); setIsSessionActive(true); startLiveSessionLowLatency(apiKey);
@@ -152,13 +152,13 @@ export const LaughterCoach: React.FC = () => {
       return;
     }
     // 1. Immediate Feedback (Browser TTS)
-    playImmediateGreeting("Starting your one minute laughter boost. Get ready!");
+    playImmediateGreeting(t('coach.quick_session_start'));
 
     // 2. Reset State
     cleanupAudio();
 
     // 2. Immediate feedback (Browser TTS)
-    playImmediateGreeting("Starting your quick laughter session. Get ready to smile!");
+    playImmediateGreeting(t('coach.quick_session_start_2'));
 
     setIsSessionLoading(true);
     setIsSessionActive(true);
@@ -316,7 +316,7 @@ export const LaughterCoach: React.FC = () => {
       if (errorMsg.includes("MISSING_GEMINI_KEY") || errorMsg.includes("429") || errorMsg.includes("Quota") || errorMsg.includes("RESOURCE_EXHAUSTED")) {
         setScoreData({
           score: 85,
-          feedback: "Even without my AI brain (Quota Limit/Offline), I can tell that was joyful! Keep laughing!",
+          feedback: t('coach.offline_feedback'),
           energyLevel: "High"
         });
         setUsingOfflineVoice(true);
@@ -395,7 +395,7 @@ export const LaughterCoach: React.FC = () => {
             </div>
             <div className="text-left">
               <h3 className="font-bold">
-                {isSessionActive && sessionType === 'LIVE' ? 'Stop Session' : 'Live Laughter Session'}
+                {isSessionActive && sessionType === 'LIVE' ? t('coach.stop_session') : t('coach.live_session_btn')}
               </h3>
               <p className={`text-xs ${isSessionActive && sessionType === 'LIVE' ? 'opacity-80' : 'text-gray-500'}`}>{t('coach.interactive')}</p>
             </div>
@@ -420,10 +420,10 @@ export const LaughterCoach: React.FC = () => {
             </div>
             <div className="text-left">
               <h3 className="font-bold">
-                {isSessionActive && sessionType === 'QUICK' ? 'Stop Session' : t('coach.quick_laugh')}
+                {isSessionActive && sessionType === 'QUICK' ? t('coach.stop_session') : t('coach.quick_laugh')}
               </h3>
               <p className={`text-xs ${isSessionActive && sessionType === 'QUICK' ? 'opacity-80' : 'text-gray-500'}`}>
-                {usingOfflineVoice ? 'Using Offline Voice (Data Saver)' : t('coach.guided_boost')}
+                {usingOfflineVoice ? t('coach.offline_voice_saver') : t('coach.guided_boost')}
               </p>
             </div>
           </div>

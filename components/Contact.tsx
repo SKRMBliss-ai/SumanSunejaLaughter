@@ -3,14 +3,16 @@ import { Phone, Mail, Globe, Youtube, MessageCircle, Briefcase, Users, User, Map
 import { useSettings } from '../contexts/SettingsContext';
 
 export const Contact: React.FC = () => {
-    const { currentTheme, colorTheme } = useSettings();
+    const { currentTheme, colorTheme, t } = useSettings();
     const handleWhatsApp = () => {
-        const text = encodeURIComponent("Hi Suman! I'm interested in Laughter Yoga and want to know more.");
+        const text = encodeURIComponent(t('contact.whatsapp_msg'));
         window.open(`https://wa.me/918217581238?text=${text}`, '_blank');
     };
 
     const handleEmail = () => {
-        window.location.href = "mailto:Enquiry@sumansuneja.com?subject=Laughter%20Yoga%20Enquiry&body=Hi%20Suman%2C%20I%20would%20love%20to%20book%20a%20session.";
+        const subject = encodeURIComponent(t('contact.email_subject'));
+        const body = encodeURIComponent(t('contact.email_body'));
+        window.location.href = `mailto:Enquiry@sumansuneja.com?subject=${subject}&body=${body}`;
     };
 
     // Helper for card styles based on theme
@@ -40,12 +42,11 @@ export const Contact: React.FC = () => {
                         <Smile className={`${currentTheme.TEXT_ACCENT} w-10 h-10 fill-[#EDE8F8] dark:fill-slate-700`} />
                     </div>
                     <h2 className={`text-4xl font-fredoka font-bold ${currentTheme.TEXT_PRIMARY} dark:text-gray-100 leading-tight`}>
-                        Let's Make <br />
-                        <span className={`text-transparent bg-clip-text bg-gradient-to-r ${colorTheme === 'pastel' ? 'from-purple-400 to-pink-400' : 'from-[#8B3A3A] to-[#B85C5C]'}`}>Magic Happen!</span>
+                        {t('contact.header_title')}
                     </h2>
                 </div>
                 <p className={`${currentTheme.TEXT_PRIMARY} font-medium text-sm max-w-xs mx-auto`}>
-                    Booking a session is the first step to a happier, healthier life.
+                    {t('contact.header_subtitle')}
                 </p>
             </div>
 
@@ -66,8 +67,8 @@ export const Contact: React.FC = () => {
                             <MessageCircle size={28} fill="currentColor" strokeWidth={1.5} />
                         </div>
                         <div className="text-left">
-                            <span className="block font-black text-xl tracking-tight">WhatsApp Us</span>
-                            <span className="text-xs font-bold uppercase tracking-wider opacity-80">Instant Reply</span>
+                            <span className="block font-black text-xl tracking-tight">{t('contact.whatsapp_btn')}</span>
+                            <span className="text-xs font-bold uppercase tracking-wider opacity-80">{t('contact.instant_reply')}</span>
                         </div>
                     </div>
                     <div className={`z-10 p-2 rounded-full shadow-sm ${colorTheme === 'pastel' ? 'bg-white text-[#00695C]' : 'bg-[#8B3A3A]/10 text-[#8B3A3A] group-hover:bg-white group-hover:text-[#8B3A3A]'}`}>
@@ -89,8 +90,8 @@ export const Contact: React.FC = () => {
                             <Mail size={28} strokeWidth={2} />
                         </div>
                         <div className="text-left">
-                            <span className="block font-black text-xl tracking-tight">Send Email</span>
-                            <span className="text-xs font-bold uppercase tracking-wider opacity-70">For Enquiries</span>
+                            <span className="block font-black text-xl tracking-tight">{t('contact.email_btn')}</span>
+                            <span className="text-xs font-bold uppercase tracking-wider opacity-70">{t('contact.for_enquiries')}</span>
                         </div>
                     </div>
                 </button>
@@ -100,29 +101,29 @@ export const Contact: React.FC = () => {
             <div>
                 <div className="flex items-center gap-2 mb-4 px-2">
                     <Star className={`${currentTheme.TEXT_ACCENT} fill-current animate-spin-slow`} size={18} />
-                    <h3 className={`font-bold ${currentTheme.TEXT_PRIMARY} uppercase tracking-widest text-xs`}>What we offer</h3>
+                    <h3 className={`font-bold ${currentTheme.TEXT_PRIMARY} uppercase tracking-widest text-xs`}>{t('contact.offerings_title')}</h3>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                     <div className={`p-4 rounded-2xl border ${getCardStyle('primary')}`}>
                         <User className="mb-2 opacity-80" size={24} />
-                        <div className="font-bold">1-on-1</div>
-                        <div className="text-xs font-medium opacity-70">Personal Coaching</div>
+                        <div className="font-bold">{t('contact.offering_1_title')}</div>
+                        <div className="text-xs font-medium opacity-70">{t('contact.offering_1_desc')}</div>
                     </div>
                     <div className={`p-4 rounded-2xl border ${getCardStyle('secondary')}`}>
                         <Briefcase className="mb-2 opacity-80" size={24} />
-                        <div className="font-bold">Corporate</div>
-                        <div className="text-xs font-medium opacity-70">Stress Relief</div>
+                        <div className="font-bold">{t('contact.offering_2_title')}</div>
+                        <div className="text-xs font-medium opacity-70">{t('contact.offering_2_desc')}</div>
                     </div>
                     <div className={`p-4 rounded-2xl border ${getCardStyle('tertiary')}`}>
                         <Users className="mb-2 opacity-80" size={24} />
-                        <div className="font-bold">Groups</div>
-                        <div className="text-xs font-medium opacity-70">Workshops</div>
+                        <div className="font-bold">{t('contact.offering_3_title')}</div>
+                        <div className="text-xs font-medium opacity-70">{t('contact.offering_3_desc')}</div>
                     </div>
                     <div className={`p-4 rounded-2xl border ${getCardStyle('quaternary')}`}>
                         <Heart className="mb-2 opacity-80" size={24} />
-                        <div className="font-bold">Retreats</div>
-                        <div className="text-xs font-medium opacity-70">Wellness Days</div>
+                        <div className="font-bold">{t('contact.offering_4_title')}</div>
+                        <div className="text-xs font-medium opacity-70">{t('contact.offering_4_desc')}</div>
                     </div>
                 </div>
             </div>
@@ -143,13 +144,13 @@ export const Contact: React.FC = () => {
                         <Youtube size={20} fill="currentColor" />
                     </div>
                     <div className="flex-1">
-                        <div className="text-sm font-bold">Watch on YouTube</div>
+                        <div className="text-sm font-bold">{t('contact.youtube_btn')}</div>
                     </div>
                     <div className={`text-[10px] font-bold px-3 py-1 rounded-md uppercase transition-colors border
                         ${colorTheme === 'pastel'
                             ? 'bg-white text-[#C62828] border-red-200 group-hover:bg-[#EF5350] group-hover:text-white'
                             : 'bg-white text-[#8B3A3A] border-[#8B3A3A] group-hover:bg-[#8B3A3A] group-hover:text-white'
-                        }`}>Subscribe</div>
+                        }`}>{t('contact.subscribe')}</div>
                 </a>
 
                 <a
@@ -158,7 +159,7 @@ export const Contact: React.FC = () => {
                     rel="noopener noreferrer"
                     className={`flex items-center justify-center gap-2 ${currentTheme.TEXT_PRIMARY} text-sm font-bold hover:opacity-80 transition-colors py-2`}
                 >
-                    <Globe size={16} /> Visit Official Website
+                    <Globe size={16} /> {t('contact.website_btn')}
                 </a>
             </div>
 
@@ -172,7 +173,7 @@ export const Contact: React.FC = () => {
                     />
                 </div>
                 <p className={`text-xs ${currentTheme.TEXT_PRIMARY} dark:text-slate-500 font-bold tracking-wide`}>
-                    App Developed by <a href="http://skrmblissai.in/" target="_blank" rel="noopener noreferrer" className={`${currentTheme.TEXT_ACCENT} hover:text-opacity-80 underline`}>SKRMBliss.ai Studio</a>
+                    {t('app.developed_by')} <a href="http://skrmblissai.in/" target="_blank" rel="noopener noreferrer" className={`${currentTheme.TEXT_ACCENT} hover:text-opacity-80 underline`}>SKRMBliss.ai Studio</a>
                 </p>
             </div>
         </div>

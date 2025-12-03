@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Video, ArrowRight, Star, Bell, X, Sparkles, Smile, Globe, Calendar, Lock, Check, Clock, Trophy, Flame, Moon, Sun, Type, Palette, ChevronDown, Info } from 'lucide-react';
+import { Video, ArrowRight, Star, Bell, X, Sparkles, Smile, Globe, Calendar, Lock, Check, Clock, Trophy, Flame, Moon, Sun, Type, Palette, ChevronDown, Info, Mic } from 'lucide-react';
 import { ViewState, RewardState } from '../types';
 import { getRewardState } from '../services/rewardService';
 import { useSettings, SUPPORTED_LANGUAGES, FontSize } from '../contexts/SettingsContext';
@@ -96,8 +96,8 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
 
         if (currentMinutesFromMidnight === notifyStartMinutes) {
           setNotification({
-            title: "Daily Laughter Yoga Starting!",
-            message: `The daily joy session starts in ${reminderMinutes} minutes.`,
+            title: t('notification.daily_title'),
+            message: t('notification.daily_message').replace('{minutes}', reminderMinutes.toString()),
             link: "https://zoom.us/j/3415272874"
           });
         }
@@ -109,8 +109,8 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
 
         if (currentMinutesFromMidnight === notifyStartMinutes) {
           setNotification({
-            title: "Traditional Yoga Starting!",
-            message: `Get your mat ready! Session starts in ${reminderMinutes} minutes.`,
+            title: t('notification.traditional_title'),
+            message: t('notification.traditional_message').replace('{minutes}', reminderMinutes.toString()),
             link: "https://zoom.us/join"
           });
         }
@@ -119,7 +119,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
 
     const interval = setInterval(checkSessionTime, 60000);
     return () => clearInterval(interval);
-  }, [reminderMinutes, remindersEnabled]);
+  }, [reminderMinutes, remindersEnabled, t]);
 
   const toggleReminder = (type: 'daily' | 'traditional') => {
     setRemindersEnabled(prev => ({
@@ -153,12 +153,12 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
       <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-3 leading-snug font-medium">{desc}</p>
 
       <div className="flex justify-between items-center">
-        <button onClick={finishTour} className="text-[10px] font-bold text-gray-400 hover:text-gray-600 underline decoration-dashed">Skip</button>
+        <button onClick={finishTour} className="text-[10px] font-bold text-gray-400 hover:text-gray-600 underline decoration-dashed">{t('tour.skip')}</button>
         <button
           onClick={handleNextStep}
           className={`px-3 py-1.5 rounded-lg font-bold text-[10px] text-[#8B3A3A] shadow-md active:scale-95 transition-transform ${currentTheme.BUTTON}`}
         >
-          {isLast ? "Finish" : "Next"}
+          {isLast ? t('tour.finish') : t('tour.next')}
         </button>
       </div>
     </div>
@@ -178,7 +178,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           >
             {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
           </button>
-          {tourStep === 1 && <TourTooltip title="Light / Dark" desc="Tap to switch between day and night modes!" />}
+          {tourStep === 1 && <TourTooltip title={t('tour.dark_mode')} desc={t('tour.dark_mode_desc')} />}
         </div>
 
         {/* Step 2: Color Theme */}
@@ -191,7 +191,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             <Palette size={18} className={colorTheme === 'pastel' ? 'text-purple-500' : 'text-[#8B3A3A]'} />
             <ChevronDown size={14} />
           </button>
-          {tourStep === 2 && <TourTooltip title="Color Themes" desc="Switch between Brand Red and other fun themes!" />}
+          {tourStep === 2 && <TourTooltip title={t('tour.color_theme')} desc={t('tour.color_theme_desc')} />}
 
           {isThemeMenuOpen && (
             <>
@@ -225,7 +225,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
               <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${fontSize === 'normal' ? 'hidden' : 'bg-pink-500'}`}></span>
             </span>
           </button>
-          {tourStep === 3 && <TourTooltip title="Text Size" desc="Tap to make the text larger or smaller." />}
+          {tourStep === 3 && <TourTooltip title={t('tour.font_size')} desc={t('tour.font_size_desc')} />}
         </div>
 
         {/* Step 4: Language */}
@@ -236,7 +236,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           >
             <Globe size={18} /> <span className="text-[0.65rem] font-bold uppercase">{SUPPORTED_LANGUAGES.find(l => l.code === language)?.label || language}</span>
           </button>
-          {tourStep === 4 && <TourTooltip title="Language" desc="Change the app language here!" isLast={true} />}
+          {tourStep === 4 && <TourTooltip title={t('settings.language')} desc={t('tour.language_desc')} isLast={true} />}
 
           {isLangMenuOpen && (
             <>
@@ -280,13 +280,13 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 <h3 className="text-xl font-bold text-gray-700 dark:text-gray-100">
                   {showReminderSettings === 'daily' ? t('daily_session') : t('traditional_yoga')}
                 </h3>
-                <p className="text-xs text-gray-400">Set your alarm</p>
+                <p className="text-xs text-gray-400">{t('reminder.set_alarm')}</p>
               </div>
             </div>
 
             <div className="space-y-4">
               <div className="flex items-center justify-between bg-gray-50 dark:bg-slate-700 p-4 rounded-2xl">
-                <span className="font-bold text-gray-600 dark:text-gray-200">Enable Reminders</span>
+                <span className="font-bold text-gray-600 dark:text-gray-200">{t('reminder.enable')}</span>
                 <button
                   onClick={() => toggleReminder(showReminderSettings as 'daily' | 'traditional')}
                   className={`w-14 h-8 rounded-full p-1 transition-colors duration-300 relative ${remindersEnabled[showReminderSettings as 'daily' | 'traditional'] ? (showReminderSettings === 'daily' ? 'bg-pink-500' : 'bg-violet-500') : 'bg-gray-300 dark:bg-gray-600'}`}
@@ -306,7 +306,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                         : 'border-transparent bg-gray-50 dark:bg-slate-700 text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-600 hover:scale-105'
                         }`}
                     >
-                      {reminderMinutes === mins && <Check size={14} />} {mins} Mins
+                      {reminderMinutes === mins && <Check size={14} />} {mins} {t('reminder.mins')}
                     </button>
                   ))}
                 </div>
@@ -316,7 +316,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 onClick={() => setShowReminderSettings(null)}
                 className="w-full bg-gray-800 dark:bg-slate-900 text-white font-bold py-3 rounded-xl mt-2 hover:bg-gray-700 transition-transform active:scale-95"
               >
-                Save Settings
+                {t('reminder.save')}
               </button>
             </div>
           </div>
@@ -340,7 +340,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           </div>
           <div className="min-w-0">
             <div className="text-xl font-black text-gray-800 dark:text-gray-100 leading-none truncate">{rewards.points}</div>
-            <div className="text-[0.65rem] font-bold text-purple-400 uppercase truncate">{t('points')} (Lvl {rewards.level})</div>
+            <div className="text-[0.65rem] font-bold text-purple-400 uppercase truncate">{t('points')} ({t('level')} {rewards.level})</div>
           </div>
         </div>
       </div>
@@ -363,7 +363,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 mt-4 bg-white text-pink-600 text-xs font-bold px-5 py-2.5 rounded-full hover:bg-gray-50 transition-all shadow-sm active:scale-95 hover:scale-105"
             >
-              Join Now <ArrowRight size={12} className="rtl:rotate-180" />
+              {t('notification.join_now')} <ArrowRight size={12} className="rtl:rotate-180" />
             </a>
           </div>
           <button
@@ -394,12 +394,12 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         <div className="relative z-10 w-full pe-28 sm:pe-36 md:pe-48 text-start pb-2">
           <div className="flex items-center gap-2 mb-2 opacity-90">
             <Smile className="w-4 h-4 animate-spin-slow" />
-            <span className="text-[0.6rem] font-bold uppercase tracking-widest">Wellness Partner</span>
+            <span className="text-[0.6rem] font-bold uppercase tracking-widest">{t('home.wellness_partner')}</span>
           </div>
           {/* Main Heading Text */}
-          <h2 className="text-2xl font-bold mb-2 leading-tight text-white drop-shadow-sm whitespace-pre-wrap">Ignite Your Inner Joy</h2>
+          <h2 className="text-2xl font-bold mb-2 leading-tight text-white drop-shadow-sm whitespace-pre-wrap">{t('home.welcome')}</h2>
           <p className="text-white/90 text-xs mb-4 font-medium leading-relaxed drop-shadow-md text-shadow-sm max-w-[200px]">
-            Boost immunity & relieve stress with expert guidance from Suman Suneja.
+            {t('home.subtitle')}
           </p>
           <button
             onClick={() => onNavigate(ViewState.COACH)}
@@ -430,16 +430,16 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
 
           <div className="flex-1">
             <h3 className="text-2xl font-bold text-[#333333] dark:text-white mb-2 flex items-center justify-center md:justify-start gap-2">
-              Talk to Suman AI <Sparkles size={20} className="text-yellow-400 animate-spin-slow" />
+              {t('home.talk_ai')} <Sparkles size={20} className="text-yellow-400 animate-spin-slow" />
             </h3>
             <p className={`${currentTheme.TEXT_PRIMARY} dark:text-gray-300 text-sm font-medium leading-relaxed mb-4 max-w-md mx-auto md:mx-0`}>
-              Experience the world's first real-time Laughter Yoga AI. Have a conversation, get instant feedback, and laugh together!
+              {t('home.ai_desc')}
             </p>
             <button
               onClick={openWidget}
               className={`${currentTheme.LIVE_BTN} w-full md:w-auto font-bold py-3 px-8 rounded-xl active:scale-95 transition-all flex items-center justify-center gap-2 text-base`}
             >
-              Start Live Interaction <ArrowRight size={18} />
+              {t('home.start_live')} <ArrowRight size={18} />
             </button>
           </div>
         </div>
@@ -451,7 +451,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           <div className="p-1.5 bg-pink-100 rounded-lg">
             <Video size={18} className="text-pink-500" />
           </div>
-          <h3 className={`font-bold ${currentTheme.TEXT_PRIMARY} dark:text-gray-200`}>Live Sessions</h3>
+          <h3 className={`font-bold ${currentTheme.TEXT_PRIMARY} dark:text-gray-200`}>{t('home.live_sessions')}</h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -481,21 +481,21 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
               <div className="space-y-1.5 mb-4">
                 <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
                   <Globe size={14} className={`${currentTheme.SESSION_1_ACCENT} shrink-0`} />
-                  <span>Dubai: <span className="text-gray-700 dark:text-gray-200 font-bold">6:00 - 7:00 AM</span></span>
+                  <span>{t('home.dubai')}: <span className="text-gray-700 dark:text-gray-200 font-bold">6:00 - 7:00 AM</span></span>
                 </div>
                 <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
                   <Globe size={14} className={`${currentTheme.SESSION_1_ACCENT} shrink-0`} />
-                  <span>India: <span className="text-gray-700 dark:text-gray-200 font-bold">7:30 - 8:30 AM</span></span>
+                  <span>{t('home.india')}: <span className="text-gray-700 dark:text-gray-200 font-bold">7:30 - 8:30 AM</span></span>
                 </div>
               </div>
 
               <div className={`${currentTheme.SESSION_1_BG}/50 dark:bg-slate-700/50 rounded-xl p-3 mb-4 space-y-1`}>
                 <div className="flex justify-between text-xs flex-wrap gap-1">
-                  <span className="text-gray-400 font-bold">Meeting ID</span>
+                  <span className="text-gray-400 font-bold">{t('home.meeting_id')}</span>
                   <span className="font-mono font-bold text-gray-600 dark:text-gray-300">341 527 2874</span>
                 </div>
                 <div className="flex justify-between text-xs flex-wrap gap-1">
-                  <span className="text-gray-400 font-bold">Passcode</span>
+                  <span className="text-gray-400 font-bold">{t('home.passcode')}</span>
                   <span className="font-mono font-bold text-gray-600 dark:text-gray-300">12345</span>
                 </div>
               </div>
@@ -537,16 +537,16 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
               <div className="space-y-1.5 mb-4">
                 <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
                   <Globe size={14} className={`${currentTheme.SESSION_2_ACCENT} shrink-0`} />
-                  <span>Dubai: <span className="text-gray-700 dark:text-gray-200 font-bold">6:45 - 7:45 AM</span></span>
+                  <span>{t('home.dubai')}: <span className="text-gray-700 dark:text-gray-200 font-bold">6:45 - 7:45 AM</span></span>
                 </div>
                 <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
                   <Globe size={14} className={`${currentTheme.SESSION_2_ACCENT} shrink-0`} />
-                  <span>India: <span className="text-gray-700 dark:text-gray-200 font-bold">8:15 - 9:15 AM</span></span>
+                  <span>{t('home.india')}: <span className="text-gray-700 dark:text-gray-200 font-bold">8:15 - 9:15 AM</span></span>
                 </div>
               </div>
 
               <div className={`${currentTheme.SESSION_2_BG}/50 dark:bg-slate-700/50 rounded-xl p-3 mb-4 flex items-center justify-between flex-wrap gap-1`}>
-                <span className="text-gray-400 font-bold text-xs">Passcode</span>
+                <span className="text-gray-400 font-bold text-xs">{t('home.passcode')}</span>
                 <span className="font-mono font-bold text-gray-600 dark:text-gray-300 flex items-center gap-1">
                   <Lock size={12} className={`${currentTheme.SESSION_2_ACCENT}`} /> 536805
                 </span>
