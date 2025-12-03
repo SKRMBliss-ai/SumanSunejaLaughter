@@ -492,7 +492,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
               <div className={`${currentTheme.SESSION_1_BG}/50 dark:bg-slate-700/50 rounded-xl p-3 mb-4 space-y-1`}>
                 <div className="flex justify-between text-xs flex-wrap gap-1">
                   <span className="text-gray-400 font-bold">{t('home.meeting_id')}</span>
-                  <span className="font-mono font-bold text-gray-600 dark:text-gray-300">341 527 2874</span>
+                  <span className="font-mono font-bold text-gray-600 dark:text-gray-300">953 306 4234</span>
                 </div>
                 <div className="flex justify-between text-xs flex-wrap gap-1">
                   <span className="text-gray-400 font-bold">{t('home.passcode')}</span>
@@ -501,7 +501,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
               </div>
 
               <a
-                href="https://zoom.us/j/3415272874"
+                href="https://app.zoom.us/wc/9533064234/join?fromPWA=1&_x_zm_rtaid=Vmx05wF_R-W9lGnlqk_iyg.1764772854826.74f3c13599452a215cdc1149ec6b7633&_x_zm_rhtaid=150"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`w-full ${currentTheme.BUTTON} font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 text-sm hover:scale-[1.02]`}
@@ -545,15 +545,19 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 </div>
               </div>
 
-              <div className={`${currentTheme.SESSION_2_BG}/50 dark:bg-slate-700/50 rounded-xl p-3 mb-4 flex items-center justify-between flex-wrap gap-1`}>
-                <span className="text-gray-400 font-bold text-xs">{t('home.passcode')}</span>
-                <span className="font-mono font-bold text-gray-600 dark:text-gray-300 flex items-center gap-1">
-                  <Lock size={12} className={`${currentTheme.SESSION_2_ACCENT}`} /> 536805
-                </span>
+              <div className={`${currentTheme.SESSION_2_BG}/50 dark:bg-slate-700/50 rounded-xl p-3 mb-4 space-y-1`}>
+                <div className="flex justify-between text-xs flex-wrap gap-1">
+                  <span className="text-gray-400 font-bold">{t('home.meeting_id')}</span>
+                  <span className="font-mono font-bold text-gray-600 dark:text-gray-300">929 4672 2663</span>
+                </div>
+                <div className="flex justify-between text-xs flex-wrap gap-1">
+                  <span className="text-gray-400 font-bold">{t('home.passcode')}</span>
+                  <span className="font-mono font-bold text-gray-600 dark:text-gray-300">536805</span>
+                </div>
               </div>
 
               <a
-                href="https://zoom.us/join"
+                href="https://zoom.us/j/92946722663?pwd=NFAyNDVHTlJPdTdDbFlvcWlCUFFRZz09"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`w-full ${currentTheme.BUTTON_SECONDARY} font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 text-sm hover:scale-[1.02]`}
