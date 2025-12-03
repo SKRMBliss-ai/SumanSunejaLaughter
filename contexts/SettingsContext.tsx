@@ -201,7 +201,7 @@ const translations: Record<Language, Record<string, string>> = {
         'reminder.save': 'Save Settings',
         'notification.join_now': 'Join Now',
         'home.wellness_partner': 'Wellness Partner',
-        'home.talk_ai': 'Talk to Suman AI',
+        'home.talk_ai': 'Talk to Suman AI (Updated)',
         'home.ai_desc': "Experience the world's first real-time Laughter Yoga AI. Have a conversation, get instant feedback, and laugh together!",
         'home.start_live': 'Start Live Interaction',
         'home.live_sessions': 'Live Sessions',
