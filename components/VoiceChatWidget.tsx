@@ -120,6 +120,7 @@ export const VoiceChatWidget: React.FC<{ onClose?: () => void }> = ({ onClose })
     const handleTextQuery = async (text: string) => {
         if (!text.trim()) return;
 
+        console.log("handleTextQuery started with:", text);
         setIsProcessing(true);
         setReplyText(null);
         setAudioUrl(null);
@@ -127,11 +128,15 @@ export const VoiceChatWidget: React.FC<{ onClose?: () => void }> = ({ onClose })
 
         try {
             // 1. Get Text Response
+            console.log("Calling getChatResponse...");
             const responseText = await getChatResponse([], text);
+            console.log("getChatResponse result:", responseText);
             setReplyText(responseText);
 
             // 2. Generate Audio
+            console.log("Calling generateSpeech...");
             const audioBase64 = await generateSpeech(responseText, 'Kore');
+            console.log("generateSpeech result (length):", audioBase64 ? audioBase64.length : 'null');
             playAudioResponse(audioBase64);
 
         } catch (e) {

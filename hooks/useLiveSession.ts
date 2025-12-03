@@ -140,6 +140,10 @@ export const useLiveSession = ({ onSessionEnd, onError, onAudioStart }: UseLiveS
           4. Keep your responses short, punchy, and filled with laughter sounds. 
           5. Be spontaneous and fun. Do not give long lectures. Just laugh and guide.`;
 
+            // Create a promise that resolves when the connection is open
+            let resolveOpen: () => void;
+            const openPromise = new Promise<void>((resolve) => { resolveOpen = resolve; });
+
             const session = await ai.live.connect({
                 model: 'gemini-2.0-flash-exp', // Best model for Live Audio
                 config: {
@@ -191,12 +195,20 @@ export const useLiveSession = ({ onSessionEnd, onError, onAudioStart }: UseLiveS
                             const pcmBlob = createBlob(inputData);
                             // Use the ref which is set after connect resolves
                             if (liveSessionRef.current) {
-                                liveSessionRef.current.sendRealtimeInput({ media: pcmBlob });
+                                try {
+                                    liveSessionRef.current.sendRealtimeInput({ media: pcmBlob });
+                                } catch (e) {
+                                    // Ignore errors if socket is closed/closing
+                                    // console.warn("Failed to send audio frame:", e);
+                                }
                             }
                         };
 
                         source.connect(processor);
                         processor.connect(liveInputContextRef.current.destination);
+
+                        // Signal that connection is open
+                        if (resolveOpen) resolveOpen();
                     },
                     onmessage: async (message: LiveServerMessage) => {
                         const base64Audio = message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
@@ -231,7 +243,8 @@ export const useLiveSession = ({ onSessionEnd, onError, onAudioStart }: UseLiveS
                             if (onAudioStart) onAudioStart();
                         }
                     },
-                    onclose: () => {
+                    onclose: (event: any) => {
+                        console.log("Live session closed", event);
                         stopSession();
                     },
                     onerror: (err) => {
@@ -244,13 +257,16 @@ export const useLiveSession = ({ onSessionEnd, onError, onAudioStart }: UseLiveS
 
             liveSessionRef.current = session;
 
+            // Wait for the connection to be fully open before sending the trigger message
+            await openPromise;
+
             // Trigger AI to speak immediately
-            try {
-                // @ts-ignore
-                await session.send("Hello, start the session now.");
-            } catch (e) {
-                console.warn("Failed to send initial trigger message:", e);
-            }
+            // session.send is throwing TypeError, so we rely on system instruction
+            console.log("Session initialized. Available methods:", Object.keys(session));
+            // console.log("Session prototype methods:", Object.getOwnPropertyNames(Object.getPrototypeOf(session)));
+
+            // Optional: Send a silent frame or empty input to 'wake' the connection if needed
+            // await session.sendRealtimeInput({ media: { mimeType: "audio/pcm;rate=16000", data: "" } });
 
         } catch (err) {
             console.error(err);
