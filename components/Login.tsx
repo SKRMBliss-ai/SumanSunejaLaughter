@@ -271,7 +271,7 @@ export const Login: React.FC = () => {
                     Ha Ha Ha!
                 </div>
             </div>
-            <h1 className="mt-6 text-3xl font-fredoka font-bold text-gray-800 tracking-tight">Laughter Hub</h1>
+            <h1 className="mt-6 text-3xl font-fredoka font-bold text-gray-800 tracking-tight">Laughterr Hub</h1>
         </div>
 
         <div className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/60 animate-fade-in-up delay-200">
