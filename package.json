@@ -13,6 +13,7 @@
     "axios": "^1.13.2",
     "firebase": "^12.6.0",
     "lucide-react": "^0.554.0",
+    "onnxruntime-web": "^1.23.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },

@@ -5,7 +5,8 @@ import { rateLaughter, getGuidedSessionScript, generateSpeech, createAudioBuffer
 import { LaughterScore } from '../types';
 import { addPoints } from '../services/rewardService';
 import { useSettings } from '../contexts/SettingsContext';
-import { useLiveSession } from '../hooks/useLiveSession';
+import { useLiveSessionV3 } from '../hooks/useLiveSessionV3';
+import { audioService } from '../services/audioService';
 import { VoiceChatWidget } from './VoiceChatWidget';
 
 interface HistoryItem {
@@ -127,7 +128,8 @@ export const LaughterCoach: React.FC = () => {
     } catch (e) { console.warn("Prefetch failed", e); }
   };
 
-  const { startSession: startLiveSessionLowLatency, stopSession: stopLiveSessionLowLatency, isSessionActive: isLiveSessionActive, isLoading: isLiveSessionLoading, volumeLevel } = useLiveSession({
+
+  const { startSession: startLiveSessionLowLatency, stopSession: stopLiveSessionLowLatency, isSessionActive: isLiveSessionActive, isLoading: isLiveSessionLoading, volumeLevel } = useLiveSessionV3({
     onSessionEnd: () => { stopSession(); },
     onError: (err) => { setError(err); },
     onAudioStart: () => { if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); } }
@@ -135,7 +137,7 @@ export const LaughterCoach: React.FC = () => {
 
   const startLiveSession = async () => {
     cleanupAudio();
-    playImmediateGreeting(t('coach.live_session_start'));
+    audioService.playLocalGreeting(t('coach.live_session_start'));
     const apiKey = process.env.API_KEY;
     if (!apiKey) { setError(t('coach.live_unavailable')); setIsMissingKey(true); return; }
     setSessionType('LIVE'); setIsSessionActive(true); startLiveSessionLowLatency(apiKey);
