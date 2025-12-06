@@ -4,6 +4,14 @@ import { getChatResponse } from '../services/geminiService';
 import { ChatMessage } from '../types';
 import { useSettings } from '../contexts/SettingsContext';
 
+const PREDEFINED_PROMPTS = [
+  "What is Laughter Yoga?",
+  "How to relieve stress?",
+  "Tell me a joke!",
+  "Benefits of laughing?",
+  "Book a session"
+];
+
 export const SumanAI: React.FC = () => {
   // Destructure colorTheme to conditionally style the button
   const { currentTheme, colorTheme } = useSettings();
@@ -22,10 +30,11 @@ export const SumanAI: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+  const handleSend = async (text?: string) => {
+    const messageText = typeof text === 'string' ? text : input;
+    if (!messageText.trim() || isLoading) return;
 
-    const userMsg = { role: 'user', text: input } as ChatMessage;
+    const userMsg = { role: 'user', text: messageText } as ChatMessage;
     setMessages(prev => [...prev, userMsg]);
     setInput('');
     setIsLoading(true);
@@ -85,6 +94,25 @@ export const SumanAI: React.FC = () => {
       </div>
 
       <div className={`p-4 bg-[#FFF8F0] dark:bg-slate-800 border-t ${currentTheme.VIDEO_BORDER} dark:border-slate-700`}>
+        {/* Predefined Prompts */}
+        <div className="flex gap-2 mb-3 overflow-x-auto pb-2 hide-scrollbar">
+          {PREDEFINED_PROMPTS.map((prompt, index) => (
+            <button
+              key={index}
+              onClick={() => handleSend(prompt)}
+              disabled={isLoading}
+              className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-colors border shadow-sm flex-shrink-0
+                ${colorTheme === 'pastel'
+                  ? 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+                  : 'bg-white text-[#8B3A3A] border-[#8B3A3A]/20 hover:bg-[#8B3A3A]/5'}
+                dark:bg-slate-700 dark:text-gray-200 dark:border-slate-600 dark:hover:bg-slate-600
+              `}
+            >
+              {prompt}
+            </button>
+          ))}
+        </div>
+
         <div className="flex items-center gap-2">
           <input
             type="text"
@@ -95,7 +123,7 @@ export const SumanAI: React.FC = () => {
             className={`flex-1 p-3 bg-white dark:bg-slate-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C3B8D5] text-sm text-gray-700 dark:text-gray-100 border border-gray-100 dark:border-slate-700`}
           />
           <button
-            onClick={handleSend}
+            onClick={() => handleSend()}
             disabled={isLoading}
             // Button Style: Red Brick for brand theme, standard secondary for pastel
             className={`p-3 ${colorTheme === 'pastel' ? currentTheme.BUTTON_SECONDARY : 'bg-[#8B3A3A] hover:bg-[#7a302a]'} text-white rounded-xl disabled:opacity-50 transition-colors shadow-md`}
