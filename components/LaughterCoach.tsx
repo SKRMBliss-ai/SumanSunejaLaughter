@@ -15,23 +15,20 @@ interface HistoryItem {
   energyLevel: string;
 }
 
-// --- Audio Helpers for Live API ---
+// --- Audio Helpers ---
 function createBlob(data: Float32Array): { data: string; mimeType: string } {
   const l = data.length;
   const int16 = new Int16Array(l);
   for (let i = 0; i < l; i++) {
-    // Clamp values to [-1, 1] before scaling to avoid wrapping artifacts
     const s = Math.max(-1, Math.min(1, data[i]));
     int16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
   }
-
   let binary = '';
   const bytes = new Uint8Array(int16.buffer);
   const len = bytes.byteLength;
   for (let i = 0; i < len; i++) {
     binary += String.fromCharCode(bytes[i]);
   }
-
   return {
     data: btoa(binary),
     mimeType: 'audio/pcm;rate=16000',
@@ -49,10 +46,9 @@ function decode(base64: string) {
 }
 
 export const LaughterCoach: React.FC = () => {
-  const { t, currentTheme } = useSettings();
+  const { t, currentTheme, colorTheme } = useSettings();
 
-  // Main modes
-  const [isRecording, setIsRecording] = useState(false); // For Score Analyzer
+  const [isRecording, setIsRecording] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [scoreData, setScoreData] = useState<LaughterScore | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -60,31 +56,21 @@ export const LaughterCoach: React.FC = () => {
   const [showFeedback, setShowFeedback] = useState(false);
   const [showVoiceChat, setShowVoiceChat] = useState(false);
   const [usingOfflineVoice, setUsingOfflineVoice] = useState(false);
-
-  // Session States
   const [isSessionLoading, setIsSessionLoading] = useState(false);
   const [isSessionActive, setIsSessionActive] = useState(false);
   const [sessionType, setSessionType] = useState<'LIVE' | 'QUICK' | null>(null);
-
-  // Use ref to track session type inside callbacks (avoiding stale closures)
   const sessionTypeRef = useRef<'LIVE' | 'QUICK' | null>(null);
-
-  // Audio Refs
-  const audioContextRef = useRef<AudioContext | null>(null); // For playback
-  const liveInputContextRef = useRef<AudioContext | null>(null); // For mic input (16kHz)
-  const sourceRef = useRef<AudioBufferSourceNode | null>(null); // For legacy TTS playback
-  const liveSessionRef = useRef<any>(null); // To store the active session
-  const nextStartTimeRef = useRef<number>(0); // For scheduling live audio chunks
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const liveInputContextRef = useRef<AudioContext | null>(null);
+  const sourceRef = useRef<AudioBufferSourceNode | null>(null);
+  const liveSessionRef = useRef<any>(null);
+  const nextStartTimeRef = useRef<number>(0);
   const inputProcessorRef = useRef<ScriptProcessorNode | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
-
-  // Pre-fetch Ref
   const introBufferRef = useRef<AudioBuffer | null>(null);
   const hasPrefetchedRef = useRef(false);
-
-  // History State
   const [history, setHistory] = useState<HistoryItem[]>(() => {
     try {
       const saved = localStorage.getItem('laughterHistory');
@@ -94,157 +80,86 @@ export const LaughterCoach: React.FC = () => {
     }
   });
 
-  // Init Audio Context for Playback
+  useEffect(() => { return () => { cleanupAudio(); }; }, []);
+  useEffect(() => { sessionTypeRef.current = sessionType; }, [sessionType]);
+  useEffect(() => { localStorage.setItem('laughterHistory', JSON.stringify(history)); }, [history]);
   useEffect(() => {
-    return () => {
-      cleanupAudio();
-    };
-  }, []);
-
-  // Sync ref with state
-  useEffect(() => {
-    sessionTypeRef.current = sessionType;
-  }, [sessionType]);
-
-  // Persist history changes
-  useEffect(() => {
-    localStorage.setItem('laughterHistory', JSON.stringify(history));
-  }, [history]);
-
-  // Visibility Change Listener - Stop session when tab is hidden
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.hidden && isSessionActive) {
-        stopSession();
-      }
-    };
-
+    const handleVisibilityChange = () => { if (document.hidden && isSessionActive) { stopSession(); } };
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
+    return () => { document.removeEventListener('visibilitychange', handleVisibilityChange); };
   }, [isSessionActive]);
 
   const cleanupAudio = () => {
-    if (sourceRef.current) sourceRef.current.stop();
+    if (sourceRef.current) {
+      try { sourceRef.current.stop(); } catch (e) { }
+    }
     window.speechSynthesis.cancel();
-
-    // Cleanup Live Session
-    if (liveSessionRef.current) {
-      liveSessionRef.current = null;
-    }
-
-    if (inputProcessorRef.current) {
-      inputProcessorRef.current.disconnect();
-      inputProcessorRef.current = null;
-    }
-
-    if (mediaStreamRef.current) {
-      mediaStreamRef.current.getTracks().forEach(track => track.stop());
-      mediaStreamRef.current = null;
-    }
-
-    if (liveInputContextRef.current) {
-      liveInputContextRef.current.close();
-      liveInputContextRef.current = null;
-    }
-
-    if (audioContextRef.current) {
-      audioContextRef.current.close();
-      audioContextRef.current = null;
-    }
+    if (liveSessionRef.current) liveSessionRef.current = null;
+    if (inputProcessorRef.current) { try { inputProcessorRef.current.disconnect(); } catch (e) { } inputProcessorRef.current = null; }
+    if (mediaStreamRef.current) { try { mediaStreamRef.current.getTracks().forEach(track => track.stop()); } catch (e) { } mediaStreamRef.current = null; }
+    if (liveInputContextRef.current) { try { liveInputContextRef.current.close(); } catch (e) { } liveInputContextRef.current = null; }
+    if (audioContextRef.current) { try { audioContextRef.current.close(); } catch (e) { } audioContextRef.current = null; }
   };
 
-  const handleFeedback = (rating: 'up' | 'down') => {
-    // In a real app, send this rating to backend
-    console.log(`User rated session: ${rating}`);
-    addPoints(5, t('coach.thanks_feedback'), 'COACH');
-    setShowFeedback(false);
-  };
+  const handleFeedback = (rating: 'up' | 'down') => { console.log(`User rated session: ${rating}`); addPoints(5, t('coach.thanks_feedback'), 'COACH'); setShowFeedback(false); };
 
-  // Helper for immediate feedback
   const playImmediateGreeting = (text: string) => {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = 1.0;
       utterance.lang = 'en-US';
-
       const voices = window.speechSynthesis.getVoices();
-      const femaleVoice = voices.find(v =>
-        (v.lang === 'en-US' && (v.name.includes('Female') || v.name.includes('Google') || v.name.includes('Zira')))
-      );
+      const femaleVoice = voices.find(v => (v.lang === 'en-US' && (v.name.includes('Female') || v.name.includes('Google') || v.name.includes('Zira'))));
       if (femaleVoice) utterance.voice = femaleVoice;
-
       window.speechSynthesis.speak(utterance);
     }
   };
 
-  // --- Pre-fetch Intro for Quick Session ---
   const prefetchIntro = async () => {
     if (hasPrefetchedRef.current) return;
     hasPrefetchedRef.current = true;
-
     try {
-      // Initialize Audio Context if needed
-      if (!audioContextRef.current) {
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-      }
-
+      if (!audioContextRef.current) { audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)(); }
       const introText = "Hello! Ready to laugh?";
       const audioBase64 = await generateSpeech(introText, 'Kore');
-
-      if (audioContextRef.current) {
-        const audioBuffer = createAudioBufferFromPCM(audioContextRef.current, audioBase64);
-        introBufferRef.current = audioBuffer;
-      }
-    } catch (e) {
-      console.warn("Prefetch failed", e);
-    }
+      if (audioContextRef.current) { const audioBuffer = createAudioBufferFromPCM(audioContextRef.current, audioBase64); introBufferRef.current = audioBuffer; }
+    } catch (e) { console.warn("Prefetch failed", e); }
   };
 
-  // --- Live Conversational Session (Refactored for Low Latency) ---
-  const {
-    startSession: startLiveSessionLowLatency,
-    stopSession: stopLiveSessionLowLatency,
-    isSessionActive: isLiveSessionActive,
-    isLoading: isLiveSessionLoading,
-    volumeLevel
-  } = useLiveSession({
-    onSessionEnd: () => {
-      stopSession(); // Call main stopSession to handle UI/Points
-    },
-    onError: (err) => {
-      setError(err);
-    },
-    onAudioStart: () => {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
-    }
+  const { startSession: startLiveSessionLowLatency, stopSession: stopLiveSessionLowLatency, isSessionActive: isLiveSessionActive, isLoading: isLiveSessionLoading, volumeLevel } = useLiveSession({
+    onSessionEnd: () => { stopSession(); },
+    onError: (err) => { setError(err); },
+    onAudioStart: () => { if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); } }
   });
 
-  // Wrapper to start session using the new hook
   const startLiveSession = async () => {
-    playImmediateGreeting("Live laughter session");
+    cleanupAudio();
+    playImmediateGreeting(t('coach.live_session_start'));
+    const apiKey = process.env.API_KEY;
+    if (!apiKey) { setError(t('coach.live_unavailable')); setIsMissingKey(true); return; }
+    setSessionType('LIVE'); setIsSessionActive(true); startLiveSessionLowLatency(apiKey);
+  };
+
+  // --- ROBUST QUICK SESSION HANDLER (With Fallback) ---
+  const handleQuickSession = async () => {
+
+    // 0. Check API Key
     const apiKey = process.env.API_KEY;
     if (!apiKey) {
       setError(t('coach.live_unavailable'));
       setIsMissingKey(true);
       return;
     }
+    // 1. Immediate Feedback (Browser TTS)
+    playImmediateGreeting(t('coach.quick_session_start'));
 
-    setSessionType('LIVE');
-    setIsSessionActive(true); // Set local UI state
-    startLiveSessionLowLatency(apiKey);
-  };
-
-  // --- Quick 1-Min Guided Session (TTS) ---
-  const handleQuickSession = async () => {
-    if (!introBufferRef.current) {
-      playImmediateGreeting("Starting quick session");
-    }
+    // 2. Reset State
     cleanupAudio();
+
+    // 2. Immediate feedback (Browser TTS)
+    playImmediateGreeting(t('coach.quick_session_start_2'));
+
     setIsSessionLoading(true);
     setIsSessionActive(true);
     setSessionType('QUICK');
@@ -253,151 +168,97 @@ export const LaughterCoach: React.FC = () => {
     setIsMissingKey(false);
 
     try {
+      // 3. Get Script
       const script = await getGuidedSessionScript();
 
-      // Split script into sentences for chunked streaming
-      // Matches periods, exclamation marks, question marks followed by space or end of string
-      const sentences = script.match(/[^.!?]+[.!?]+(\s|$)/g) || [script];
+      let audioBase64 = null;
 
-      // Initialize Audio Context
-      if (!audioContextRef.current) {
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-      }
-      if (audioContextRef.current.state === 'suspended') {
-        await audioContextRef.current.resume();
+      // 4. Try AI Generation first
+      try {
+        audioBase64 = await generateSpeech(script, 'Kore');
+      } catch (ttsErr: any) {
+        console.warn("AI TTS Failed/Rate Limited, switching to Browser TTS:", ttsErr);
       }
 
-      let currentSentenceIndex = 0;
-      let isPlaying = false;
-      const audioQueue: AudioBuffer[] = [];
-
-      // Play intro first if available
-      if (introBufferRef.current) {
-        const introSource = audioContextRef.current.createBufferSource();
-        introSource.buffer = introBufferRef.current;
-        introSource.connect(audioContextRef.current.destination);
-
-        // We treat it as the "current" source but we need to know when it ends
-        isPlaying = true;
-        sourceRef.current = introSource;
-
-        introSource.onended = () => {
-          playNextInQueue();
-        };
-        introSource.start(0);
-      }
-
-      // Function to process the queue
-      const playNextInQueue = () => {
-        if (audioQueue.length > 0 && audioContextRef.current) {
-          isPlaying = true;
-          const buffer = audioQueue.shift()!;
-          const source = audioContextRef.current.createBufferSource();
-          source.buffer = buffer;
-          source.connect(audioContextRef.current.destination);
-
-          source.onended = () => {
-            playNextInQueue();
-          };
-
-          sourceRef.current = source;
-          source.start(0);
-        } else {
-          isPlaying = false;
-          // If queue is empty but we haven't finished all sentences, we are buffering.
-          // If we finished all sentences, stop session.
-          if (currentSentenceIndex >= sentences.length) {
-            stopSession();
-          }
+      if (audioBase64) {
+        // --- AI AUDIO PATH ---
+        if (!audioContextRef.current) {
+          audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
         }
-      };
-
-      // Function to fetch and queue audio
-      const fetchAndQueueAudio = async (index: number) => {
-        if (index >= sentences.length) return;
-
-        try {
-          const text = sentences[index].trim();
-          if (!text) {
-            fetchAndQueueAudio(index + 1); // Skip empty
-            return;
-          }
-
-          const audioBase64 = await generateSpeech(text, 'Kore');
-
-          if (!audioContextRef.current) return;
-          const audioBuffer = createAudioBufferFromPCM(audioContextRef.current, audioBase64);
-
-          audioQueue.push(audioBuffer);
-
-          // If nothing is playing, start playing immediately
-          if (!isPlaying) {
-            // First chunk loaded! Stop loading spinner.
-            setIsSessionLoading(false);
-            playNextInQueue();
-          }
-
-          // Fetch next chunk
-          currentSentenceIndex++;
-          fetchAndQueueAudio(currentSentenceIndex);
-
-        } catch (err) {
-          console.warn("Error fetching chunk:", err);
-          // If error, just try next chunk or stop if critical
-          currentSentenceIndex++;
-          fetchAndQueueAudio(currentSentenceIndex);
+        if (audioContextRef.current.state === 'suspended') {
+          await audioContextRef.current.resume();
         }
-      };
 
-      // Start fetching the first chunk
-      // If we played intro, we are already "playing", so fetchAndQueueAudio will just queue.
-      // If we didn't play intro (no prefetch), it will start playing first chunk immediately.
-      fetchAndQueueAudio(0);
+        const audioBuffer = createAudioBufferFromPCM(audioContextRef.current, audioBase64);
+        const source = audioContextRef.current.createBufferSource();
+        source.buffer = audioBuffer;
+        source.connect(audioContextRef.current.destination);
 
-      // If we have intro, we stop loading immediately
-      if (introBufferRef.current) {
+        source.onended = () => stopSession();
+
+        window.speechSynthesis.cancel(); // Stop greeting
+        sourceRef.current = source;
+        source.start(0);
         setIsSessionLoading(false);
+
+      } else {
+        // --- FALLBACK BROWSER TTS PATH ---
+        setUsingOfflineVoice(true);
+        window.speechSynthesis.cancel(); // Stop greeting
+
+        const utterance = new SpeechSynthesisUtterance(script);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.1; // Slightly cheerful pitch
+
+        const voices = window.speechSynthesis.getVoices();
+        const femaleVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Google US English'));
+        if (femaleVoice) utterance.voice = femaleVoice;
+
+        utterance.onstart = () => setIsSessionLoading(false);
+        utterance.onend = () => stopSession();
+        utterance.onerror = (e) => {
+          console.error("Browser TTS failed", e);
+          stopSession();
+        };
+
+        window.speechSynthesis.speak(utterance);
       }
 
     } catch (e: any) {
-      console.error(e);
+      console.error("Critical Session Error:", e);
       setError(t('coach.session_error'));
       stopSession();
     }
   };
 
   const stopSession = () => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-    }
-    // If live session is active, stop it via hook
-    if (sessionTypeRef.current === 'LIVE') {
-      stopLiveSessionLowLatency();
+    if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); }
+
+    const completedSessionType = sessionTypeRef.current;
+    if (!completedSessionType && !isSessionActive) return;
+
+    sessionTypeRef.current = null; // Break loop
+
+    if (completedSessionType === 'LIVE') {
+      try { stopLiveSessionLowLatency(); } catch (e) { }
     }
 
     cleanupAudio();
-    const wasActive = isSessionActive;
-
     setIsSessionActive(false);
     setIsSessionLoading(false);
-
-    // Check which session was active using ref to ensure we capture state correctly in callbacks
-    const completedSessionType = sessionTypeRef.current;
     setSessionType(null);
 
-    if (completedSessionType && wasActive) {
+    if (completedSessionType) {
       addPoints(completedSessionType === 'LIVE' ? 30 : 20, t('coach.session_completed'), 'COACH');
-      // Show feedback modal with a slight delay
       setTimeout(() => setShowFeedback(true), 500);
     }
   };
 
-  // --- Recording Logic (Analyzer) ---
+  // --- RECORDING LOGIC ---
   const startRecording = async () => {
     setError(null);
     setScoreData(null);
     setIsMissingKey(false);
-
     if (isSessionActive) stopSession();
 
     try {
@@ -416,7 +277,7 @@ export const LaughterCoach: React.FC = () => {
         reader.readAsDataURL(audioBlob);
         reader.onloadend = async () => {
           const base64String = reader.result as string;
-          const base64Data = base64String.split(',')[1];
+          const base64Data = base64String.includes(',') ? base64String.split(',')[1] : base64String;
           analyzeAudio(base64Data, audioBlob.type || 'audio/webm');
         };
         stream.getTracks().forEach(track => track.stop());
@@ -425,16 +286,18 @@ export const LaughterCoach: React.FC = () => {
       mediaRecorder.start();
       setIsRecording(true);
     } catch (err) {
-      console.error(err);
+      console.error("Microphone error:", err);
       setError(t('coach.mic_permission'));
     }
   };
 
   const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
       setIsAnalyzing(true);
+    } else {
+      setIsRecording(false);
     }
   };
 
@@ -443,21 +306,17 @@ export const LaughterCoach: React.FC = () => {
       const result = await rateLaughter(base64, mimeType);
       setScoreData(result);
       if (result.score > 0) {
-        const newItem: HistoryItem = {
-          id: Date.now(),
-          timestamp: Date.now(),
-          score: result.score,
-          energyLevel: result.energyLevel
-        };
+        const newItem: HistoryItem = { id: Date.now(), timestamp: Date.now(), score: result.score, energyLevel: result.energyLevel };
         setHistory(prev => [newItem, ...prev]);
         addPoints(15, t('coach.laughter_analyzed'), 'COACH');
       }
     } catch (err: any) {
-      if (err.message === "MISSING_GEMINI_KEY") {
-        // Just show a fake score for fun if key is missing, instead of blocking
+      // Handle Quota/Error Fallback
+      const errorMsg = err.message || "";
+      if (errorMsg.includes("MISSING_GEMINI_KEY") || errorMsg.includes("429") || errorMsg.includes("Quota") || errorMsg.includes("RESOURCE_EXHAUSTED")) {
         setScoreData({
           score: 85,
-          feedback: "Even without my AI brain, I can tell that was joyful! (AI Offline Mode)",
+          feedback: t('coach.offline_feedback'),
           energyLevel: "High"
         });
         setUsingOfflineVoice(true);
@@ -469,9 +328,22 @@ export const LaughterCoach: React.FC = () => {
     }
   };
 
-  const clearHistory = () => {
-    if (window.confirm(t('coach.clear_confirm'))) {
-      setHistory([]);
+  const clearHistory = () => { if (window.confirm(t('coach.clear_confirm'))) { setHistory([]); } };
+
+  // --- BUTTON STYLING HELPERS ---
+  const getOutlineButtonStyle = () => {
+    if (colorTheme === 'pastel') {
+      return "bg-white text-[#5B5166] border-2 border-[#B8B8D0] hover:bg-[#B8B8D0] hover:text-white hover:border-[#B8B8D0]";
+    } else {
+      return "bg-white text-[#8B3A3A] border-2 border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-white hover:border-[#8B3A3A]";
+    }
+  };
+
+  const getActiveButtonStyle = () => {
+    if (colorTheme === 'pastel') {
+      return "bg-[#B8B8D0] text-white border-2 border-[#B8B8D0]";
+    } else {
+      return "bg-[#8B3A3A] text-white border-2 border-[#8B3A3A]";
     }
   };
 
@@ -485,63 +357,49 @@ export const LaughterCoach: React.FC = () => {
             <div className={`absolute top-0 left-0 w-full h-2 bg-gradient-to-r ${currentTheme.VIDEO_RING_1} ${currentTheme.VIDEO_RING_2}`}></div>
             <h3 className="text-xl font-fredoka font-bold text-gray-700 dark:text-gray-100 mb-2 mt-2">{t('coach.how_was_it')}</h3>
             <p className={`text-sm ${currentTheme.TEXT_PRIMARY} mb-6`}>{t('coach.help_improve')}</p>
-
             <div className="flex gap-4 justify-center">
-              <button
-                onClick={() => handleFeedback('down')}
-                className="p-4 rounded-2xl bg-red-50 dark:bg-red-900/30 text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50 transition-all active:scale-95 transform hover:-rotate-12 border border-red-100 dark:border-red-900/50"
-              >
-                <ThumbsDown size={32} />
-              </button>
-              <button
-                onClick={() => handleFeedback('up')}
-                className="p-4 rounded-2xl bg-green-50 dark:bg-green-900/30 text-green-500 hover:bg-green-100 dark:hover:bg-green-900/50 transition-all active:scale-95 transform hover:rotate-12 border border-green-100 dark:border-green-900/50"
-              >
-                <ThumbsUp size={32} />
-              </button>
+              <button onClick={() => handleFeedback('down')} className="p-4 rounded-2xl bg-red-50 dark:bg-red-900/30 text-red-400 hover:bg-red-100 transition-all active:scale-95 border border-red-100"><ThumbsDown size={32} /></button>
+              <button onClick={() => handleFeedback('up')} className="p-4 rounded-2xl bg-green-50 dark:bg-green-900/30 text-green-500 hover:bg-green-100 transition-all active:scale-95 border border-green-100"><ThumbsUp size={32} /></button>
             </div>
-
-            <button
-              onClick={() => setShowFeedback(false)}
-              className="mt-6 text-xs font-bold text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 underline decoration-dashed"
-            >
-              {t('coach.skip_feedback')}
-            </button>
+            <button onClick={() => setShowFeedback(false)} className="mt-6 text-xs font-bold text-gray-400 underline decoration-dashed">{t('coach.skip_feedback')}</button>
           </div>
+        </div>
+      )}
+
+      {/* Error Message (Dismissible) */}
+      {error && (
+        <div className="bg-red-100 border border-red-200 text-red-600 px-4 py-3 rounded-xl animate-fade-in-up flex items-center gap-2 max-w-sm w-full text-sm z-20">
+          <WifiOff size={16} />
+          <span className="flex-1">{error}</span>
+          <button onClick={() => setError(null)} className="ml-auto hover:bg-red-200 rounded-full p-1"><X size={14} /></button>
         </div>
       )}
 
       {/* Session Controls */}
       <div className="w-full max-w-sm space-y-3 animate-fade-in-up">
+
         {/* Live Session Button */}
         <button
           onClick={() => isSessionActive && sessionType === 'LIVE' ? stopSession() : startLiveSession()}
           disabled={isSessionLoading || isRecording || (isSessionActive && sessionType !== 'LIVE')}
-          className={`w-full p-4 rounded-2xl shadow-lg flex items-center justify-between transition-all transform active:scale-95 border-2 hover:scale-[1.02] ${isSessionActive && sessionType === 'LIVE'
-            ? 'bg-white dark:bg-slate-800 border-purple-400 ring-4 ring-purple-100 dark:ring-purple-900 text-purple-700 dark:text-purple-400'
-            : `bg-white dark:bg-slate-800 ${currentTheme.VIDEO_BORDER} text-purple-600 dark:text-purple-400 hover:border-purple-200 dark:hover:border-purple-800`
-            } ${isSessionActive && sessionType !== 'LIVE' ? 'opacity-50' : ''}`}
+          className={`w-full p-4 rounded-2xl shadow-lg flex items-center justify-between transition-all transform active:scale-95 border-2 hover:scale-[1.02] 
+            ${isSessionActive && sessionType === 'LIVE' ? getActiveButtonStyle() : getOutlineButtonStyle()}
+            ${isSessionActive && sessionType !== 'LIVE' ? 'opacity-50' : ''}
+          `}
         >
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-full ${isSessionActive && sessionType === 'LIVE' ? 'bg-purple-500 text-white' : `${currentTheme.ICON_BG} text-purple-600 dark:text-purple-300`}`}>
+            <div className={`p-2 rounded-full ${isSessionActive && sessionType === 'LIVE' ? 'bg-white/20 text-white' : `${currentTheme.ICON_BG} ${currentTheme.ICON_COLOR}`}`}>
               {isSessionLoading && sessionType === 'LIVE' ? <Loader2 size={24} className="animate-spin" /> :
                 isSessionActive && sessionType === 'LIVE' ? <StopCircle size={24} fill="currentColor" /> :
                   <Mic size={24} />}
             </div>
             <div className="text-left">
-              <h3 className="font-bold text-gray-800 dark:text-gray-100">
-                {isSessionActive && sessionType === 'LIVE' ? 'Stop Session' : 'Live Laughter Session'}
+              <h3 className="font-bold">
+                {isSessionActive && sessionType === 'LIVE' ? t('coach.stop_session') : t('coach.live_session_btn')}
               </h3>
-              <p className="text-xs opacity-70 text-gray-600 dark:text-gray-400">{t('coach.interactive')}</p>
+              <p className={`text-xs ${isSessionActive && sessionType === 'LIVE' ? 'opacity-80' : 'text-gray-500'}`}>{t('coach.interactive')}</p>
             </div>
           </div>
-          {isSessionActive && sessionType === 'LIVE' && (
-            <div className="flex gap-1 items-end h-4">
-              <div className="w-1 bg-purple-400 h-2 animate-[bounce_1s_infinite]"></div>
-              <div className="w-1 bg-purple-400 h-4 animate-[bounce_1.2s_infinite]"></div>
-              <div className="w-1 bg-purple-400 h-3 animate-[bounce_0.8s_infinite]"></div>
-            </div>
-          )}
         </button>
 
         {/* Quick Laugh Button */}
@@ -549,31 +407,26 @@ export const LaughterCoach: React.FC = () => {
           onMouseEnter={prefetchIntro}
           onClick={() => isSessionActive && sessionType === 'QUICK' ? stopSession() : handleQuickSession()}
           disabled={isSessionLoading || isRecording || (isSessionActive && sessionType !== 'QUICK')}
-          className={`w-full p-4 rounded-2xl shadow-lg flex items-center justify-between transition-all transform active:scale-95 border-2 hover:scale-[1.02] ${isSessionActive && sessionType === 'QUICK'
-            ? `bg-white dark:bg-slate-800 border-[#ABCEC9] ring-4 ring-[#ABCEC9]/20 text-[#ABCEC9]`
-            : `${currentTheme.BUTTON} border-transparent`
-            } ${isSessionActive && sessionType !== 'QUICK' ? 'opacity-50' : ''}`}
+          className={`w-full p-4 rounded-2xl shadow-lg flex items-center justify-between transition-all transform active:scale-95 border-2 hover:scale-[1.02]
+             ${isSessionActive && sessionType === 'QUICK' ? getActiveButtonStyle() : getOutlineButtonStyle()}
+             ${isSessionActive && sessionType !== 'QUICK' ? 'opacity-50' : ''}
+          `}
         >
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-full ${isSessionActive && sessionType === 'QUICK' ? 'bg-[#ABCEC9] text-white' : 'bg-white/20'}`}>
+            <div className={`p-2 rounded-full ${isSessionActive && sessionType === 'QUICK' ? 'bg-white/20 text-white' : `${currentTheme.ICON_BG} ${currentTheme.ICON_COLOR}`}`}>
               {isSessionLoading && sessionType === 'QUICK' ? <Loader2 size={24} className="animate-spin" /> :
                 isSessionActive && sessionType === 'QUICK' ? <StopCircle size={24} fill="currentColor" /> :
                   <Zap size={24} fill="currentColor" />}
             </div>
             <div className="text-left">
-              <h3 className={`font-bold ${isSessionActive && sessionType === 'QUICK' ? 'text-gray-800 dark:text-gray-100' : 'text-white'}`}>
-                {isSessionActive && sessionType === 'QUICK' ? 'Stop Session' : t('coach.quick_laugh')}
+              <h3 className="font-bold">
+                {isSessionActive && sessionType === 'QUICK' ? t('coach.stop_session') : t('coach.quick_laugh')}
               </h3>
-              <p className={`text-xs ${isSessionActive && sessionType === 'QUICK' ? 'opacity-70 text-gray-600 dark:text-gray-400' : 'text-white/80'}`}>{t('coach.guided_boost')}</p>
+              <p className={`text-xs ${isSessionActive && sessionType === 'QUICK' ? 'opacity-80' : 'text-gray-500'}`}>
+                {usingOfflineVoice ? t('coach.offline_voice_saver') : t('coach.guided_boost')}
+              </p>
             </div>
           </div>
-          {isSessionActive && sessionType === 'QUICK' && (
-            <div className="flex gap-1 items-end h-4">
-              <div className="w-1 bg-white h-2 animate-[bounce_1s_infinite]"></div>
-              <div className="w-1 bg-white h-4 animate-[bounce_1.2s_infinite]"></div>
-              <div className="w-1 bg-white h-3 animate-[bounce_0.8s_infinite]"></div>
-            </div>
-          )}
         </button>
 
       </div>
@@ -588,8 +441,8 @@ export const LaughterCoach: React.FC = () => {
         {/* Ripples */}
         {(isRecording || isSessionActive) && (
           <>
-            <div className={`absolute w-full h-full rounded-full opacity-20 animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite] ${sessionType === 'LIVE' ? 'bg-purple-300 dark:bg-purple-900' : currentTheme.VIDEO_RING_1}`}></div>
-            <div className={`absolute w-3/4 h-3/4 rounded-full opacity-30 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite] ${sessionType === 'LIVE' ? 'bg-purple-200 dark:bg-purple-800' : currentTheme.VIDEO_RING_2}`}></div>
+            <div className={`absolute w-full h-full rounded-full opacity-20 animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite] ${currentTheme.VIDEO_RING_1}`}></div>
+            <div className={`absolute w-3/4 h-3/4 rounded-full opacity-30 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite] ${currentTheme.VIDEO_RING_2}`}></div>
           </>
         )}
 
@@ -632,12 +485,12 @@ export const LaughterCoach: React.FC = () => {
         </div>
       </div>
 
-      {/* Controls */}
+      {/* Controls - Updated to use Outline Style */}
       <div className="space-y-4 w-full max-w-xs text-center z-10">
         {!isRecording && !isAnalyzing && !scoreData && !isSessionActive && (
           <button
             onClick={startRecording}
-            className={`w-full bg-white dark:bg-slate-800 border-2 ${currentTheme.VIDEO_BORDER} ${currentTheme.TEXT_ACCENT} hover:brightness-95 font-bold py-4 rounded-2xl shadow-md transform transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-3 text-lg animate-fade-in-up delay-400`}
+            className={`w-full font-bold py-4 rounded-2xl shadow-md transform transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-3 text-lg animate-fade-in-up delay-400 ${getOutlineButtonStyle()}`}
           >
             <Mic size={24} /> {t('coach.rate_my_laugh')}
           </button>
@@ -646,7 +499,7 @@ export const LaughterCoach: React.FC = () => {
         {isRecording && (
           <button
             onClick={stopRecording}
-            className={`w-full bg-white dark:bg-slate-800 border-2 ${currentTheme.VIDEO_BORDER} ${currentTheme.TEXT_PRIMARY} font-bold py-5 rounded-2xl shadow-lg transform transition active:scale-95 flex items-center justify-center gap-3 text-xl animate-pulse`}
+            className={`w-full font-bold py-5 rounded-2xl shadow-lg transform transition active:scale-95 flex items-center justify-center gap-3 text-xl animate-pulse ${getActiveButtonStyle()}`}
           >
             <Square fill="currentColor" size={20} /> {t('coach.stop_rate')}
           </button>

@@ -20,6 +20,7 @@ import { ViewState } from './types';
 import { Loader2 } from 'lucide-react';
 import { SettingsProvider, useSettings } from './contexts/SettingsContext';
 import { LiveWidgetProvider } from './contexts/LiveWidgetContext';
+import { IOSInstallPrompt } from './components/IOSInstallPrompt';
 
 const AppContent: React.FC = () => {
   const [currentView, setView] = useState<ViewState>(ViewState.HOME);
@@ -37,6 +38,33 @@ const AppContent: React.FC = () => {
     });
     return () => unsubscribe();
   }, []);
+
+  // Handle Browser Back Button
+  useEffect(() => {
+    // Set initial state if not set
+    if (!window.history.state) {
+      window.history.replaceState({ view: ViewState.HOME }, '');
+    }
+
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state && event.state.view) {
+        setView(event.state.view);
+      } else {
+        // Fallback to home if no state
+        setView(ViewState.HOME);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Custom Navigation function that pushes to history
+  const handleNavigate = (view: ViewState) => {
+    if (view === currentView) return;
+    window.history.pushState({ view }, '');
+    setView(view);
+  };
 
   if (loading) {
     return (
@@ -69,7 +97,7 @@ const AppContent: React.FC = () => {
   const renderView = () => {
     switch (currentView) {
       case ViewState.HOME:
-        return <Home onNavigate={setView} />;
+        return <Home onNavigate={handleNavigate} />;
       case ViewState.COACH:
         return <LaughterCoach />;
       case ViewState.GAMES:
@@ -81,15 +109,15 @@ const AppContent: React.FC = () => {
       case ViewState.CONTACT:
         return <Contact />;
       case ViewState.PROFILE:
-        return <Profile onNavigate={setView} />;
+        return <Profile onNavigate={handleNavigate} />;
       default:
-        return <Home onNavigate={setView} />;
+        return <Home onNavigate={handleNavigate} />;
     }
   };
 
   return (
     <div className={`min-h-screen ${currentTheme.APP_BG} dark:bg-slate-900 font-sans text-gray-800 dark:text-gray-100 flex flex-col transition-colors duration-500`}>
-      <Header onNavigate={setView} />
+      <Header onNavigate={handleNavigate} />
 
       <main className="flex-1 max-w-2xl mx-auto w-full bg-white/50 dark:bg-slate-800/50 min-h-screen shadow-2xl transition-colors duration-500">
         {renderView()}
@@ -97,8 +125,9 @@ const AppContent: React.FC = () => {
 
       <AmbientMusic />
       <HomeLiveWidget visible={currentView === ViewState.HOME} />
-      <Navigation currentView={currentView} setView={setView} />
+      <Navigation currentView={currentView} setView={handleNavigate} />
       <RewardPopup />
+      <IOSInstallPrompt />
     </div>
   );
 };

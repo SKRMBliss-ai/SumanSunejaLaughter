@@ -64,7 +64,11 @@ export const useLiveSession = ({ onSessionEnd, onError, onAudioStart }: UseLiveS
 
     const cleanupAudio = useCallback(() => {
         if (currentSourceRef.current) {
-            currentSourceRef.current.stop();
+            try {
+                currentSourceRef.current.stop();
+            } catch (e) {
+                // Ignore errors if already stopped or not started
+            }
             currentSourceRef.current = null;
         }
 
@@ -74,32 +78,40 @@ export const useLiveSession = ({ onSessionEnd, onError, onAudioStart }: UseLiveS
         }
 
         if (inputProcessorRef.current) {
-            inputProcessorRef.current.disconnect();
+            try {
+                inputProcessorRef.current.disconnect();
+            } catch (e) { }
             inputProcessorRef.current = null;
         }
 
         if (mediaStreamRef.current) {
-            mediaStreamRef.current.getTracks().forEach(track => track.stop());
+            try {
+                mediaStreamRef.current.getTracks().forEach(track => track.stop());
+            } catch (e) { }
             mediaStreamRef.current = null;
         }
 
         if (liveInputContextRef.current) {
-            liveInputContextRef.current.close();
+            try {
+                liveInputContextRef.current.close();
+            } catch (e) { }
             liveInputContextRef.current = null;
         }
 
         if (audioContextRef.current) {
-            audioContextRef.current.close();
+            try {
+                audioContextRef.current.close();
+            } catch (e) { }
             audioContextRef.current = null;
         }
     }, []);
 
-    const stopSession = useCallback(() => {
+    const stopSession = useCallback((notify = true) => {
         cleanupAudio();
         setIsSessionActive(false);
         setIsLoading(false);
         setVolumeLevel(0);
-        if (onSessionEnd) onSessionEnd();
+        if (notify && onSessionEnd) onSessionEnd();
     }, [cleanupAudio, onSessionEnd]);
 
     const startSession = useCallback(async (apiKey: string, customSystemInstruction?: string) => {
@@ -129,7 +141,7 @@ export const useLiveSession = ({ onSessionEnd, onError, onAudioStart }: UseLiveS
           5. Be spontaneous and fun. Do not give long lectures. Just laugh and guide.`;
 
             const session = await ai.live.connect({
-                model: 'gemini-2.0-flash-exp',
+                model: 'gemini-2.0-flash-exp', // Best model for Live Audio
                 config: {
                     responseModalities: [Modality.AUDIO],
                     speechConfig: {
@@ -224,7 +236,7 @@ export const useLiveSession = ({ onSessionEnd, onError, onAudioStart }: UseLiveS
                     },
                     onerror: (err) => {
                         console.error("Live session error", err);
-                        if (onError) onError("Connection lost");
+                        if (onError) onError(err.message || "Connection lost");
                         stopSession();
                     }
                 }

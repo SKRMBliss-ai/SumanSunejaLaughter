@@ -3,7 +3,12 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="LaughterHub">
+  <meta name="theme-color" content="#FEF4E6">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <title>Suman Suneja Laughter Hub</title>
   <script src="https://cdn.tailwindcss.com"></script>
   
@@ -30,6 +35,7 @@
     body {
       font-family: 'Lato', sans-serif;
       background-color: #FEF4E6;
+      overscroll-behavior-y: none;
     }
 
     h1,
@@ -164,6 +170,10 @@
     .hover-scale-bounce:hover {
       transform: scale(1.05);
       transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .pb-safe {
+      padding-bottom: env(safe-area-inset-bottom);
     }
   </style>
   <script type="importmap">
