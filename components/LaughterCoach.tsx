@@ -6,6 +6,7 @@ import { LaughterScore } from '../types';
 import { addPoints } from '../services/rewardService';
 import { useSettings } from '../contexts/SettingsContext';
 import { useLiveSessionV3 } from '../hooks/useLiveSessionV3';
+import { useLiveSessionVapi } from '../hooks/useLiveSessionVapi';
 import { audioService } from '../services/audioService';
 import { VoiceChatWidget } from './VoiceChatWidget';
 
@@ -129,18 +130,50 @@ export const LaughterCoach: React.FC = () => {
   };
 
 
-  const { startSession: startLiveSessionLowLatency, stopSession: stopLiveSessionLowLatency, isSessionActive: isLiveSessionActive, isLoading: isLiveSessionLoading, volumeLevel } = useLiveSessionV3({
+  // MODULAR SWITCH: Toggle this to switch between Gemini Live and Vapi
+  const USE_VAPI_IMPLEMENTATION = true; // Set to false to usage original Gemini Live
+
+  // Initialize both hooks (only one will typically "run" its effect fully or matter)
+  const geminiSession = useLiveSessionV3({
     onSessionEnd: () => { stopSession(); },
     onError: (err) => { setError(err); },
     onAudioStart: () => { if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); } }
   });
 
+  const vapiSession = useLiveSessionVapi({
+    onSessionEnd: () => { stopSession(); },
+    onError: (err) => {
+      // Force string conversion to prevent React render crashes
+      const msg = typeof err === 'string' ? err : JSON.stringify(err);
+      setError(msg);
+    },
+    onAudioStart: () => { if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); } }
+  });
+
+  // Dynamically select the active interface
+  const {
+    startSession: startLiveSessionLowLatency,
+    stopSession: stopLiveSessionLowLatency,
+    isSessionActive: isLiveSessionActive,
+    isLoading: isLiveSessionLoading,
+    volumeLevel
+  } = USE_VAPI_IMPLEMENTATION ? vapiSession : geminiSession;
+
   const startLiveSession = async () => {
     cleanupAudio();
     audioService.playLocalGreeting(t('coach.live_session_start'));
-    const apiKey = process.env.API_KEY;
-    if (!apiKey) { setError(t('coach.live_unavailable')); setIsMissingKey(true); return; }
-    setSessionType('LIVE'); setIsSessionActive(true); startLiveSessionLowLatency(apiKey);
+
+    // For Vapi we need public key in Env, for Gemini we need API key. 
+    // We'll grab the Gemini Key here just to satisfy the check, but Vapi hook relies on process.env.NEXT_PUBLIC_VAPI_KEY internally.
+    const apiKey = process.env.API_KEY || "placeholder_for_vapi";
+
+    if (!apiKey && !USE_VAPI_IMPLEMENTATION) { setError(t('coach.live_unavailable')); setIsMissingKey(true); return; }
+
+    setSessionType('LIVE');
+    setIsSessionActive(true);
+
+    // In Vapi mode, "apiKey" arg is ignored by our hook, so it's safe to pass
+    startLiveSessionLowLatency(apiKey);
   };
 
   // --- ROBUST QUICK SESSION HANDLER (With Fallback) ---

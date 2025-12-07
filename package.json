@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@google/genai": "^1.30.0",
+    "@vapi-ai/web": "^2.5.2",
     "axios": "^1.13.2",
     "firebase": "^12.6.0",
     "lucide-react": "^0.554.0",
