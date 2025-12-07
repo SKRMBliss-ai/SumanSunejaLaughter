@@ -21,6 +21,8 @@ steps:
       - 'VITE_YOUTUBE_API_KEY=${_VITE_YOUTUBE_API_KEY}'
       - '--build-arg'
       - 'VITE_YOUTUBE_CHANNEL_ID=${_VITE_YOUTUBE_CHANNEL_ID}'
+      - '--build-arg'
+      - 'VITE_VAPI_PUBLIC_KEY=${_VITE_VAPI_PUBLIC_KEY}'
       - '-t'
       - >-
         $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
@@ -57,6 +59,7 @@ options:
   logging: CLOUD_LOGGING_ONLY
 substitutions:
   _GEMINI_API_KEY: ''
+  _VITE_VAPI_PUBLIC_KEY: ''
   _VITE_YOUTUBE_API_KEY: ''
   _VITE_YOUTUBE_CHANNEL_ID: ''
   _DEPLOY_REGION: me-central1
