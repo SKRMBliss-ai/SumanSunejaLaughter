@@ -55,7 +55,9 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rew
     if (!rewards) return null;
 
     const dailyTarget = 50;
-    const dailyProgress = Math.min(rewards.points % 50, 50);
+    // Fix: If points is a multiple of 50 (and >0), show 50/50 (complete) instead of 0/50 (empty)
+    const remainder = rewards.points % dailyTarget;
+    const dailyProgress = (remainder === 0 && rewards.points > 0) ? dailyTarget : remainder;
 
     // Calculate Streak Metrics
     const history = rewards.activityHistory || [];
@@ -351,7 +353,11 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rew
                                                 alt={item.name}
                                                 className={`
                                                     w-full h-full object-contain transition-all duration-500
-                                                    ${isLocked ? 'opacity-90 scale-100' : 'scale-110 group-hover:scale-110 drop-shadow-xl'}
+                                                    ${item.id === 1 ? 'translate-y-3' : ''}
+                                                    ${item.id === 3
+                                                        ? (isLocked ? 'scale-[1.6] opacity-90' : 'scale-[1.6] group-hover:scale-[1.7] drop-shadow-xl')
+                                                        : (isLocked ? 'scale-100 opacity-90' : 'scale-110 group-hover:scale-110 drop-shadow-xl')
+                                                    }
                                                 `}
                                                 onError={(e) => {
                                                     (e.target as HTMLImageElement).src = `https://placehold.co/400x400/orange/white?text=${encodeURIComponent(item.name[0])}`;

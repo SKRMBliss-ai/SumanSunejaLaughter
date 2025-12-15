@@ -1,6 +1,6 @@
 import { RewardState, RewardEvent } from '../types';
 import { db, auth } from './firebase';
-import { doc, getDoc, setDoc, updateDoc, increment } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, increment, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 
 const REWARD_KEY = 'suman_rewards_v1';
 const EVENT_NAME = 'REWARD_EARNED';
@@ -162,18 +162,62 @@ const saveState = async (state: RewardState, syncToCloud = true) => {
     if (uid) {
       const userRef = doc(db, 'users', uid);
       try {
+        // Also save generic profile info for leaderboard
+        const user = auth.currentUser;
+
         await setDoc(userRef, {
           points: state.points,
           streak: state.streak,
           lastActiveDate: state.lastActiveDate,
           level: state.level,
           activityHistory: state.activityHistory,
-          lastUpdated: new Date()
+          lastUpdated: new Date(),
+          displayName: user?.displayName || 'Anonymous',
+          photoURL: user?.photoURL || null
         }, { merge: true });
       } catch (error) {
         // Silent fail
       }
     }
+  }
+};
+
+export interface LeaderboardUser {
+  rank: number;
+  name: string;
+  points: number;
+  streak: number;
+  avatar: string | null;
+  isCurrentUser: boolean;
+}
+
+export const getLeaderboardData = async (): Promise<LeaderboardUser[]> => {
+  try {
+    const usersRef = collection(db, 'users');
+    const q = query(usersRef, orderBy("points", "desc"), limit(50));
+    const querySnapshot = await getDocs(q);
+
+    const currentUserId = getCurrentUserId();
+
+    const leaderboard: LeaderboardUser[] = [];
+
+    let rank = 1;
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      leaderboard.push({
+        rank: rank++,
+        name: data.displayName || 'Anonymous',
+        points: data.points || 0,
+        streak: data.streak || 0,
+        avatar: data.photoURL || null,
+        isCurrentUser: doc.id === currentUserId
+      });
+    });
+
+    return leaderboard;
+  } catch (error) {
+    console.error("Error fetching leaderboard:", error);
+    return [];
   }
 };
 

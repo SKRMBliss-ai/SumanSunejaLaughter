@@ -3,6 +3,7 @@ import { Video, ArrowRight, Star, Bell, X, Sparkles, Smile, Globe, Calendar, Loc
 import { ViewState, RewardState } from '../types';
 import { getRewardState } from '../services/rewardService';
 import { RewardsModal } from './RewardsModal';
+import { LeaderboardModal } from './LeaderboardModal';
 import { useSettings, SUPPORTED_LANGUAGES, FontSize } from '../contexts/SettingsContext';
 import { useLiveWidget } from '../contexts/LiveWidgetContext';
 
@@ -24,6 +25,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
   const [isRewardsOpen, setIsRewardsOpen] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   // --- NEW: Tour State (0 = off, 1 = Dark Mode, 2 = Theme, 3 = Font, 4 = Lang) ---
   const [tourStep, setTourStep] = useState(0);
@@ -327,13 +329,20 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
 
       {/* Stats Cards - Pop In */}
       <div className="flex flex-wrap gap-3 animate-pop-in delay-100">
-        <div className={`flex-1 min-w-[140px] ${currentTheme.STAT_BG_1} dark:bg-slate-800 p-3 rounded-2xl flex items-center gap-3 shadow-sm relative group`}>
+        <div className={`flex-1 min-w-[140px] ${currentTheme.STAT_BG_1} dark:bg-slate-800 p-3 rounded-2xl flex items-center gap-3 shadow-sm relative group cursor-pointer hover:ring-2 hover:ring-orange-200 transition-all`} onClick={() => setIsRewardsOpen(true)}>
           <div className={`${currentTheme.STAT_ICON_BG_1} dark:bg-orange-900 p-2 rounded-xl shadow-sm shrink-0`}>
             <Flame size={20} fill="currentColor" className="animate-pulse" />
           </div>
           <div className="min-w-0">
             <div className="text-xl font-black text-gray-800 dark:text-gray-100 leading-none truncate">{rewards.streak}</div>
             <div className="text-[0.65rem] font-bold text-orange-400 uppercase truncate">{t('streak')}</div>
+          </div>
+          {/* Leaderboard Icon Button - Left Side */}
+          <div
+            onClick={(e) => { e.stopPropagation(); setShowLeaderboard(true); }}
+            className="absolute -top-2 -left-2 bg-gradient-to-br from-yellow-400 to-orange-500 p-2 rounded-full shadow-lg shadow-yellow-500/40 text-white animate-bounce-gentle ring-2 ring-white dark:ring-slate-800 z-10 hover:scale-110 transition-transform"
+          >
+            <Trophy size={18} fill="currentColor" />
           </div>
         </div>
 
@@ -345,9 +354,9 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             <div className="text-xl font-black text-gray-800 dark:text-gray-100 leading-none truncate">{rewards.points}</div>
             <div className="text-[0.65rem] font-bold text-purple-400 uppercase truncate">{t('points')}</div>
           </div>
-          {/* Gift Icon Button */}
-          <div className="bg-white dark:bg-slate-600 p-1.5 rounded-full shadow-sm text-pink-500 animate-bounce-gentle">
-            <Gift size={16} />
+          {/* Gift Icon Button - Enhanced Visibility */}
+          <div className="absolute -top-2 -right-2 bg-gradient-to-br from-pink-500 to-red-500 p-2 rounded-full shadow-lg shadow-pink-500/40 text-white animate-bounce-gentle ring-2 ring-white dark:ring-slate-800 z-10">
+            <Gift size={18} fill="currentColor" />
           </div>
         </div>
       </div>
@@ -617,6 +626,11 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         isOpen={isRewardsOpen}
         onClose={() => setIsRewardsOpen(false)}
         rewards={rewards}
+      />
+
+      <LeaderboardModal
+        isOpen={showLeaderboard}
+        onClose={() => setShowLeaderboard(false)}
       />
 
     </div>
