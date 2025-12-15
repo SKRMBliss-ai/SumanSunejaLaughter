@@ -100,7 +100,8 @@ export const checkDailyStreak = async () => {
   } else {
     // Streak broken or new user
     newStreak = 1;
-    // Don't alert for streak reset, just set it
+    pointsToAdd = 20; // Award points for logging in even if streak broken
+    dispatchReward({ pointsAdded: 20, message: "Daily Login Bonus! ☀️", type: 'STREAK' });
   }
 
   const newPoints = state.points + pointsToAdd;

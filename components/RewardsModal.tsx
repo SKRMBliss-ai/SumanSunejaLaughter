@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ShoppingBag, ExternalLink, Flame, Target, Trophy, Award, Check, Infinity, Lock, Share2, Zap } from 'lucide-react';
+import { X, ShoppingBag, ExternalLink, Flame, Target, Trophy, Award, Check, Infinity, Lock, Share2, Zap, Mic, Star, Gamepad2, PlayCircle } from 'lucide-react';
 import { useSettings } from '../contexts/SettingsContext';
 import { RewardState } from '../types';
 import { getLevelTitle, calculateLongestStreak, addPoints } from '../services/rewardService';
@@ -48,7 +48,7 @@ const MERCHANDISE = [
 export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rewards }) => {
     const { currentTheme } = useSettings();
     const [activeTab, setActiveTab] = useState<'journey' | 'shop'>('journey');
-    const [showPointsInfo, setShowPointsInfo] = useState(true);
+    const [showPointsInfo, setShowPointsInfo] = useState(false);
     const [isSharing, setIsSharing] = useState(false);
 
     if (!isOpen) return null;
@@ -127,8 +127,8 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rew
                     <button
                         onClick={() => setActiveTab('journey')}
                         className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 flex items-center justify-center gap-2 ${activeTab === 'journey'
-                                ? 'bg-white dark:bg-slate-800 shadow-md scale-[1.02] text-slate-900 dark:text-white'
-                                : 'text-slate-500 dark:text-gray-400 hover:bg-white/40'
+                            ? 'bg-white dark:bg-slate-800 shadow-md scale-[1.02] text-slate-900 dark:text-white'
+                            : 'text-slate-500 dark:text-gray-400 hover:bg-white/40'
                             }`}
                     >
                         <Trophy size={14} className={activeTab === 'journey' ? 'text-yellow-500 fill-yellow-500' : ''} />
@@ -137,8 +137,8 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rew
                     <button
                         onClick={() => setActiveTab('shop')}
                         className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all duration-300 flex items-center justify-center gap-2 ${activeTab === 'shop'
-                                ? 'bg-white dark:bg-slate-800 shadow-md scale-[1.02] text-slate-900 dark:text-white'
-                                : 'text-slate-500 dark:text-gray-400 hover:bg-white/40'
+                            ? 'bg-white dark:bg-slate-800 shadow-md scale-[1.02] text-slate-900 dark:text-white'
+                            : 'text-slate-500 dark:text-gray-400 hover:bg-white/40'
                             }`}
                     >
                         <ShoppingBag size={14} className={activeTab === 'shop' ? 'text-pink-500 fill-pink-500' : ''} />
@@ -264,9 +264,12 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rew
                                     <div className="px-4 pb-4 animate-in slide-in-from-top-2 duration-200">
                                         <div className="space-y-2">
                                             {[
-                                                { label: "Daily Login", points: "+10", icon: Check, action: null },
-                                                { label: "Complete Session", points: "+50", icon: Trophy, action: null },
-                                                { label: "7-Day Streak", points: "+100", icon: Flame, action: null },
+                                                { label: "Daily Login", points: "+20", icon: Check, action: null },
+                                                { label: "Quick 1-Min Laugh", points: "+20", icon: Zap, action: null },
+                                                { label: "Live Session", points: "+30", icon: Mic, action: null },
+                                                { label: "Rate My Laugh", points: "+15", icon: Star, action: null },
+                                                { label: "Play Games", points: "+10", icon: Gamepad2, action: null },
+                                                { label: "Watch Video", points: "+5", icon: PlayCircle, action: null },
                                                 { label: "Share App", points: "+20", icon: Share2, action: handleShareApp, highlight: true }
                                             ].map((item, idx) => (
                                                 <div
