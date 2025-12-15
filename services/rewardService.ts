@@ -12,7 +12,10 @@ const getInitialState = (): RewardState => {
   try {
     const saved = localStorage.getItem(REWARD_KEY);
     if (saved) {
-      return JSON.parse(saved);
+      const parsed = JSON.parse(saved);
+      // Migration: Ensure activityHistory exists
+      if (!parsed.activityHistory) parsed.activityHistory = [];
+      return parsed;
     }
   } catch (e) {
     // Silent fail
@@ -21,7 +24,8 @@ const getInitialState = (): RewardState => {
     points: 0,
     streak: 0,
     lastActiveDate: '',
-    level: 1
+    level: 1,
+    activityHistory: []
   };
 };
 
@@ -45,7 +49,8 @@ export const syncRewardsWithFirestore = async (): Promise<boolean> => {
         points: data.points || 0,
         streak: data.streak || 0,
         lastActiveDate: data.lastActiveDate || '',
-        level: data.level || 1
+        level: data.level || 1,
+        activityHistory: data.activityHistory || []
       };
 
       // Update local storage with remote data
@@ -69,28 +74,51 @@ export const checkDailyStreak = async () => {
   const today = new Date().toDateString();
   const lastDate = state.lastActiveDate;
 
-  // If already active today, do nothing
-  if (lastDate === today) return;
+  // Ensure history exists
+  const history = state.activityHistory || [];
+
+  // If already active today, do nothing (but ensure history is consistent)
+  if (lastDate === today) {
+    if (!history.includes(today)) {
+      const updatedHistory = [...history, today];
+      await saveState({ ...state, activityHistory: updatedHistory });
+    }
+    return;
+  }
 
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
 
   let newStreak = state.streak;
+  let pointsToAdd = 0;
 
   if (lastDate === yesterday.toDateString()) {
     // Continued streak
     newStreak += 1;
-    dispatchReward({ pointsAdded: 50, message: "Daily Streak Kept! 🔥", type: 'STREAK' });
+    pointsToAdd = 20;
+    dispatchReward({ pointsAdded: 20, message: "Daily Streak Kept! 🔥", type: 'STREAK' });
   } else {
     // Streak broken or new user
     newStreak = 1;
     // Don't alert for streak reset, just set it
   }
 
+  const newPoints = state.points + pointsToAdd;
+  const newLevel = Math.floor(newPoints / 500) + 1;
+
+  // Add today to history
+  const newHistory = [...history];
+  if (!newHistory.includes(today)) {
+    newHistory.push(today);
+  }
+
   const newState: RewardState = {
     ...state,
+    points: newPoints,
+    level: newLevel,
     streak: newStreak,
-    lastActiveDate: today
+    lastActiveDate: today,
+    activityHistory: newHistory
   };
 
   await saveState(newState);
@@ -100,13 +128,22 @@ export const addPoints = async (amount: number, message: string, type: RewardEve
   const state = getInitialState();
   const newPoints = state.points + amount;
   const newLevel = Math.floor(newPoints / 500) + 1;
+  const today = new Date().toDateString();
+
+  // Update history
+  const history = state.activityHistory || [];
+  const newHistory = [...history];
+  if (!newHistory.includes(today)) {
+    newHistory.push(today);
+  }
 
   const newState: RewardState = {
     ...state,
     points: newPoints,
     level: newLevel,
     // Update active date on any activity to ensure streak is maintained
-    lastActiveDate: new Date().toDateString()
+    lastActiveDate: today,
+    activityHistory: newHistory
   };
 
   await saveState(newState);
@@ -129,6 +166,7 @@ const saveState = async (state: RewardState, syncToCloud = true) => {
           streak: state.streak,
           lastActiveDate: state.lastActiveDate,
           level: state.level,
+          activityHistory: state.activityHistory,
           lastUpdated: new Date()
         }, { merge: true });
       } catch (error) {
@@ -151,4 +189,70 @@ export const onReward = (callback: (event: RewardEvent) => void) => {
 
   window.addEventListener(EVENT_NAME, handler);
   return () => window.removeEventListener(EVENT_NAME, handler);
+};
+
+// DEV TOOL: Simulate Streak
+// Usage: Open console, type window.simulateStreak(30)
+(window as any).simulateStreak = async (days: number) => {
+  console.log(`Simulating ${days} days streak...`);
+  const state = getInitialState();
+
+  // Logic: Day 1 = 0 bonus. Day 2..days = +20 per day.
+  const bonusDays = Math.max(0, days - 1);
+  const pointsEarned = bonusDays * 20;
+
+  // Generate history
+  const history: string[] = [];
+  for (let i = 0; i < days; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    history.push(d.toDateString());
+  }
+
+  const newState: RewardState = {
+    ...state,
+    streak: days,
+    points: state.points + pointsEarned,
+    level: Math.floor((state.points + pointsEarned) / 500) + 1,
+    lastActiveDate: new Date().toDateString(),
+    activityHistory: history
+  };
+
+  await saveState(newState);
+  window.location.reload(); // Force reload to see changes instantly
+};
+
+export const getLevelTitle = (points: number) => {
+  if (points < 500) return "Smiling Starter";
+  if (points < 1000) return "Giggle Generator";
+  if (points < 2000) return "Joyful Journeyer";
+  return "Laughter Master";
+};
+
+export const calculateLongestStreak = (history: string[]) => {
+  if (!history || history.length === 0) return 0;
+
+  // Convert to timestamps and sort
+  const timestamps = history.map(date => new Date(date).setHours(0, 0, 0, 0)).sort((a, b) => a - b);
+
+  // Remove duplicates
+  const uniqueTimestamps = [...new Set(timestamps)];
+
+  let longest = 1;
+  let current = 1;
+
+  for (let i = 1; i < uniqueTimestamps.length; i++) {
+    const diff = uniqueTimestamps[i] - uniqueTimestamps[i - 1];
+    const oneDay = 1000 * 60 * 60 * 24;
+
+    // Allow +/- 2 hours for DST shifts
+    if (Math.abs(diff - oneDay) < (1000 * 60 * 60 * 2)) {
+      current++;
+    } else {
+      longest = Math.max(longest, current);
+      current = 1;
+    }
+  }
+
+  return Math.max(longest, current);
 };

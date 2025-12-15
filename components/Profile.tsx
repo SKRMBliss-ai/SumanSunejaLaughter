@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { User, Camera, Save, Phone, LogOut, Sparkles, Check, X, Flame, Trophy, Zap, Calendar, TrendingUp, Moon, Sun, Globe, Type, Star, Award, Edit2 } from 'lucide-react';
+import { User, Camera, Save, Phone, LogOut, Sparkles, Check, X, Flame, Trophy, Zap, Calendar, TrendingUp, Moon, Sun, Globe, Type, Star, Award, Edit2, Infinity, History } from 'lucide-react';
 import { updateProfile } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import { ViewState, RewardState } from '../types';
-import { getRewardState } from '../services/rewardService';
+import { getRewardState, getLevelTitle } from '../services/rewardService';
 import { useSettings, SUPPORTED_LANGUAGES, FontSize } from '../contexts/SettingsContext';
 
 interface ProfileProps {
@@ -115,6 +115,37 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
     }
     setIsEditingName(false);
   };
+
+  const calculateLongestStreak = (history: string[]) => {
+    if (!history || history.length === 0) return 0;
+
+    // Convert to timestamps and sort
+    const timestamps = history.map(date => new Date(date).setHours(0, 0, 0, 0)).sort((a, b) => a - b);
+
+    // Remove duplicates
+    const uniqueTimestamps = [...new Set(timestamps)];
+
+    let longest = 1;
+    let current = 1;
+
+    for (let i = 1; i < uniqueTimestamps.length; i++) {
+      const diff = uniqueTimestamps[i] - uniqueTimestamps[i - 1];
+      const oneDay = 1000 * 60 * 60 * 24;
+
+      // Allow some variability for DST, so check if difference is roughly 24 hours
+      if (Math.abs(diff - oneDay) < (1000 * 60 * 60 * 2)) {
+        current++;
+      } else {
+        longest = Math.max(longest, current);
+        current = 1;
+      }
+    }
+
+    return Math.max(longest, current);
+  };
+
+  const longestStreak = calculateLongestStreak(rewards.activityHistory || []);
+  const totalActiveDays = (rewards.activityHistory || []).length;
 
   const fontSizes: { id: FontSize; label: string; px: string }[] = [
     { id: 'small', label: 'S', px: '14px' },
@@ -231,8 +262,9 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
                 <Edit2 size={16} className={`text-gray-300 group-hover:${currentTheme.TEXT_ACCENT} transition-colors`} />
               </div>
             )}
-            <div className="text-sm text-gray-500 font-medium bg-gray-100 dark:bg-slate-700 px-3 py-1 rounded-full inline-block">
-              {t('level')} {rewards.level} • {t('points')}: {rewards.points}
+
+            <div className="text-sm font-bold text-purple-600 bg-purple-50 dark:bg-purple-900/20 px-4 py-1.5 rounded-full inline-block mt-1 shadow-sm border border-purple-100 dark:border-purple-800">
+              {getLevelTitle(rewards.points)} <span className="text-gray-400 mx-1">•</span> <span className="text-gray-500 dark:text-gray-400 font-medium">{t('points')}: {rewards.points}</span>
             </div>
           </div>
 
@@ -262,11 +294,48 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
             </div>
           </div>
 
+          {/* New 'My Streaks' Section - Based on User Request */}
+          <div className="mb-6 bg-slate-800 text-white rounded-3xl p-5 shadow-lg relative overflow-hidden">
+
+            {/* Background decoration to match app feeling */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/20 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+
+            <h3 className="text-lg font-bold mb-4 relative z-10 flex items-center gap-2">
+              My Streaks
+            </h3>
+
+            <div className="grid grid-cols-3 gap-2 relative z-10">
+              {/* Total Active Days */}
+              <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-slate-700/50 hover:bg-slate-700 transition-colors">
+                <Infinity size={24} className="mb-2 text-blue-300" />
+                <span className="text-[0.65rem] font-medium opacity-60 uppercase tracking-widest mb-1">Total</span>
+                <span className="text-lg font-bold">{totalActiveDays}</span>
+                <span className="text-[0.65rem] opacity-50">days</span>
+              </div>
+
+              {/* Longest Streak */}
+              <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-slate-700/50 hover:bg-slate-700 transition-colors border border-yellow-500/30">
+                <Trophy size={24} className="mb-2 text-yellow-300" />
+                <span className="text-[0.65rem] font-medium opacity-60 uppercase tracking-widest mb-1">Longest</span>
+                <span className="text-lg font-bold text-yellow-100">{longestStreak}</span>
+                <span className="text-[0.65rem] opacity-50">days</span>
+              </div>
+
+              {/* Current Streak */}
+              <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-slate-700/50 hover:bg-slate-700 transition-colors border border-orange-500/30">
+                <Flame size={24} className="mb-2 text-orange-400" />
+                <span className="text-[0.65rem] font-medium opacity-60 uppercase tracking-widest mb-1">Current</span>
+                <span className="text-lg font-bold text-orange-100">{rewards.streak}</span>
+                <span className="text-[0.65rem] opacity-50">days</span>
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-3 gap-3 mb-6">
             <div className={`${currentTheme.STAT_BG_1} dark:bg-slate-700/50 p-3 rounded-2xl flex flex-col items-center justify-center shadow-sm relative overflow-hidden group hover:brightness-95 transition-all min-h-[5rem]`}>
-              <TrendingUp className={`${currentTheme.TEXT_ACCENT} mb-1 z-10`} size={20} />
-              <span className="text-xl font-black text-gray-700 dark:text-gray-100 leading-none z-10 break-all">{rewards.level}</span>
-              <span className="text-[0.65rem] font-bold text-gray-400 uppercase tracking-tight z-10 text-center leading-tight break-words w-full">{t('level')}</span>
+              <Award className="text-purple-500 mb-1 z-10" size={20} />
+              <span className="text-xs font-black text-purple-700 dark:text-purple-300 leading-tight z-10 break-words text-center px-1">{getLevelTitle(rewards.points)}</span>
+              <span className="text-[0.65rem] font-bold text-gray-400 uppercase tracking-tight z-10 text-center leading-tight break-words w-full mt-1">Rank</span>
             </div>
             <div className={`${currentTheme.STAT_BG_2} dark:bg-slate-700/50 p-3 rounded-2xl flex flex-col items-center justify-center shadow-sm relative overflow-hidden hover:brightness-95 transition-all min-h-[5rem]`}>
               <Zap className={`${currentTheme.TEXT_ACCENT} mb-1 z-10`} size={20} fill="currentColor" />

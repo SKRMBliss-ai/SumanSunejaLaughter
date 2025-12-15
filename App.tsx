@@ -65,6 +65,12 @@ const AppContent: React.FC = () => {
 
       setUser(currentUser);
       setLoading(false);
+
+      if (currentUser) {
+        // Initialize Rewards & Check Streak
+        checkDailyStreak();
+        syncRewardsWithFirestore();
+      }
     });
     return () => unsubscribe();
   }, []);

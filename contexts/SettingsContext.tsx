@@ -1444,7 +1444,7 @@ const translations: Record<Language, Record<string, string>> = {
         'notification.join_now': '今すぐ参加',
         'home.wellness_partner': 'ウェルネスパートナー',
         'home.talk_ai': 'スーマンAIと話す',
-        'home.ai_desc': '世界初のリアルタイムラフターヨガAIを体験してください。会話をして、即座にフィードバックを得て、一緒に笑いましょう！',
+        'home.ai_desc': '世界初のリアルタイムラフターヨガAIを体験してください。会話を楽しみ、即座にフィードバックを受け取り、一緒に笑いましょう！',
         'home.start_live': 'ライブインタラクションを開始',
         'home.live_sessions': 'ライブセッション',
         'home.meeting_id': 'ミーティングID',
@@ -1452,25 +1452,25 @@ const translations: Record<Language, Record<string, string>> = {
         'home.dubai': 'ドバイ',
         'home.india': 'インド',
         'contact.whatsapp_msg': 'こんにちは、スーマン！ラフターヨガに興味があり、もっと知りたいです。',
-        'contact.email_subject': 'ラフターヨガのお問い合わせ',
+        'contact.email_subject': 'ラフターヨガに関するお問い合わせ',
         'contact.email_body': 'こんにちは、スーマン。セッションを予約したいです。',
-        'coach.live_session_start': 'ライブ笑いセッション',
-        'coach.quick_session_start': '1分間の笑いブーストを開始します。準備してください！',
-        'coach.quick_session_start_2': 'クイック笑いセッションを開始します。笑顔の準備をしてください！',
-        'coach.offline_feedback': '私のAI脳（クォータ制限/オフライン）がなくても、それが楽しかったことはわかります！笑い続けてください！',
+        'coach.live_session_start': 'ライブラフターセッション',
+        'coach.quick_session_start': '1分間のラフターブーストを開始します。準備してください！',
+        'coach.quick_session_start_2': 'クイックラフターセッションを開始します。笑顔になる準備をしてください！',
+        'coach.offline_feedback': '私のAI脳（クォータ制限/オフライン）がなくても、これは楽しかったと言えます！笑い続けてください！',
         'coach.stop_session': 'セッションを停止',
-        'coach.live_session_btn': 'ライブ笑いセッション',
-        'coach.offline_voice_saver': 'オフライン音声を使用中（データ節約）',
-        'games.thinking_joke': '面白いジョークを考えています...',
+        'coach.live_session_btn': 'ライブラフターセッション',
+        'coach.offline_voice_saver': 'オフライン音声を使用（データ節約モード）',
+        'games.thinking_joke': '面白いことを考えています...',
         'games.thinking_story': '喜びを醸造中...',
-        'games.mood_change': '{mood}気分ですか？変えましょう！',
-        'games.offline_error': 'オフラインモードを使用中（APIキーなし）',
-        'games.offline_story': '今はコメディ脳にアクセスできませんが、それでも笑うことはできます！ハハハ！',
+        'games.mood_change': '{mood}な気分ですか？変えましょう！',
+        'games.offline_error': 'オフラインモードを使用中（APIキーがありません）',
+        'games.offline_story': '今、私のコメディ脳にアクセスできませんが、それでも笑うことはできます！ハハハ！',
         'games.connection_error': '接続の問題。もう一度試してください！',
-        'games.generic_error': 'おっと！何かがうまくいきませんでした。でも笑顔でいてください！',
+        'games.generic_error': 'おっと！何か問題が発生しました。でも笑顔でいてください！',
         'games.offline_mood': 'ハハハ！ヒヒヒ！笑いは最高の薬です、オフラインでも！',
-        'games.mood_error': '気分の笑いを生成できませんでした。',
-        'games.pick_a': 'または選ぶ',
+        'games.mood_error': '気分による笑いを生成できませんでした。',
+        'games.pick_a': 'または選択',
         'games.theme': 'テーマ',
         'games.topic': 'トピック',
         'games.mood_1': 'クスクス笑い 🤭',
@@ -1520,6 +1520,7 @@ export interface ThemeColors {
     SESSION_1_ACCENT: string;
     SESSION_2_BG: string;
     SESSION_2_ACCENT: string;
+    TEXT_SECONDARY: string;
 }
 
 export const THEMES: Record<ColorTheme, ThemeColors> = {
@@ -1541,14 +1542,10 @@ export const THEMES: Record<ColorTheme, ThemeColors> = {
         STAT_ICON_BG_2: "bg-white text-purple-400",
         LIVE_CARD_BG: "bg-white border-2 border-purple-100",
         LIVE_BTN: "bg-[#A8C8C0] text-white hover:brightness-105 shadow-md",
-
         HEADER_BG: "bg-[#F7F9FC]",
         HEADER_TEXT: "text-[#5B5166]",
         HEADER_BORDER: "border-[#B8B8D0]/20",
-
-        // Pastel: Default is purple/grey button with white text
         SUBSCRIBE_BTN: "bg-[#C0B8D0] hover:bg-[#B0A8C0] text-white",
-
         MUSIC_BTN: "bg-white border-[#EDE8F8] text-[#C3B8D5] hover:border-[#A8C8C0] hover:text-[#A8C8C0]",
         MUSIC_BTN_ACTIVE: "bg-[#A8C8C0] border-white text-white",
         MUSIC_ICON: "text-[#A8C8C0]",
@@ -1565,7 +1562,8 @@ export const THEMES: Record<ColorTheme, ThemeColors> = {
         SESSION_1_BG: "bg-[#E0F7FA]",
         SESSION_1_ACCENT: "text-[#006064]",
         SESSION_2_BG: "bg-[#F3E5F5]",
-        SESSION_2_ACCENT: "text-[#4A148C]"
+        SESSION_2_ACCENT: "text-[#4A148C]",
+        TEXT_SECONDARY: "text-gray-500"
     },
     red_brick: {
         HERO: "bg-[linear-gradient(110deg,#592E2E_0%,#8C4A4A_50%,#592E2E_100%)]",
@@ -1585,14 +1583,10 @@ export const THEMES: Record<ColorTheme, ThemeColors> = {
         STAT_ICON_BG_2: "bg-white text-purple-500",
         LIVE_CARD_BG: "bg-white/70 backdrop-blur-xl border-2 border-purple-300/50",
         LIVE_BTN: "bg-[#FFF8F0] text-[#8B3A3A] border-2 border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-[#FFF8F0] hover:border-[#FFF8F0] shadow-lg transition-colors",
-
         HEADER_BG: "bg-[#FEF4E6]",
         HEADER_TEXT: "text-[#783766]",
         HEADER_BORDER: "border-[#783766]/10",
-
-        // UPDATED: Text is Brick Red by default, White on Hover
         SUBSCRIBE_BTN: "bg-[#FFF8F0] text-[#8B3A3A] border-2 border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-[#FFF8F0] hover:border-[#FFF8F0] transition-colors",
-
         MUSIC_BTN: "bg-white border-[#EDE8F8] text-[#C3B8D5] hover:border-[#8B3A3A] hover:text-[#8B3A3A]",
         MUSIC_BTN_ACTIVE: "bg-[#8B3A3A] border-white text-white",
         MUSIC_ICON: "text-[#8B3A3A]",
@@ -1609,7 +1603,8 @@ export const THEMES: Record<ColorTheme, ThemeColors> = {
         SESSION_1_BG: "bg-pink-50",
         SESSION_1_ACCENT: "text-pink-500",
         SESSION_2_BG: "bg-violet-50",
-        SESSION_2_ACCENT: "text-violet-500"
+        SESSION_2_ACCENT: "text-violet-500",
+        TEXT_SECONDARY: "text-[#5D4037]"
     }
 };
 

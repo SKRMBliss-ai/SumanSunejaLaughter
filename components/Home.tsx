@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Video, ArrowRight, Star, Bell, X, Sparkles, Smile, Globe, Calendar, Lock, Check, Clock, Trophy, Flame, Moon, Sun, Type, Palette, ChevronDown, Info, Mic } from 'lucide-react';
+import { Video, ArrowRight, Star, Bell, X, Sparkles, Smile, Globe, Calendar, Lock, Check, Clock, Trophy, Flame, Moon, Sun, Type, Palette, ChevronDown, Info, Mic, Gift } from 'lucide-react';
 import { ViewState, RewardState } from '../types';
 import { getRewardState } from '../services/rewardService';
+import { RewardsModal } from './RewardsModal';
 import { useSettings, SUPPORTED_LANGUAGES, FontSize } from '../contexts/SettingsContext';
 import { useLiveWidget } from '../contexts/LiveWidgetContext';
 
@@ -22,6 +23,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
   const [rewards, setRewards] = useState<RewardState>(getRewardState());
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
+  const [isRewardsOpen, setIsRewardsOpen] = useState(false);
 
   // --- NEW: Tour State (0 = off, 1 = Dark Mode, 2 = Theme, 3 = Font, 4 = Lang) ---
   const [tourStep, setTourStep] = useState(0);
@@ -325,7 +327,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
 
       {/* Stats Cards - Pop In */}
       <div className="flex flex-wrap gap-3 animate-pop-in delay-100">
-        <div className={`flex-1 min-w-[140px] ${currentTheme.STAT_BG_1} dark:bg-slate-800 p-3 rounded-2xl flex items-center gap-3 shadow-sm`}>
+        <div className={`flex-1 min-w-[140px] ${currentTheme.STAT_BG_1} dark:bg-slate-800 p-3 rounded-2xl flex items-center gap-3 shadow-sm relative group`}>
           <div className={`${currentTheme.STAT_ICON_BG_1} dark:bg-orange-900 p-2 rounded-xl shadow-sm shrink-0`}>
             <Flame size={20} fill="currentColor" className="animate-pulse" />
           </div>
@@ -334,13 +336,18 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             <div className="text-[0.65rem] font-bold text-orange-400 uppercase truncate">{t('streak')}</div>
           </div>
         </div>
-        <div className={`flex-1 min-w-[140px] ${currentTheme.STAT_BG_2} dark:bg-slate-800 p-3 rounded-2xl flex items-center gap-3 shadow-sm`}>
+
+        <div className={`flex-1 min-w-[140px] ${currentTheme.STAT_BG_2} dark:bg-slate-800 p-3 rounded-2xl flex items-center gap-3 shadow-sm relative group cursor-pointer hover:ring-2 hover:ring-purple-200 transition-all`} onClick={() => setIsRewardsOpen(true)}>
           <div className={`${currentTheme.STAT_ICON_BG_2} dark:bg-purple-900 p-2 rounded-xl shadow-sm shrink-0`}>
             <Trophy size={20} fill="currentColor" className="animate-wiggle" />
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <div className="text-xl font-black text-gray-800 dark:text-gray-100 leading-none truncate">{rewards.points}</div>
-            <div className="text-[0.65rem] font-bold text-purple-400 uppercase truncate">{t('points')} ({t('level')} {rewards.level})</div>
+            <div className="text-[0.65rem] font-bold text-purple-400 uppercase truncate">{t('points')}</div>
+          </div>
+          {/* Gift Icon Button */}
+          <div className="bg-white dark:bg-slate-600 p-1.5 rounded-full shadow-sm text-pink-500 animate-bounce-gentle">
+            <Gift size={16} />
           </div>
         </div>
       </div>
@@ -605,6 +612,12 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           </button>
         </div>
       </div>
+
+      <RewardsModal
+        isOpen={isRewardsOpen}
+        onClose={() => setIsRewardsOpen(false)}
+        rewards={rewards}
+      />
 
     </div>
   );
