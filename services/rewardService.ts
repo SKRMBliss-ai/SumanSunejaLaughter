@@ -27,7 +27,8 @@ const getInitialState = (): RewardState => {
     level: 1,
     activityHistory: [],
     dailyPoints: 0,
-    lastDailyReset: new Date().toDateString()
+    lastDailyReset: new Date().toDateString(),
+    dailyTarget: 50 // Default target
   };
 };
 
@@ -54,7 +55,8 @@ export const syncRewardsWithFirestore = async (): Promise<boolean> => {
         level: data.level || 1,
         activityHistory: data.activityHistory || [],
         dailyPoints: data.dailyPoints || 0,
-        lastDailyReset: data.lastDailyReset || new Date().toDateString()
+        lastDailyReset: data.lastDailyReset || new Date().toDateString(),
+        dailyTarget: data.dailyTarget || 50
       };
 
       // Update local storage with remote data
@@ -167,7 +169,8 @@ export const addPoints = async (amount: number, message: string, type: RewardEve
     lastActiveDate: today,
     activityHistory: newHistory,
     dailyPoints: dailyPoints,
-    lastDailyReset: today
+    lastDailyReset: today,
+    dailyTarget: state.dailyTarget // Maintain target
   };
 
   await saveState(newState);
@@ -196,6 +199,7 @@ const saveState = async (state: RewardState, syncToCloud = true) => {
           activityHistory: state.activityHistory,
           dailyPoints: state.dailyPoints,
           lastDailyReset: state.lastDailyReset,
+          dailyTarget: state.dailyTarget,
           lastUpdated: new Date(),
           displayName: user?.displayName || 'Anonymous',
           photoURL: user?.photoURL || null

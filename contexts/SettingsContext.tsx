@@ -1518,6 +1518,19 @@ export interface ThemeColors {
     APP_BG: string;
     SESSION_1_BG: string;
     SESSION_1_ACCENT: string;
+
+    // New additions for generic styling support across themes
+    LEADERBOARD_ICON_BG_GRADIENT: string;
+    LEADERBOARD_ICON_COLOR: string;
+    LEADERBOARD_BTN_GRADIENT: string;
+    LEADERBOARD_BTN_TEXT: string;
+    LEADERBOARD_BTN_BORDER: string;
+
+    REWARD_ICON_BG_GRADIENT: string;
+    REWARD_ICON_COLOR: string;
+    REWARD_BTN_GRADIENT: string;
+    REWARD_BTN_TEXT: string;
+    REWARD_BTN_BORDER: string;
     SESSION_2_BG: string;
     SESSION_2_ACCENT: string;
     TEXT_SECONDARY: string;
@@ -1559,11 +1572,25 @@ export const THEMES: Record<ColorTheme, ThemeColors> = {
         VIDEO_RING_2: "bg-[#C0B8D0]/40",
         VIDEO_BORDER: "border-[#C0B8D0]/50",
         APP_BG: "bg-[#F7F9FC]",
-        SESSION_1_BG: "bg-[#E0F7FA]",
-        SESSION_1_ACCENT: "text-[#006064]",
-        SESSION_2_BG: "bg-[#F3E5F5]",
-        SESSION_2_ACCENT: "text-[#4A148C]",
-        TEXT_SECONDARY: "text-gray-500"
+        SESSION_1_BG: "bg-pink-50",
+        SESSION_1_ACCENT: "text-pink-500",
+        SESSION_2_BG: "bg-violet-50",
+        SESSION_2_ACCENT: "text-violet-500",
+        TEXT_SECONDARY: "text-[#5D4037]",
+
+        // Pastel Theme - Leaderboard (Warm/Orange tones to match flame)
+        LEADERBOARD_ICON_BG_GRADIENT: "bg-gradient-to-br from-orange-400/20 to-amber-600/20",
+        LEADERBOARD_ICON_COLOR: "text-orange-500 fill-orange-500",
+        LEADERBOARD_BTN_GRADIENT: "bg-gradient-to-r from-orange-100 to-amber-100 dark:from-slate-800 dark:to-slate-800",
+        LEADERBOARD_BTN_TEXT: "text-orange-700 dark:text-orange-400",
+        LEADERBOARD_BTN_BORDER: "border-orange-200 dark:border-slate-700",
+
+        // Pastel Theme - Rewards (Purple/Pink tones to match trophy)
+        REWARD_ICON_BG_GRADIENT: "bg-gradient-to-br from-purple-400/20 to-fuchsia-600/20",
+        REWARD_ICON_COLOR: "text-purple-500 fill-purple-500",
+        REWARD_BTN_GRADIENT: "bg-gradient-to-r from-purple-100 to-fuchsia-100 dark:from-slate-800 dark:to-slate-800",
+        REWARD_BTN_TEXT: "text-purple-700 dark:text-purple-400",
+        REWARD_BTN_BORDER: "border-purple-200 dark:border-slate-700"
     },
     red_brick: {
         HERO: "bg-[linear-gradient(110deg,#592E2E_0%,#8C4A4A_50%,#592E2E_100%)]",
@@ -1604,7 +1631,20 @@ export const THEMES: Record<ColorTheme, ThemeColors> = {
         SESSION_1_ACCENT: "text-pink-500",
         SESSION_2_BG: "bg-violet-50",
         SESSION_2_ACCENT: "text-violet-500",
-        TEXT_SECONDARY: "text-[#5D4037]"
+        TEXT_SECONDARY: "text-[#5D4037]",
+
+        // Red Brick Theme - darker, richer tones
+        LEADERBOARD_ICON_BG_GRADIENT: "bg-gradient-to-br from-orange-400/20 to-orange-600/20",
+        LEADERBOARD_ICON_COLOR: "text-orange-500 fill-orange-500",
+        LEADERBOARD_BTN_GRADIENT: "bg-gradient-to-r from-slate-800/80 to-slate-900/80",
+        LEADERBOARD_BTN_TEXT: "text-orange-100",
+        LEADERBOARD_BTN_BORDER: "border-slate-700 hover:border-orange-500/50",
+
+        REWARD_ICON_BG_GRADIENT: "bg-gradient-to-br from-purple-400/20 to-pink-600/20",
+        REWARD_ICON_COLOR: "text-pink-500 fill-pink-500",
+        REWARD_BTN_GRADIENT: "bg-gradient-to-r from-slate-800/80 to-slate-900/80",
+        REWARD_BTN_TEXT: "text-pink-100",
+        REWARD_BTN_BORDER: "border-slate-700 hover:border-pink-500/50"
     }
 };
 

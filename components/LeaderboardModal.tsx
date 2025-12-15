@@ -61,27 +61,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ isOpen, onCl
                     <p className={`text-xs text-slate-600 dark:text-gray-300 font-bold`}>Top Laughter Champions</p>
                 </div>
 
-                {/* Tabs */}
-                <div className="relative z-10 mx-6 mb-4 p-1 bg-white/60 dark:bg-slate-700/50 rounded-2xl flex border border-white/30 shadow-sm backdrop-blur-sm">
-                    <button
-                        onClick={() => setPeriod('weekly')}
-                        className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 flex items-center justify-center gap-2 ${period === 'weekly'
-                            ? 'bg-white dark:bg-slate-800 shadow-md scale-[1.02] text-slate-900 dark:text-white'
-                            : 'text-slate-500 dark:text-gray-400 hover:bg-white/40'
-                            }`}
-                    >
-                        Weekly
-                    </button>
-                    <button
-                        onClick={() => setPeriod('allTime')}
-                        className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all duration-300 flex items-center justify-center gap-2 ${period === 'allTime'
-                            ? 'bg-white dark:bg-slate-800 shadow-md scale-[1.02] text-slate-900 dark:text-white'
-                            : 'text-slate-500 dark:text-gray-400 hover:bg-white/40'
-                            }`}
-                    >
-                        All Time
-                    </button>
-                </div>
+
 
                 {/* List */}
                 <div className="flex-1 overflow-y-auto px-4 pb-4 relative z-10 no-scrollbar space-y-4">

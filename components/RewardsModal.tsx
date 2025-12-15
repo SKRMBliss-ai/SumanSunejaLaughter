@@ -54,7 +54,7 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rew
     if (!isOpen) return null;
     if (!rewards) return null;
 
-    const dailyTarget = 50;
+    const dailyTarget = rewards.dailyTarget || 50;
     // Use tracked daily points, defaulting to 0 if not set yet
     const dailyProgress = Math.min(dailyTarget, rewards.dailyPoints || 0);
 

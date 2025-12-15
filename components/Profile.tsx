@@ -239,9 +239,7 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
               </div>
             )}
 
-            <div className="text-sm font-bold text-purple-600 bg-purple-50 dark:bg-purple-900/20 px-4 py-1.5 rounded-full inline-block mt-1 shadow-sm border border-purple-100 dark:border-purple-800">
-              {getLevelTitle(rewards.points)} <span className="text-gray-400 mx-1">•</span> <span className="text-gray-500 dark:text-gray-400 font-medium">{t('points')}: {rewards.points}</span>
-            </div>
+
           </div>
 
           <div className="mb-6 bg-gradient-to-r from-orange-50 via-white to-orange-50 dark:from-slate-800 dark:via-slate-700 dark:to-slate-800 border border-orange-200 dark:border-slate-600 rounded-3xl p-4 shadow-sm relative overflow-hidden group">
