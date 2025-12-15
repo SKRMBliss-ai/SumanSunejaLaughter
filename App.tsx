@@ -15,7 +15,8 @@ import { PhoneLinker } from './components/PhoneLinker';
 import { RewardPopup } from './components/RewardPopup';
 import { AmbientMusic } from './components/AmbientMusic';
 import { HomeLiveWidget } from './components/HomeLiveWidget';
-import { checkDailyStreak } from './services/rewardService';
+import { checkDailyStreak, syncRewardsWithFirestore } from './services/rewardService';
+
 import { ViewState } from './types';
 import { Loader2 } from 'lucide-react';
 import { SettingsProvider, useSettings } from './contexts/SettingsContext';
@@ -28,18 +29,46 @@ const AppContent: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const { currentTheme } = useSettings();
 
+  // Handle Auth State & Firestore Profile Check
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        // If Auth profile lacks phone number, check Firestore
+        if (!currentUser.phoneNumber) {
+          try {
+            const { doc, getDoc } = await import('firebase/firestore');
+            const { db } = await import('./services/firebase');
+
+            const userRef = doc(db, 'users', currentUser.uid);
+            const userSnap = await getDoc(userRef);
+
+            if (userSnap.exists()) {
+              const userData = userSnap.data();
+              const phoneFromStore = userData.phoneNumber;
+
+              if (phoneFromStore) {
+                // Found in Firestore -> Cache locally to pass the check below
+                localStorage.setItem(`user_phone_${currentUser.uid}`, phoneFromStore);
+              } else {
+                // Doc exists but no phone -> Clear local cache to force re-link
+                localStorage.removeItem(`user_phone_${currentUser.uid}`);
+              }
+            } else {
+              // Doc deleted/missing -> Clear local cache to force re-link
+              localStorage.removeItem(`user_phone_${currentUser.uid}`);
+            }
+          } catch (error) {
+            console.error("Error fetching user profile:", error);
+          }
+        }
+      }
+
       setUser(currentUser);
       setLoading(false);
-      if (currentUser) {
-        checkDailyStreak();
-      }
     });
     return () => unsubscribe();
   }, []);
 
-  // Handle Browser Back Button
   useEffect(() => {
     // Set initial state if not set
     if (!window.history.state) {
@@ -86,12 +115,15 @@ const AppContent: React.FC = () => {
   }
 
   // Mandatory Phone Linking for Gmail users
+  // We check again here. If the async check above succeeded, localStorage should be set.
   const hasLinkedPhone = user.phoneNumber || localStorage.getItem(`user_phone_${user.uid}`);
 
   if (!hasLinkedPhone) {
-    return <PhoneLinker user={user} onLinkSuccess={() => {
-      window.location.reload();
-    }} />;
+    return (
+      <PhoneLinker user={user} onLinkSuccess={() => {
+        window.location.reload();
+      }} />
+    );
   }
 
   const renderView = () => {
