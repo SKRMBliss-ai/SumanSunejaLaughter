@@ -15,7 +15,7 @@ const MERCHANDISE = [
         id: 1,
         name: "Laughter Mug",
         price: 150,
-        image: "https://res.cloudinary.com/dfopoyt9v/image/upload/v1765796031/Gemini_Generated_Image_9lg44j9lg44j9lg4_jvttsb.png",
+        image: "https://res.cloudinary.com/dfopoyt9v/image/upload/v1765823285/mug_ags64s.png",
         type: "Accessory",
         requiredPoints: 100
     },
@@ -23,7 +23,7 @@ const MERCHANDISE = [
         id: 2,
         name: "Laughter Ball (Pack of 4)",
         price: 220,
-        image: "https://res.cloudinary.com/dfopoyt9v/image/upload/v1765796182/Gemini_Generated_Image_zf7tg1zf7tg1zf7t_wlzb8e.png",
+        image: "https://res.cloudinary.com/dfopoyt9v/image/upload/v1765823386/ball_gsfucq.png",
         type: "Accessory",
         requiredPoints: 300
     },
@@ -31,15 +31,15 @@ const MERCHANDISE = [
         id: 3,
         name: "Laughter T-Shirt",
         price: 450,
-        image: "https://res.cloudinary.com/dfopoyt9v/image/upload/v1765795977/ChatGPT_Image_Dec_15_2025_04_02_13_PM_znmrda.png",
+        image: "https://res.cloudinary.com/dfopoyt9v/image/upload/v1765823629/ChatGPT_Image_Dec_15_2025_04_02_13_PM_ovpyuk.png",
         type: "Apparel",
         requiredPoints: 700
     },
     {
         id: 4,
-        name: "LAUGH LED T-Shirt",
+        name: "Laugh LED T-Shirt",
         price: 800,
-        image: "https://res.cloudinary.com/dfopoyt9v/image/upload/v1765796034/Gemini_Generated_Image_osq1cqosq1cqosq1_tausbc.png",
+        image: "https://res.cloudinary.com/dfopoyt9v/image/upload/v1765823505/LED_dxg1tb.png",
         type: "Apparel",
         requiredStreak: 30
     }
@@ -343,25 +343,27 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rew
                                             }
                                         `}
                                     >
-                                        {/* Image Container */}
-                                        <div className="aspect-square bg-white dark:bg-slate-700 rounded-xl flex items-center justify-center overflow-hidden relative p-4 transition-transform group-hover:scale-95">
+                                        {/* Image Container - Seamless Integration */}
+                                        {/* Image Container - Seamless Integration */}
+                                        <div className="aspect-square rounded-xl flex items-center justify-center overflow-hidden relative p-0 transition-transform group-hover:scale-[1.02]">
                                             <img
                                                 src={item.image.includes('http') ? item.image : `https://placehold.co/400x400/orange/white?text=${encodeURIComponent(item.name[0])}`}
                                                 alt={item.name}
                                                 className={`
-                                                    w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal transition-all duration-500
-                                                    ${isLocked ? 'grayscale blur-[1px] opacity-50 scale-90' : ''}
+                                                    w-full h-full object-contain transition-all duration-500
+                                                    ${isLocked ? 'opacity-90 scale-100' : 'scale-110 group-hover:scale-110 drop-shadow-xl'}
                                                 `}
                                                 onError={(e) => {
                                                     (e.target as HTMLImageElement).src = `https://placehold.co/400x400/orange/white?text=${encodeURIComponent(item.name[0])}`;
                                                 }}
                                             />
-                                            {/* Locked Overlay */}
+
+                                            {/* Top Right Lock Badge (Subtle) */}
                                             {isLocked && (
-                                                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/10 z-10 backdrop-blur-[1px]">
-                                                    <div className="w-10 h-10 rounded-full bg-slate-800 text-white flex items-center justify-center shadow-lg mb-2 relative">
-                                                        <Lock size={16} className="relative z-10" />
-                                                        {needsStreak && <Flame className="absolute -top-2 -right-2 text-orange-500 fill-orange-500 animate-pulse" size={12} />}
+                                                <div className="absolute top-2 right-2 flex flex-col items-center justify-center z-20">
+                                                    <div className="w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-gray-300 flex items-center justify-center shadow-md backdrop-blur-sm border border-white/50">
+                                                        <Lock size={14} />
+                                                        {needsStreak && <Flame className="absolute -top-1 -right-1 text-orange-500 fill-orange-500 animate-pulse" size={10} />}
                                                     </div>
                                                 </div>
                                             )}
