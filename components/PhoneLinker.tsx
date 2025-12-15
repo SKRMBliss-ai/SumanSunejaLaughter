@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { User, updateProfile } from 'firebase/auth';
-import { auth } from '../services/firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { auth, db } from '../services/firebase';
 import { Phone, Check, ChevronDown, LogOut, Shield, User as UserIcon } from 'lucide-react';
 
 interface Country {
@@ -47,14 +48,44 @@ export const PhoneLinker: React.FC<PhoneLinkerProps> = ({ user, onLinkSuccess })
     return selectedCountry.dialCode + clean;
   };
 
+  // Fetch existing profile if available
+  React.useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!user.uid) return;
+      try {
+        const userRef = doc(db, 'users', user.uid);
+        const docSnap = await getDoc(userRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data.phoneNumber) {
+            // Remove country code for display if possible, or just show as is
+            // For simplicity in this fix, we just set it
+            // Ideally we'd parse it, but let's just use what we have
+            // setPhoneNumber(data.phoneNumber); 
+            // Logic: If phone exists in DB, we shouldn't even seem this screen right? 
+            // The parent component checks localStorage or user.phoneNumber.
+            // We need to update parent or localStorage if DB has it.
+            localStorage.setItem(`user_phone_${user.uid}`, data.phoneNumber);
+            onLinkSuccess(); // Auto-dismiss if found
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching user profile:", err);
+      }
+    };
+    fetchUserProfile();
+  }, [user.uid, onLinkSuccess]);
+
   const handleSave = async () => {
     if (!name.trim()) {
       setError("Please enter your name.");
       return;
     }
 
-    if (!phoneNumber.trim() || phoneNumber.replace(/\D/g, '').length < 5) {
-      setError("Please enter a valid mobile number.");
+    // Phone Validation: Must be exactly 10 digits
+    const cleanedPhone = phoneNumber.replace(/\D/g, '');
+    if (cleanedPhone.length !== 10) {
+      setError("Mobile number must be exactly 10 digits.");
       return;
     }
 
@@ -62,13 +93,21 @@ export const PhoneLinker: React.FC<PhoneLinkerProps> = ({ user, onLinkSuccess })
     setError(null);
 
     try {
-      // Update Display Name in Firebase
+      // Update Display Name in Firebase Auth
       await updateProfile(user, { displayName: name });
 
       const formattedPhone = formatPhoneNumber(phoneNumber);
 
-      // Since we are bypassing OTP as requested for this specific flow,
-      // we save the phone number locally to mark the profile as "complete".
+      // Save to Firestore
+      const userRef = doc(db, 'users', user.uid);
+      await setDoc(userRef, {
+        phoneNumber: formattedPhone,
+        displayName: name,
+        email: user.email, // Good to have
+        lastUpdated: new Date()
+      }, { merge: true });
+
+      // Save locally to satisfy the check in App.tsx
       localStorage.setItem(`user_phone_${user.uid}`, formattedPhone);
 
       onLinkSuccess();
@@ -89,9 +128,6 @@ export const PhoneLinker: React.FC<PhoneLinkerProps> = ({ user, onLinkSuccess })
     auth.signOut();
     window.location.reload();
   };
-
-  const isPhoneValid = phoneNumber.replace(/\D/g, '').length >= 5;
-  const isFormValid = isPhoneValid && name.trim().length > 0;
 
   return (
     <div className="fixed inset-0 z-[60] bg-[#FFF8F0] flex items-center justify-center p-4">
@@ -174,14 +210,14 @@ export const PhoneLinker: React.FC<PhoneLinkerProps> = ({ user, onLinkSuccess })
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 className="w-full bg-white border-2 border-[#8B3A3A]/30 text-[#8B3A3A] text-lg font-bold py-4 px-4 rounded-2xl focus:outline-none focus:border-[#8B3A3A] transition-all placeholder:text-[#8B3A3A]/40"
-                onKeyDown={(e) => e.key === 'Enter' && isFormValid && handleSave()}
+                onKeyDown={(e) => e.key === 'Enter' && handleSave()}
               />
             </div>
           </div>
 
           <button
             onClick={handleSave}
-            disabled={!isFormValid || isSaving}
+            disabled={isSaving}
             className="w-full bg-[#FFF8F0] text-[#8B3A3A] border-2 border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-[#FFF8F0] font-bold py-4 rounded-2xl shadow-lg shadow-[#8B3A3A]/10 transition-all active:scale-95 disabled:opacity-50 disabled:scale-100 flex items-center justify-center gap-2"
           >
             {isSaving ? "Saving..." : <><Check size={20} strokeWidth={3} /> Save & Link</>}
