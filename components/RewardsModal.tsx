@@ -55,9 +55,8 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rew
     if (!rewards) return null;
 
     const dailyTarget = 50;
-    // Fix: If points is a multiple of 50 (and >0), show 50/50 (complete) instead of 0/50 (empty)
-    const remainder = rewards.points % dailyTarget;
-    const dailyProgress = (remainder === 0 && rewards.points > 0) ? dailyTarget : remainder;
+    // Use tracked daily points, defaulting to 0 if not set yet
+    const dailyProgress = Math.min(dailyTarget, rewards.dailyPoints || 0);
 
     // Calculate Streak Metrics
     const history = rewards.activityHistory || [];

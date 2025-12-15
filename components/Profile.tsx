@@ -95,9 +95,14 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
     }
   };
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
     if (window.confirm("Are you sure you want to sign out?")) {
-      auth.signOut();
+      try {
+        await auth.signOut();
+      } catch (error) {
+        console.error("Error signing out:", error);
+        alert("Failed to sign out. Please try again.");
+      }
     }
   };
 
@@ -116,36 +121,7 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
     setIsEditingName(false);
   };
 
-  const calculateLongestStreak = (history: string[]) => {
-    if (!history || history.length === 0) return 0;
 
-    // Convert to timestamps and sort
-    const timestamps = history.map(date => new Date(date).setHours(0, 0, 0, 0)).sort((a, b) => a - b);
-
-    // Remove duplicates
-    const uniqueTimestamps = [...new Set(timestamps)];
-
-    let longest = 1;
-    let current = 1;
-
-    for (let i = 1; i < uniqueTimestamps.length; i++) {
-      const diff = uniqueTimestamps[i] - uniqueTimestamps[i - 1];
-      const oneDay = 1000 * 60 * 60 * 24;
-
-      // Allow some variability for DST, so check if difference is roughly 24 hours
-      if (Math.abs(diff - oneDay) < (1000 * 60 * 60 * 2)) {
-        current++;
-      } else {
-        longest = Math.max(longest, current);
-        current = 1;
-      }
-    }
-
-    return Math.max(longest, current);
-  };
-
-  const longestStreak = calculateLongestStreak(rewards.activityHistory || []);
-  const totalActiveDays = (rewards.activityHistory || []).length;
 
   const fontSizes: { id: FontSize; label: string; px: string }[] = [
     { id: 'small', label: 'S', px: '14px' },
@@ -294,42 +270,7 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
             </div>
           </div>
 
-          {/* New 'My Streaks' Section - Based on User Request */}
-          <div className="mb-6 bg-slate-800 text-white rounded-3xl p-5 shadow-lg relative overflow-hidden">
 
-            {/* Background decoration to match app feeling */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/20 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
-
-            <h3 className="text-lg font-bold mb-4 relative z-10 flex items-center gap-2">
-              My Streaks
-            </h3>
-
-            <div className="grid grid-cols-3 gap-2 relative z-10">
-              {/* Total Active Days */}
-              <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-slate-700/50 hover:bg-slate-700 transition-colors">
-                <Infinity size={24} className="mb-2 text-blue-300" />
-                <span className="text-[0.65rem] font-medium opacity-60 uppercase tracking-widest mb-1">Total</span>
-                <span className="text-lg font-bold">{totalActiveDays}</span>
-                <span className="text-[0.65rem] opacity-50">days</span>
-              </div>
-
-              {/* Longest Streak */}
-              <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-slate-700/50 hover:bg-slate-700 transition-colors border border-yellow-500/30">
-                <Trophy size={24} className="mb-2 text-yellow-300" />
-                <span className="text-[0.65rem] font-medium opacity-60 uppercase tracking-widest mb-1">Longest</span>
-                <span className="text-lg font-bold text-yellow-100">{longestStreak}</span>
-                <span className="text-[0.65rem] opacity-50">days</span>
-              </div>
-
-              {/* Current Streak */}
-              <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-slate-700/50 hover:bg-slate-700 transition-colors border border-orange-500/30">
-                <Flame size={24} className="mb-2 text-orange-400" />
-                <span className="text-[0.65rem] font-medium opacity-60 uppercase tracking-widest mb-1">Current</span>
-                <span className="text-lg font-bold text-orange-100">{rewards.streak}</span>
-                <span className="text-[0.65rem] opacity-50">days</span>
-              </div>
-            </div>
-          </div>
 
           <div className="grid grid-cols-3 gap-3 mb-6">
             <div className={`${currentTheme.STAT_BG_1} dark:bg-slate-700/50 p-3 rounded-2xl flex flex-col items-center justify-center shadow-sm relative overflow-hidden group hover:brightness-95 transition-all min-h-[5rem]`}>

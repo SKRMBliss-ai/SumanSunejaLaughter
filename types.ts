@@ -32,6 +32,8 @@ export interface RewardState {
   lastActiveDate: string;
   level: number;
   activityHistory: string[];
+  dailyPoints?: number;
+  lastDailyReset?: string;
 }
 
 export interface RewardEvent {

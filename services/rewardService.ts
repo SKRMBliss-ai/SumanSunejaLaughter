@@ -25,7 +25,9 @@ const getInitialState = (): RewardState => {
     streak: 0,
     lastActiveDate: '',
     level: 1,
-    activityHistory: []
+    activityHistory: [],
+    dailyPoints: 0,
+    lastDailyReset: new Date().toDateString()
   };
 };
 
@@ -50,7 +52,9 @@ export const syncRewardsWithFirestore = async (): Promise<boolean> => {
         streak: data.streak || 0,
         lastActiveDate: data.lastActiveDate || '',
         level: data.level || 1,
-        activityHistory: data.activityHistory || []
+        activityHistory: data.activityHistory || [],
+        dailyPoints: data.dailyPoints || 0,
+        lastDailyReset: data.lastDailyReset || new Date().toDateString()
       };
 
       // Update local storage with remote data
@@ -77,11 +81,20 @@ export const checkDailyStreak = async () => {
   // Ensure history exists
   const history = state.activityHistory || [];
 
-  // If already active today, do nothing (but ensure history is consistent)
+  // Check for daily reset
+  let dailyPoints = state.dailyPoints || 0;
+  if (state.lastDailyReset !== today) {
+    dailyPoints = 0;
+  }
+
+  // If already active today, just ensure history and daily points are saved if changed
   if (lastDate === today) {
     if (!history.includes(today)) {
       const updatedHistory = [...history, today];
-      await saveState({ ...state, activityHistory: updatedHistory });
+      await saveState({ ...state, activityHistory: updatedHistory, dailyPoints, lastDailyReset: today });
+    } else if (state.lastDailyReset !== today) {
+      // Just updating the reset date if logic was somehow off
+      await saveState({ ...state, dailyPoints, lastDailyReset: today });
     }
     return;
   }
@@ -138,13 +151,23 @@ export const addPoints = async (amount: number, message: string, type: RewardEve
     newHistory.push(today);
   }
 
+  // Reset daily points if new day
+  let dailyPoints = state.dailyPoints || 0;
+  if (state.lastDailyReset !== today) {
+    dailyPoints = 0;
+  }
+
+  dailyPoints += amount;
+
   const newState: RewardState = {
     ...state,
     points: newPoints,
     level: newLevel,
     // Update active date on any activity to ensure streak is maintained
     lastActiveDate: today,
-    activityHistory: newHistory
+    activityHistory: newHistory,
+    dailyPoints: dailyPoints,
+    lastDailyReset: today
   };
 
   await saveState(newState);
@@ -171,6 +194,8 @@ const saveState = async (state: RewardState, syncToCloud = true) => {
           lastActiveDate: state.lastActiveDate,
           level: state.level,
           activityHistory: state.activityHistory,
+          dailyPoints: state.dailyPoints,
+          lastDailyReset: state.lastDailyReset,
           lastUpdated: new Date(),
           displayName: user?.displayName || 'Anonymous',
           photoURL: user?.photoURL || null
