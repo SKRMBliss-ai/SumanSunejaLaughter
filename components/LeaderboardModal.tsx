@@ -109,7 +109,22 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ isOpen, onCl
 
                                                 <div className="relative shrink-0">
                                                     <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-sm bg-gray-200 flex items-center justify-center">
-                                                        {user.avatar ? <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" /> : <User size={24} className="text-gray-400" />}
+                                                        {user.avatar ? (
+                                                            <img
+                                                                src={user.avatar}
+                                                                alt={user.name}
+                                                                className="w-full h-full object-cover"
+                                                                onError={(e) => {
+                                                                    const target = e.target as HTMLImageElement;
+                                                                    // Prevent infinite loop if fallback also fails (though ui-avatars is reliable)
+                                                                    if (!target.src.includes('ui-avatars.com')) {
+                                                                        target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=random`;
+                                                                    }
+                                                                }}
+                                                            />
+                                                        ) : (
+                                                            <User size={24} className="text-gray-400" />
+                                                        )}
                                                     </div>
                                                     {user.rank <= 3 && (
                                                         <div className="absolute -bottom-1 -right-1 bg-yellow-400 text-[8px] font-black text-white px-1 rounded-full border border-white">

@@ -195,7 +195,18 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
             <div className="relative group">
               <div className={`w-32 h-32 rounded-full border-4 border-white dark:border-slate-700 shadow-lg ${currentTheme.HEADER_BG} dark:bg-slate-700 flex items-center justify-center overflow-hidden`}>
                 {photoURL ? (
-                  <img src={photoURL} alt="Profile" className="w-full h-full object-cover" />
+                  <img
+                    src={photoURL}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      if (!target.src.includes('ui-avatars.com')) {
+                        // Use local state update to ensure UI reflects the change immediately
+                        setPhotoURL(`https://ui-avatars.com/api/?name=${encodeURIComponent(displayName || 'User')}&background=random`);
+                      }
+                    }}
+                  />
                 ) : (
                   <User size={48} className={`${currentTheme.ICON_COLOR}`} />
                 )}
@@ -261,9 +272,7 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
                 </div>
               </div>
               <div className="text-end">
-                <div className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500">
-                  {rewards.streak * 50}
-                </div>
+                {rewards.streak * 20}
                 <div className="text-[0.65rem] font-bold text-gray-400 uppercase">{t('profile.bonus')}</div>
               </div>
             </div>
