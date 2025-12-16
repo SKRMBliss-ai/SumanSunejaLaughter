@@ -331,7 +331,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
       <div className="grid grid-cols-2 gap-4 animate-pop-in delay-100">
 
         {/* Streak / Leaderboard Card */}
-        <div className="bg-slate-900 dark:bg-slate-900/80 rounded-[2rem] p-4 relative overflow-hidden flex flex-col justify-between shadow-xl border border-slate-800 dark:border-slate-700 min-h-[160px] group">
+        <div className={`rounded-[2rem] p-4 relative overflow-hidden flex flex-col justify-between shadow-xl border min-h-[160px] group ${currentTheme.LEADERBOARD_CARD_BG} ${currentTheme.LEADERBOARD_CARD_BORDER}`}>
           {/* Subtle Background Glow */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
 
@@ -344,8 +344,8 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
 
             {/* Text Content */}
             <div className="text-right">
-              <div className="text-4xl font-black text-white leading-none tracking-tight drop-shadow-sm">{rewards.streak}</div>
-              <div className="text-[0.65rem] font-bold text-orange-400 uppercase tracking-widest mt-1">{t('streak')}</div>
+              <div className={`text-4xl font-black leading-none tracking-tight drop-shadow-sm ${currentTheme.LEADERBOARD_CARD_TEXT}`}>{rewards.streak}</div>
+              <div className={`text-[0.65rem] font-bold uppercase tracking-widest mt-1 ${currentTheme.LEADERBOARD_CARD_TEXT} opacity-80`}>{t('streak')}</div>
             </div>
           </div>
 
@@ -361,7 +361,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         </div>
 
         {/* Points / Rewards Card */}
-        <div className="bg-slate-900 dark:bg-slate-900/80 rounded-[2rem] p-4 relative overflow-hidden flex flex-col justify-between shadow-xl border border-slate-800 dark:border-slate-700 min-h-[160px] group">
+        <div className={`rounded-[2rem] p-4 relative overflow-hidden flex flex-col justify-between shadow-xl border min-h-[160px] group ${currentTheme.REWARD_CARD_BG} ${currentTheme.REWARD_CARD_BORDER}`}>
           {/* Subtle Background Glow */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
 
@@ -374,8 +374,8 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
 
             {/* Text Content */}
             <div className="text-right">
-              <div className="text-4xl font-black text-white leading-none tracking-tight drop-shadow-sm">{rewards.points}</div>
-              <div className="text-[0.65rem] font-bold text-pink-400 uppercase tracking-widest mt-1">{t('points')}</div>
+              <div className={`text-4xl font-black leading-none tracking-tight drop-shadow-sm ${currentTheme.REWARD_CARD_TEXT}`}>{rewards.points}</div>
+              <div className={`text-[0.65rem] font-bold uppercase tracking-widest mt-1 ${currentTheme.REWARD_CARD_TEXT} opacity-80`}>{t('points')}</div>
             </div>
           </div>
 

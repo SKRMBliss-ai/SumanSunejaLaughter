@@ -1525,12 +1525,18 @@ export interface ThemeColors {
     LEADERBOARD_BTN_GRADIENT: string;
     LEADERBOARD_BTN_TEXT: string;
     LEADERBOARD_BTN_BORDER: string;
+    LEADERBOARD_CARD_BG: string;
+    LEADERBOARD_CARD_BORDER: string;
+    LEADERBOARD_CARD_TEXT: string;
 
     REWARD_ICON_BG_GRADIENT: string;
     REWARD_ICON_COLOR: string;
     REWARD_BTN_GRADIENT: string;
     REWARD_BTN_TEXT: string;
     REWARD_BTN_BORDER: string;
+    REWARD_CARD_BG: string;
+    REWARD_CARD_BORDER: string;
+    REWARD_CARD_TEXT: string;
     SESSION_2_BG: string;
     SESSION_2_ACCENT: string;
     TEXT_SECONDARY: string;
@@ -1581,16 +1587,22 @@ export const THEMES: Record<ColorTheme, ThemeColors> = {
         // Pastel Theme - Leaderboard (Warm/Orange tones to match flame)
         LEADERBOARD_ICON_BG_GRADIENT: "bg-gradient-to-br from-orange-400/20 to-amber-600/20",
         LEADERBOARD_ICON_COLOR: "text-orange-500 fill-orange-500",
-        LEADERBOARD_BTN_GRADIENT: "bg-gradient-to-r from-orange-100 to-amber-100 dark:from-slate-800 dark:to-slate-800",
+        LEADERBOARD_BTN_GRADIENT: "bg-gradient-to-r from-orange-100 to-amber-100 dark:from-slate-800 dark:to-slate-900",
         LEADERBOARD_BTN_TEXT: "text-orange-700 dark:text-orange-400",
         LEADERBOARD_BTN_BORDER: "border-orange-200 dark:border-slate-700",
+        LEADERBOARD_CARD_BG: "bg-gradient-to-br from-orange-50 to-amber-100 dark:from-slate-800 dark:to-slate-900",
+        LEADERBOARD_CARD_BORDER: "border-orange-200 dark:border-slate-700",
+        LEADERBOARD_CARD_TEXT: "text-orange-900 dark:text-orange-100",
 
         // Pastel Theme - Rewards (Purple/Pink tones to match trophy)
         REWARD_ICON_BG_GRADIENT: "bg-gradient-to-br from-purple-400/20 to-fuchsia-600/20",
         REWARD_ICON_COLOR: "text-purple-500 fill-purple-500",
-        REWARD_BTN_GRADIENT: "bg-gradient-to-r from-purple-100 to-fuchsia-100 dark:from-slate-800 dark:to-slate-800",
+        REWARD_BTN_GRADIENT: "bg-gradient-to-r from-purple-100 to-fuchsia-100 dark:from-slate-800 dark:to-slate-900",
         REWARD_BTN_TEXT: "text-purple-700 dark:text-purple-400",
-        REWARD_BTN_BORDER: "border-purple-200 dark:border-slate-700"
+        REWARD_BTN_BORDER: "border-purple-200 dark:border-slate-700",
+        REWARD_CARD_BG: "bg-gradient-to-br from-purple-50 to-fuchsia-100 dark:from-slate-800 dark:to-slate-900",
+        REWARD_CARD_BORDER: "border-purple-200 dark:border-slate-700",
+        REWARD_CARD_TEXT: "text-purple-900 dark:text-purple-100",
     },
     red_brick: {
         HERO: "bg-[linear-gradient(110deg,#592E2E_0%,#8C4A4A_50%,#592E2E_100%)]",
@@ -1639,12 +1651,18 @@ export const THEMES: Record<ColorTheme, ThemeColors> = {
         LEADERBOARD_BTN_GRADIENT: "bg-gradient-to-r from-slate-800/80 to-slate-900/80",
         LEADERBOARD_BTN_TEXT: "text-orange-100",
         LEADERBOARD_BTN_BORDER: "border-slate-700 hover:border-orange-500/50",
+        LEADERBOARD_CARD_BG: "bg-gradient-to-br from-orange-50 to-red-50 dark:from-slate-800 dark:to-slate-900",
+        LEADERBOARD_CARD_BORDER: "border-orange-200 dark:border-slate-700",
+        LEADERBOARD_CARD_TEXT: "text-[#8B3A3A] dark:text-orange-100",
 
         REWARD_ICON_BG_GRADIENT: "bg-gradient-to-br from-purple-400/20 to-pink-600/20",
         REWARD_ICON_COLOR: "text-pink-500 fill-pink-500",
         REWARD_BTN_GRADIENT: "bg-gradient-to-r from-slate-800/80 to-slate-900/80",
         REWARD_BTN_TEXT: "text-pink-100",
-        REWARD_BTN_BORDER: "border-slate-700 hover:border-pink-500/50"
+        REWARD_BTN_BORDER: "border-slate-700 hover:border-pink-500/50",
+        REWARD_CARD_BG: "bg-gradient-to-br from-rose-50 to-pink-50 dark:from-slate-800 dark:to-slate-900",
+        REWARD_CARD_BORDER: "border-pink-200 dark:border-slate-700",
+        REWARD_CARD_TEXT: "text-[#8B3A3A] dark:text-pink-100",
     }
 };
 
