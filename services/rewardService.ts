@@ -299,7 +299,8 @@ export const getLeaderboardData = async (): Promise<LeaderboardUser[]> => {
         name: data.displayName || 'Anonymous',
         points: data.points || 0,
         streak: data.streak || 0,
-        avatar: data.photoURL || null,
+        // Default avatar for missing profile pic
+        avatar: data.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.displayName || 'User')}&background=random`,
         isCurrentUser: doc.id === currentUserId
       });
     });
