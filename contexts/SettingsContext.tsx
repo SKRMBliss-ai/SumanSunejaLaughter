@@ -1651,18 +1651,18 @@ export const THEMES: Record<ColorTheme, ThemeColors> = {
         LEADERBOARD_BTN_GRADIENT: "bg-gradient-to-r from-slate-800/80 to-slate-900/80",
         LEADERBOARD_BTN_TEXT: "text-orange-100",
         LEADERBOARD_BTN_BORDER: "border-slate-700 hover:border-orange-500/50",
-        LEADERBOARD_CARD_BG: "bg-gradient-to-br from-orange-50 to-red-50 dark:from-slate-800 dark:to-slate-900",
-        LEADERBOARD_CARD_BORDER: "border-orange-200 dark:border-slate-700",
-        LEADERBOARD_CARD_TEXT: "text-[#8B3A3A] dark:text-orange-100",
+        LEADERBOARD_CARD_BG: "bg-[#FFF8F0] dark:bg-slate-900",
+        LEADERBOARD_CARD_BORDER: "border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-[#FFF8F0] hover:border-[#FFF8F0] border-2 dark:border-slate-700",
+        LEADERBOARD_CARD_TEXT: "text-[#8B3A3A] hover:text-[#FFF8F0] dark:text-orange-100",
 
         REWARD_ICON_BG_GRADIENT: "bg-gradient-to-br from-purple-400/20 to-pink-600/20",
         REWARD_ICON_COLOR: "text-pink-500 fill-pink-500",
         REWARD_BTN_GRADIENT: "bg-gradient-to-r from-slate-800/80 to-slate-900/80",
         REWARD_BTN_TEXT: "text-pink-100",
         REWARD_BTN_BORDER: "border-slate-700 hover:border-pink-500/50",
-        REWARD_CARD_BG: "bg-gradient-to-br from-rose-50 to-pink-50 dark:from-slate-800 dark:to-slate-900",
-        REWARD_CARD_BORDER: "border-pink-200 dark:border-slate-700",
-        REWARD_CARD_TEXT: "text-[#8B3A3A] dark:text-pink-100",
+        REWARD_CARD_BG: "bg-[#FFF8F0] dark:bg-slate-900",
+        REWARD_CARD_BORDER: "border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-[#FFF8F0] hover:border-[#FFF8F0] border-2 dark:border-slate-700",
+        REWARD_CARD_TEXT: "text-[#8B3A3A] hover:text-[#FFF8F0] dark:text-pink-100",
     }
 };
 
