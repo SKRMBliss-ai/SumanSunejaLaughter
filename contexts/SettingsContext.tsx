@@ -1651,7 +1651,7 @@ export const THEMES: Record<ColorTheme, ThemeColors> = {
         LEADERBOARD_BTN_GRADIENT: "bg-[#FFF8F0] shadow-lg transition-colors",
         LEADERBOARD_BTN_TEXT: "text-[#8B3A3A]",
         LEADERBOARD_BTN_BORDER: "border-2 border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-[#FFF8F0] hover:border-[#FFF8F0]",
-        LEADERBOARD_CARD_BG: "bg-[#FFF8F0] dark:bg-slate-900 transition-colors duration-300",
+        LEADERBOARD_CARD_BG: "bg-gradient-to-br from-[#FFF8F0] to-[#FFE8E0] dark:bg-slate-900 transition-colors duration-300",
         LEADERBOARD_CARD_BORDER: "border-[#8B3A3A] border-2 dark:border-slate-700",
         LEADERBOARD_CARD_TEXT: "text-[#8B3A3A] dark:text-orange-100",
 
@@ -1660,7 +1660,7 @@ export const THEMES: Record<ColorTheme, ThemeColors> = {
         REWARD_BTN_GRADIENT: "bg-[#FFF8F0] shadow-lg transition-colors",
         REWARD_BTN_TEXT: "text-[#8B3A3A]",
         REWARD_BTN_BORDER: "border-2 border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-[#FFF8F0] hover:border-[#FFF8F0]",
-        REWARD_CARD_BG: "bg-[#FFF8F0] dark:bg-slate-900 transition-colors duration-300",
+        REWARD_CARD_BG: "bg-gradient-to-br from-[#FFF8F0] to-[#FCE8F0] dark:bg-slate-900 transition-colors duration-300",
         REWARD_CARD_BORDER: "border-[#8B3A3A] border-2 dark:border-slate-700",
         REWARD_CARD_TEXT: "text-[#8B3A3A] dark:text-pink-100",
     }
