@@ -68,7 +68,21 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
             title="My Profile"
           >
             {photoURL ? (
-              <img src={photoURL} alt="User" className="w-full h-full object-cover" />
+              <img
+                src={photoURL}
+                alt="User"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  if (!target.src.includes('ui-avatars.com')) {
+                    // Fallback to name-based avatar
+                    const user = auth.currentUser;
+                    const name = user?.displayName || 'User';
+                    // Use local state update to ensure UI reflects the change immediately
+                    setPhotoURL(`https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`);
+                  }
+                }}
+              />
             ) : (
               <User size={20} className={currentTheme.HEADER_TEXT} />
             )}
