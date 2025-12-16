@@ -199,6 +199,7 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
                     src={photoURL}
                     alt="Profile"
                     className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       if (!target.src.includes('ui-avatars.com')) {
@@ -250,8 +251,6 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
                 <Edit2 size={16} className={`text-gray-300 group-hover:${currentTheme.TEXT_ACCENT} transition-colors`} />
               </div>
             )}
-
-
           </div>
 
           <div className="mb-6 bg-gradient-to-r from-orange-50 via-white to-orange-50 dark:from-slate-800 dark:via-slate-700 dark:to-slate-800 border border-orange-200 dark:border-slate-600 rounded-3xl p-4 shadow-sm relative overflow-hidden group">
