@@ -141,8 +141,8 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
 
   // THEME CONFIGURATION
   const THEME_OPTIONS = [
-    { value: 'pastel' as const, label: 'Brand (Default)' },
-    { value: 'red_brick' as const, label: 'Red Brick' }
+    { value: 'pastel' as const, label: 'Pastel' },
+    { value: 'red_brick' as const, label: 'Brand' }
   ];
 
   // --- Helper Component for Tooltip ---

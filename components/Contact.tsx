@@ -25,7 +25,7 @@ export const Contact: React.FC = () => {
                 case 'quaternary': return "bg-[#FCE4EC] border-pink-100 text-pink-800"; // Light Pink
             }
         } else {
-            // Red Brick Theme: Uniform Cream/Red
+            // Brand Theme: Uniform Cream/Red
             return "bg-[#FFF8F0] border-[#8B3A3A]/30 text-[#934139]";
         }
         return "";
