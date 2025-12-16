@@ -35,6 +35,7 @@ export interface RewardState {
   dailyPoints?: number;
   lastDailyReset?: string;
   dailyTarget?: number;
+  userId?: string;
 }
 
 export interface RewardEvent {

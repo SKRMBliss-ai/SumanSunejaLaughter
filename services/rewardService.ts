@@ -13,6 +13,16 @@ const getInitialState = (): RewardState => {
     const saved = localStorage.getItem(REWARD_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
+      const currentUid = auth.currentUser?.uid;
+
+      // CRITICAL SECURITY FIX:
+      // If the stored data belongs to a different user (or no user is logged in but data has ID),
+      // IGNORE the local data to prevent leakage.
+      if (currentUid && parsed.userId && parsed.userId !== currentUid) {
+        console.warn("Detected reward data for different user. Ignoring.");
+        return createDefaultState();
+      }
+
       // Migration: Ensure activityHistory exists
       if (!parsed.activityHistory) parsed.activityHistory = [];
       return parsed;
@@ -20,17 +30,20 @@ const getInitialState = (): RewardState => {
   } catch (e) {
     // Silent fail
   }
-  return {
-    points: 0,
-    streak: 0,
-    lastActiveDate: '',
-    level: 1,
-    activityHistory: [],
-    dailyPoints: 0,
-    lastDailyReset: new Date().toDateString(),
-    dailyTarget: 50 // Default target
-  };
+  return createDefaultState();
 };
+
+const createDefaultState = (): RewardState => ({
+  points: 0,
+  streak: 0,
+  lastActiveDate: '',
+  level: 1,
+  activityHistory: [],
+  dailyPoints: 0,
+  lastDailyReset: new Date().toDateString(),
+  dailyTarget: 50,
+  userId: auth.currentUser?.uid
+});
 
 export const getRewardState = (): RewardState => {
   return getInitialState();
@@ -42,6 +55,10 @@ export const syncRewardsWithFirestore = async (): Promise<boolean> => {
   if (!uid) return false;
 
   const userRef = doc(db, 'users', uid);
+
+  // PURGE LOCAL CACHE to ensure we are 100% relying on DB or clean state
+  localStorage.removeItem(REWARD_KEY);
+
   try {
     const docSnap = await getDoc(userRef);
     if (docSnap.exists()) {
@@ -62,17 +79,45 @@ export const syncRewardsWithFirestore = async (): Promise<boolean> => {
       // Update local storage with remote data
       // await saveState to ensure local storage is ready before returning
       await saveState(remoteState, false); // false = don't double sync
+
+      // Trigger streak check NOW that we have the latest data
+      await checkDailyStreak();
+
       return true;
     } else {
       // First time user in creating doc document
-      const initialState = getInitialState();
+      // CRITICAL FIX: Do NOT use getInitialState() here because it might pull stale local storage data.
+      // Instead, use a clean default state.
+      const initialState: RewardState = {
+        points: 0,
+        streak: 0,
+        lastActiveDate: '',
+        level: 1,
+        activityHistory: [],
+        dailyPoints: 0,
+        lastDailyReset: new Date().toDateString(),
+        dailyTarget: 50
+      };
+
       await setDoc(userRef, initialState, { merge: true });
+      // Also update local storage to match this clean new state
+      await saveState(initialState, false);
+
+      // Run streak check for the new user (initializes their first day)
+      await checkDailyStreak();
+
       return true;
     }
   } catch (error) {
     // Silent fail
     return false;
   }
+};
+
+export const resetLocalRewards = () => {
+  localStorage.removeItem(REWARD_KEY);
+  // Dispatch storage event to update UI immediately
+  window.dispatchEvent(new Event('storage'));
 };
 
 export const checkDailyStreak = async () => {
@@ -178,13 +223,17 @@ export const addPoints = async (amount: number, message: string, type: RewardEve
 };
 
 const saveState = async (state: RewardState, syncToCloud = true) => {
+  const uid = getCurrentUserId();
+
+  // Ensure userId is attached to the state being saved
+  const stateWithUser = { ...state, userId: uid };
+
   // 1. Save to Local Storage (Immediate UI update)
-  localStorage.setItem(REWARD_KEY, JSON.stringify(state));
+  localStorage.setItem(REWARD_KEY, JSON.stringify(stateWithUser));
   window.dispatchEvent(new Event('storage'));
 
   // 2. Sync to Firestore (Background)
   if (syncToCloud) {
-    const uid = getCurrentUserId();
     if (uid) {
       const userRef = doc(db, 'users', uid);
       try {
@@ -197,12 +246,14 @@ const saveState = async (state: RewardState, syncToCloud = true) => {
           lastActiveDate: state.lastActiveDate,
           level: state.level,
           activityHistory: state.activityHistory,
-          dailyPoints: state.dailyPoints,
-          lastDailyReset: state.lastDailyReset,
-          dailyTarget: state.dailyTarget,
+          dailyPoints: state.dailyPoints || 0,
+          lastDailyReset: state.lastDailyReset || new Date().toDateString(),
+          dailyTarget: state.dailyTarget || 50,
           lastUpdated: new Date(),
           displayName: user?.displayName || 'Anonymous',
-          photoURL: user?.photoURL || null
+          photoURL: user?.photoURL || null,
+          email: user?.email || null,
+          uid: uid
         }, { merge: true });
       } catch (error) {
         // Silent fail

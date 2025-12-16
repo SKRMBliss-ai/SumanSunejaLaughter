@@ -3,7 +3,7 @@ import { User, Camera, Save, Phone, LogOut, Sparkles, Check, X, Flame, Trophy, Z
 import { updateProfile } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import { ViewState, RewardState } from '../types';
-import { getRewardState, getLevelTitle } from '../services/rewardService';
+import { getRewardState, getLevelTitle, resetLocalRewards } from '../services/rewardService';
 import { useSettings, SUPPORTED_LANGUAGES, FontSize } from '../contexts/SettingsContext';
 
 interface ProfileProps {
@@ -98,6 +98,7 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
   const handleSignOut = async () => {
     if (window.confirm("Are you sure you want to sign out?")) {
       try {
+        resetLocalRewards(); // Clear local storage immediately
         await auth.signOut();
       } catch (error) {
         console.error("Error signing out:", error);
