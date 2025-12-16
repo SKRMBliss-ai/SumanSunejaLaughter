@@ -186,10 +186,20 @@ export const checkDailyStreak = async () => {
 };
 
 export const addPoints = async (amount: number, message: string, type: RewardEvent['type']) => {
-  const state = getInitialState();
+  let state = getInitialState(); // Mutable mainly for re-fetching
+  const today = new Date().toDateString();
+
+  // BUG FIX: If user interacts on a new day BEFORE reloading, check streak first!
+  // Otherwise, we overwrite 'lastActiveDate' and lose the streak increment/bonus.
+  if (state.lastActiveDate !== today) {
+    console.log("New day detected during interaction! Checking streak first...");
+    await checkDailyStreak();
+    // Re-fetch state because checkDailyStreak updated it (points, streak, level, etc.)
+    state = getInitialState();
+  }
+
   const newPoints = state.points + amount;
   const newLevel = Math.floor(newPoints / 500) + 1;
-  const today = new Date().toDateString();
 
   // Update history
   const history = state.activityHistory || [];
@@ -198,7 +208,7 @@ export const addPoints = async (amount: number, message: string, type: RewardEve
     newHistory.push(today);
   }
 
-  // Reset daily points if new day
+  // Reset daily points if new day (redundant if checkDailyStreak ran, but safe)
   let dailyPoints = state.dailyPoints || 0;
   if (state.lastDailyReset !== today) {
     dailyPoints = 0;
