@@ -1590,9 +1590,9 @@ export const THEMES: Record<ColorTheme, ThemeColors> = {
         LEADERBOARD_BTN_GRADIENT: "bg-gradient-to-r from-orange-100 to-amber-100 dark:from-slate-800 dark:to-slate-900",
         LEADERBOARD_BTN_TEXT: "text-orange-700 dark:text-orange-400",
         LEADERBOARD_BTN_BORDER: "border-orange-200 dark:border-slate-700",
-        LEADERBOARD_CARD_BG: "bg-[#E0F2F1] dark:bg-slate-900",
-        LEADERBOARD_CARD_BORDER: "border-[#E0F2F1] dark:border-slate-700",
-        LEADERBOARD_CARD_TEXT: "text-[#00695C] dark:text-teal-400",
+        LEADERBOARD_CARD_BG: "bg-[#E0F2F1] dark:bg-[#002A25]",
+        LEADERBOARD_CARD_BORDER: "border-[#E0F2F1] dark:border-teal-900/50",
+        LEADERBOARD_CARD_TEXT: "text-[#00695C] dark:text-teal-200",
 
         // Pastel Theme - Rewards (Purple/Pink tones to match trophy)
         REWARD_ICON_BG_GRADIENT: "bg-gradient-to-br from-purple-400/20 to-fuchsia-600/20",
@@ -1600,9 +1600,9 @@ export const THEMES: Record<ColorTheme, ThemeColors> = {
         REWARD_BTN_GRADIENT: "bg-gradient-to-r from-purple-100 to-fuchsia-100 dark:from-slate-800 dark:to-slate-900",
         REWARD_BTN_TEXT: "text-purple-700 dark:text-purple-400",
         REWARD_BTN_BORDER: "border-purple-200 dark:border-slate-700",
-        REWARD_CARD_BG: "bg-[#F3E5F5] dark:bg-slate-900",
-        REWARD_CARD_BORDER: "border-[#F3E5F5] dark:border-slate-700",
-        REWARD_CARD_TEXT: "text-[#5B5166] dark:text-purple-400",
+        REWARD_CARD_BG: "bg-[#F3E5F5] dark:bg-[#1E102A]",
+        REWARD_CARD_BORDER: "border-[#F3E5F5] dark:border-purple-900/50",
+        REWARD_CARD_TEXT: "text-[#5B5166] dark:text-purple-200",
     },
     red_brick: {
         HERO: "bg-[linear-gradient(110deg,#592E2E_0%,#8C4A4A_50%,#592E2E_100%)]",
@@ -1651,18 +1651,18 @@ export const THEMES: Record<ColorTheme, ThemeColors> = {
         LEADERBOARD_BTN_GRADIENT: "bg-[#FFF8F0] shadow-lg transition-colors",
         LEADERBOARD_BTN_TEXT: "text-[#8B3A3A]",
         LEADERBOARD_BTN_BORDER: "border-2 border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-[#FFF8F0] hover:border-[#FFF8F0]",
-        LEADERBOARD_CARD_BG: "bg-gradient-to-br from-[#FFF8F0] to-[#FFE8E0] dark:bg-slate-900 transition-colors duration-300",
-        LEADERBOARD_CARD_BORDER: "border-[#8B3A3A] border-2 dark:border-slate-700",
-        LEADERBOARD_CARD_TEXT: "text-[#8B3A3A] dark:text-orange-100",
+        LEADERBOARD_CARD_BG: "bg-gradient-to-br from-[#FFF8F0] to-[#FFE8E0] dark:bg-none dark:bg-[#2C1A1A] transition-colors duration-300",
+        LEADERBOARD_CARD_BORDER: "border-[#8B3A3A] border-2 dark:border-[#8B3A3A]/40",
+        LEADERBOARD_CARD_TEXT: "text-[#8B3A3A] dark:text-[#FFE0E0]",
 
         REWARD_ICON_BG_GRADIENT: "bg-gradient-to-br from-purple-400/20 to-pink-600/20",
         REWARD_ICON_COLOR: "text-[#8B3A3A] fill-pink-500",
         REWARD_BTN_GRADIENT: "bg-[#FFF8F0] shadow-lg transition-colors",
         REWARD_BTN_TEXT: "text-[#8B3A3A]",
         REWARD_BTN_BORDER: "border-2 border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-[#FFF8F0] hover:border-[#FFF8F0]",
-        REWARD_CARD_BG: "bg-gradient-to-br from-[#FFF8F0] to-[#FCE8F0] dark:bg-slate-900 transition-colors duration-300",
-        REWARD_CARD_BORDER: "border-[#8B3A3A] border-2 dark:border-slate-700",
-        REWARD_CARD_TEXT: "text-[#8B3A3A] dark:text-pink-100",
+        REWARD_CARD_BG: "bg-gradient-to-br from-[#FFF8F0] to-[#FCE8F0] dark:bg-none dark:bg-[#2C1A1A] transition-colors duration-300",
+        REWARD_CARD_BORDER: "border-[#8B3A3A] border-2 dark:border-[#8B3A3A]/40",
+        REWARD_CARD_TEXT: "text-[#8B3A3A] dark:text-[#FFE0E0]",
     }
 };
 
