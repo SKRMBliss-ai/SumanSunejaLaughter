@@ -7,11 +7,9 @@ interface LeaderboardModalProps {
     isOpen: boolean;
     onClose: () => void;
 }
-// Removed MOCK_LEADERBOARD
 
 export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ isOpen, onClose }) => {
     const { currentTheme } = useSettings();
-    const [period, setPeriod] = useState<'weekly' | 'allTime'>('weekly');
     const [leaderboardData, setLeaderboardData] = useState<LeaderboardUser[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -114,6 +112,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ isOpen, onCl
                                                                 src={user.avatar}
                                                                 alt={user.name}
                                                                 className="w-full h-full object-cover"
+                                                                referrerPolicy="no-referrer"
                                                                 onError={(e) => {
                                                                     const target = e.target as HTMLImageElement;
                                                                     // Prevent infinite loop if fallback also fails (though ui-avatars is reliable)
