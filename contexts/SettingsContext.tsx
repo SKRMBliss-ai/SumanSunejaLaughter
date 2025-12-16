@@ -1647,22 +1647,22 @@ export const THEMES: Record<ColorTheme, ThemeColors> = {
 
         // Red Brick Theme - darker, richer tones
         LEADERBOARD_ICON_BG_GRADIENT: "bg-gradient-to-br from-orange-400/20 to-orange-600/20",
-        LEADERBOARD_ICON_COLOR: "text-orange-500 fill-orange-500",
-        LEADERBOARD_BTN_GRADIENT: "bg-gradient-to-r from-slate-800/80 to-slate-900/80",
-        LEADERBOARD_BTN_TEXT: "text-orange-100",
-        LEADERBOARD_BTN_BORDER: "border-slate-700 hover:border-orange-500/50",
-        LEADERBOARD_CARD_BG: "bg-[#FFF8F0] dark:bg-slate-900",
-        LEADERBOARD_CARD_BORDER: "border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-[#FFF8F0] hover:border-[#FFF8F0] border-2 dark:border-slate-700",
-        LEADERBOARD_CARD_TEXT: "text-[#8B3A3A] hover:text-[#FFF8F0] dark:text-orange-100",
+        LEADERBOARD_ICON_COLOR: "text-[#8B3A3A] fill-orange-500",
+        LEADERBOARD_BTN_GRADIENT: "bg-[#FFF8F0] shadow-lg transition-colors",
+        LEADERBOARD_BTN_TEXT: "text-[#8B3A3A]",
+        LEADERBOARD_BTN_BORDER: "border-2 border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-[#FFF8F0] hover:border-[#FFF8F0]",
+        LEADERBOARD_CARD_BG: "bg-[#FFF8F0] dark:bg-slate-900 transition-colors duration-300",
+        LEADERBOARD_CARD_BORDER: "border-[#8B3A3A] border-2 dark:border-slate-700",
+        LEADERBOARD_CARD_TEXT: "text-[#8B3A3A] dark:text-orange-100",
 
         REWARD_ICON_BG_GRADIENT: "bg-gradient-to-br from-purple-400/20 to-pink-600/20",
-        REWARD_ICON_COLOR: "text-pink-500 fill-pink-500",
-        REWARD_BTN_GRADIENT: "bg-gradient-to-r from-slate-800/80 to-slate-900/80",
-        REWARD_BTN_TEXT: "text-pink-100",
-        REWARD_BTN_BORDER: "border-slate-700 hover:border-pink-500/50",
-        REWARD_CARD_BG: "bg-[#FFF8F0] dark:bg-slate-900",
-        REWARD_CARD_BORDER: "border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-[#FFF8F0] hover:border-[#FFF8F0] border-2 dark:border-slate-700",
-        REWARD_CARD_TEXT: "text-[#8B3A3A] hover:text-[#FFF8F0] dark:text-pink-100",
+        REWARD_ICON_COLOR: "text-[#8B3A3A] fill-pink-500",
+        REWARD_BTN_GRADIENT: "bg-[#FFF8F0] shadow-lg transition-colors",
+        REWARD_BTN_TEXT: "text-[#8B3A3A]",
+        REWARD_BTN_BORDER: "border-2 border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-[#FFF8F0] hover:border-[#FFF8F0]",
+        REWARD_CARD_BG: "bg-[#FFF8F0] dark:bg-slate-900 transition-colors duration-300",
+        REWARD_CARD_BORDER: "border-[#8B3A3A] border-2 dark:border-slate-700",
+        REWARD_CARD_TEXT: "text-[#8B3A3A] dark:text-pink-100",
     }
 };
 
