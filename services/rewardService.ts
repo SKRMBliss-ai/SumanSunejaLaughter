@@ -73,7 +73,8 @@ export const syncRewardsWithFirestore = async (): Promise<boolean> => {
         activityHistory: data.activityHistory || [],
         dailyPoints: data.dailyPoints || 0,
         lastDailyReset: data.lastDailyReset || new Date().toDateString(),
-        dailyTarget: data.dailyTarget || 50
+        dailyTarget: data.dailyTarget || 50,
+        lastSharedDate: data.lastSharedDate || undefined
       };
 
       // Update local storage with remote data
@@ -118,6 +119,47 @@ export const resetLocalRewards = () => {
   localStorage.removeItem(REWARD_KEY);
   // Dispatch storage event to update UI immediately
   window.dispatchEvent(new Event('storage'));
+};
+
+const saveState = async (state: RewardState, syncToCloud = true) => {
+  const uid = getCurrentUserId();
+
+  // Ensure userId is attached to the state being saved
+  const stateWithUser = { ...state, userId: uid };
+
+  // 1. Save to Local Storage (Immediate UI update)
+  localStorage.setItem(REWARD_KEY, JSON.stringify(stateWithUser));
+  window.dispatchEvent(new Event('storage'));
+
+  // 2. Sync to Firestore (Background)
+  if (syncToCloud) {
+    if (uid) {
+      const userRef = doc(db, 'users', uid);
+      try {
+        // Also save generic profile info for leaderboard
+        const user = auth.currentUser;
+
+        await setDoc(userRef, {
+          points: state.points,
+          streak: state.streak,
+          lastActiveDate: state.lastActiveDate,
+          level: state.level,
+          activityHistory: state.activityHistory,
+          dailyPoints: state.dailyPoints || 0,
+          lastDailyReset: state.lastDailyReset || new Date().toDateString(),
+          dailyTarget: state.dailyTarget || 50,
+          lastUpdated: new Date(),
+          displayName: user?.displayName || 'Anonymous',
+          photoURL: user?.photoURL || null,
+          email: user?.email || null,
+          uid: uid,
+          lastSharedDate: state.lastSharedDate || null
+        }, { merge: true });
+      } catch (error) {
+        // Silent fail
+      }
+    }
+  }
 };
 
 export const checkDailyStreak = async () => {
@@ -232,44 +274,29 @@ export const addPoints = async (amount: number, message: string, type: RewardEve
   dispatchReward({ pointsAdded: amount, message, type });
 };
 
-const saveState = async (state: RewardState, syncToCloud = true) => {
-  const uid = getCurrentUserId();
+export const checkShareLimit = async (): Promise<boolean> => {
+  const state = getInitialState();
+  const today = new Date();
+  const currentMonthKey = `${today.getFullYear()}-${today.getMonth()}`; // e.g., "2024-11"
 
-  // Ensure userId is attached to the state being saved
-  const stateWithUser = { ...state, userId: uid };
+  // Check if last shared date is in the same month/year
+  if (state.lastSharedDate) {
+    const lastDate = new Date(state.lastSharedDate);
+    const lastMonthKey = `${lastDate.getFullYear()}-${lastDate.getMonth()}`;
 
-  // 1. Save to Local Storage (Immediate UI update)
-  localStorage.setItem(REWARD_KEY, JSON.stringify(stateWithUser));
-  window.dispatchEvent(new Event('storage'));
-
-  // 2. Sync to Firestore (Background)
-  if (syncToCloud) {
-    if (uid) {
-      const userRef = doc(db, 'users', uid);
-      try {
-        // Also save generic profile info for leaderboard
-        const user = auth.currentUser;
-
-        await setDoc(userRef, {
-          points: state.points,
-          streak: state.streak,
-          lastActiveDate: state.lastActiveDate,
-          level: state.level,
-          activityHistory: state.activityHistory,
-          dailyPoints: state.dailyPoints || 0,
-          lastDailyReset: state.lastDailyReset || new Date().toDateString(),
-          dailyTarget: state.dailyTarget || 50,
-          lastUpdated: new Date(),
-          displayName: user?.displayName || 'Anonymous',
-          photoURL: user?.photoURL || null,
-          email: user?.email || null,
-          uid: uid
-        }, { merge: true });
-      } catch (error) {
-        // Silent fail
-      }
+    if (currentMonthKey === lastMonthKey) {
+      return false; // Already shared this month
     }
   }
+
+  // Update state with new share date
+  const newState = {
+    ...state,
+    lastSharedDate: today.toDateString() // Store full date string, but logic checks month
+  };
+
+  await saveState(newState);
+  return true; // User can proceed with reward
 };
 
 export interface LeaderboardUser {
