@@ -350,13 +350,14 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           </div>
 
           {/* Bottom Action Button - Glowing */}
+          {/* Bottom Action Button - Glowing */}
           <button
             onClick={() => setShowLeaderboard(true)}
             className={`w-full relative overflow-hidden ${currentTheme.LEADERBOARD_BTN_GRADIENT} ${currentTheme.LEADERBOARD_BTN_TEXT} font-bold py-3 rounded-2xl flex items-center justify-center gap-2 text-sm ${currentTheme.LEADERBOARD_BTN_BORDER} border transition-all active:scale-95 group/btn shadow-md hover:shadow-lg`}
           >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover/btn:animate-shimmer pointer-events-none"></div>
             <Trophy size={16} className="text-yellow-400 fill-yellow-400" />
-            Leaderboard
+            {t('leaderboard.title')}
           </button>
         </div>
 
@@ -386,7 +387,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover/btn:animate-shimmer pointer-events-none"></div>
             <Gift size={16} className="text-pink-500 fill-pink-500" />
-            Rewards
+            {t('rewards.short_title')}
           </button>
         </div>
       </div>

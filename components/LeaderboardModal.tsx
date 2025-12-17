@@ -9,7 +9,7 @@ interface LeaderboardModalProps {
 }
 
 export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ isOpen, onClose }) => {
-    const { currentTheme } = useSettings();
+    const { currentTheme, t } = useSettings();
     const [leaderboardData, setLeaderboardData] = useState<LeaderboardUser[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -54,9 +54,9 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ isOpen, onCl
                 <div className="relative z-10 flex flex-col items-center pt-8 pb-4">
                     <div className="flex items-center gap-2 mb-1">
                         <Trophy className="text-yellow-600 dark:text-yellow-400 fill-yellow-500/20" size={24} />
-                        <h2 className={`text-xl font-black text-slate-900 dark:text-white tracking-tight`}>Leaderboard</h2>
+                        <h2 className={`text-xl font-black text-slate-900 dark:text-white tracking-tight`}>{t('leaderboard.title')}</h2>
                     </div>
-                    <p className={`text-xs text-slate-600 dark:text-gray-300 font-bold`}>Top Laughter Champions</p>
+                    <p className={`text-xs text-slate-600 dark:text-gray-300 font-bold`}>{t('leaderboard.subtitle')}</p>
                 </div>
 
 
@@ -134,7 +134,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ isOpen, onCl
 
                                                 <div className="flex-1 min-w-0">
                                                     <h4 className={`text-sm font-bold truncate ${user.isCurrentUser ? 'text-yellow-800 dark:text-yellow-400' : 'text-slate-900 dark:text-slate-100'}`}>
-                                                        {user.name} {user.isCurrentUser && '(You)'}
+                                                        {user.name} {user.isCurrentUser && t('leaderboard.you')}
                                                     </h4>
                                                     <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
                                                         <span className={`flex items-center gap-0.5 ${user.isCurrentUser ? 'text-slate-700' : ''}`}><Flame size={10} className="text-orange-500" /> {user.streak}</span>
@@ -143,7 +143,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ isOpen, onCl
 
                                                 <div className="text-right">
                                                     <div className={`text-sm font-black ${user.isCurrentUser ? 'text-slate-900' : 'text-slate-900 dark:text-white'}`}>{user.points}</div>
-                                                    <div className={`text-[10px] font-bold uppercase ${user.isCurrentUser ? 'text-slate-500' : 'text-slate-400'}`}>Pts</div>
+                                                    <div className={`text-[10px] font-bold uppercase ${user.isCurrentUser ? 'text-slate-500' : 'text-slate-400'}`}>{t('leaderboard.pts')}</div>
                                                 </div>
                                             </div>
                                         ))}
@@ -156,13 +156,13 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ isOpen, onCl
                 {/* Self Rank Footer */}
                 <div className="p-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-t border-white/50 dark:border-slate-700 z-20">
                     <div className="flex justify-between items-center text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">
-                        <span>Your Rank</span>
+                        <span>{t('leaderboard.your_rank')}</span>
                         <span className="flex items-center gap-1 text-green-500">
                             <TrendingUp size={12} />
                             {loading ? '...' : (
                                 leaderboardData.find(u => u.isCurrentUser)
                                     ? `#${leaderboardData.find(u => u.isCurrentUser)?.rank}`
-                                    : 'Unranked'
+                                    : t('leaderboard.unranked')
                             )}
                         </span>
                     </div>
