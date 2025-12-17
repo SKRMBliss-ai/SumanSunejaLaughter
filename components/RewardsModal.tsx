@@ -46,7 +46,7 @@ const MERCHANDISE = [
 ];
 
 export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rewards }) => {
-    const { currentTheme } = useSettings();
+    const { currentTheme, t } = useSettings();
     const [activeTab, setActiveTab] = useState<'journey' | 'shop'>('journey');
     const [showPointsInfo, setShowPointsInfo] = useState(false);
     const [isSharing, setIsSharing] = useState(false);
@@ -89,7 +89,7 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rew
                 // Fallback for desktop/unsupported
                 await navigator.clipboard.writeText(window.location.href);
                 await addPoints(20, 'Shared Link (Copied)', 'BONUS');
-                alert("Link copied to clipboard! Points added.");
+                alert(t('reward.link_copied'));
             }
         } catch (error) {
             console.error("Share failed", error);
@@ -118,9 +118,9 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rew
                 <div className="relative z-10 flex flex-col items-center pt-8 pb-4">
                     <div className="flex items-center gap-2 mb-1">
                         <ShoppingBag className="text-pink-600 fill-pink-600/20" size={20} />
-                        <h2 className={`text-lg font-black text-slate-900 dark:text-white tracking-tight`}>Rewards Shop</h2>
+                        <h2 className={`text-lg font-black text-slate-900 dark:text-white tracking-tight`}>{t('rewards.title')}</h2>
                     </div>
-                    <p className={`text-xs text-slate-600 dark:text-gray-300 font-bold`}>Exclusive Laughter Assets</p>
+                    <p className={`text-xs text-slate-600 dark:text-gray-300 font-bold`}>{t('rewards.subtitle')}</p>
                 </div>
 
                 {/* Tabs */}
@@ -133,7 +133,7 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rew
                             }`}
                     >
                         <Trophy size={14} className={activeTab === 'journey' ? 'text-yellow-500 fill-yellow-500' : ''} />
-                        Journey
+                        {t('rewards.tab_journey')}
                     </button>
                     <button
                         onClick={() => setActiveTab('shop')}
@@ -143,7 +143,7 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rew
                             }`}
                     >
                         <ShoppingBag size={14} className={activeTab === 'shop' ? 'text-pink-500 fill-pink-500' : ''} />
-                        Shop
+                        {t('rewards.tab_shop')}
                     </button>
                 </div>
 
@@ -159,10 +159,10 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rew
                                 <div className="flex items-center justify-between mb-3 relative z-10">
                                     <h3 className="text-sm font-black flex items-center gap-2 text-slate-800 dark:text-white">
                                         <Flame size={18} className="text-orange-500 fill-orange-500" />
-                                        My Streaks
+                                        {t('rewards.my_streaks')}
                                     </h3>
                                     <div className="text-[10px] font-bold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full text-slate-500 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                                        Consistency is Key
+                                        {t('rewards.consistency')}
                                     </div>
                                 </div>
 
@@ -171,14 +171,14 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rew
                                     <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-2.5 flex flex-col items-center justify-center border border-slate-100 dark:border-slate-700">
                                         <Infinity size={16} className="text-blue-500 mb-1" />
                                         <span className="text-lg font-black text-slate-800 dark:text-white leading-none mb-0.5">{totalActiveDays}</span>
-                                        <span className="text-[9px] uppercase font-bold text-slate-400 leading-top">Days</span>
+                                        <span className="text-[9px] uppercase font-bold text-slate-400 leading-top">{t('stats.days')}</span>
                                     </div>
 
                                     {/* Longest Streak */}
                                     <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-2.5 flex flex-col items-center justify-center border border-slate-100 dark:border-slate-700">
                                         <Trophy size={16} className="text-yellow-500 mb-1" />
                                         <span className="text-lg font-black text-slate-800 dark:text-white leading-none mb-0.5">{longestStreak}</span>
-                                        <span className="text-[9px] uppercase font-bold text-slate-400 leading-top">Best</span>
+                                        <span className="text-[9px] uppercase font-bold text-slate-400 leading-top">{t('stats.best')}</span>
                                     </div>
 
                                     {/* Current Streak (Highlighted) */}
@@ -186,7 +186,7 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rew
                                         <div className="absolute inset-0 bg-orange-400/5 dark:bg-orange-400/10 animate-pulse pointer-events-none"></div>
                                         <Flame size={16} className="text-orange-500 fill-orange-500 mb-1 relative z-10" />
                                         <span className="text-lg font-black text-orange-600 dark:text-orange-100 leading-none mb-0.5 relative z-10">{rewards.streak}</span>
-                                        <span className="text-[9px] uppercase font-bold text-orange-400 dark:text-orange-300 leading-top relative z-10">Current</span>
+                                        <span className="text-[9px] uppercase font-bold text-orange-400 dark:text-orange-300 leading-top relative z-10">{t('stats.current')}</span>
                                     </div>
                                 </div>
                             </div>
@@ -201,13 +201,13 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rew
                                         <Share2 size={18} />
                                     </div>
                                     <div className="text-left">
-                                        <div className="text-xs font-bold text-purple-100 uppercase tracking-wide">Instant Reward</div>
-                                        <div className="text-sm font-black text-white">Share App & Earn +20</div>
+                                        <div className="text-xs font-bold text-purple-100 uppercase tracking-wide">{t('rewards.instant_reward')}</div>
+                                        <div className="text-sm font-black text-white">{t('rewards.share_earn')}</div>
                                     </div>
                                 </div>
                                 <div className="bg-white text-purple-600 px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1 shadow-sm group-hover:bg-purple-50 transition-colors">
                                     <Zap size={12} className="fill-current" />
-                                    Claim
+                                    {t('rewards.claim')}
                                 </div>
                             </button>
 
@@ -219,7 +219,7 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rew
 
                                 <div className="flex justify-between items-start relative z-10">
                                     <div>
-                                        <p className="text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1">Total Balance</p>
+                                        <p className="text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1">{t('rewards.total_balance')}</p>
                                         <h3 className={`text-5xl font-black text-slate-800 dark:text-white leading-tight`}>{rewards.points}</h3>
                                         <div className="mt-2 inline-flex items-center gap-1.5 bg-yellow-400/20 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300 px-3 py-1 rounded-full border border-yellow-400/30 dark:border-yellow-700">
                                             <Award size={12} className="fill-current" />
@@ -241,7 +241,7 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rew
                                             </svg>
                                             <span className="text-[10px] font-black text-slate-700 dark:text-white z-10">{dailyProgress}/{dailyTarget}</span>
                                         </div>
-                                        <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-2 uppercase tracking-tight">Daily Goal</span>
+                                        <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-2 uppercase tracking-tight">{t('rewards.daily_goal')}</span>
                                     </div>
                                 </div>
                             </div>
@@ -254,7 +254,7 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rew
                                 >
                                     <div className="flex items-center gap-2">
                                         <Target size={16} className={`text-indigo-600 dark:text-indigo-400`} />
-                                        <span className={`text-xs font-black text-slate-700 dark:text-gray-100 uppercase tracking-widest`}>How to Earn</span>
+                                        <span className={`text-xs font-black text-slate-700 dark:text-gray-100 uppercase tracking-widest`}>{t('rewards.how_to_earn')}</span>
                                     </div>
                                     <div className={`p-1 rounded-full bg-white/40 dark:bg-slate-600 transition-transform duration-300 ${showPointsInfo ? 'rotate-180' : ''}`}>
                                         <ExternalLink size={12} className="text-slate-600 dark:text-gray-300" />
@@ -265,13 +265,13 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rew
                                     <div className="px-4 pb-4 animate-in slide-in-from-top-2 duration-200">
                                         <div className="space-y-2">
                                             {[
-                                                { label: "Daily Login", points: "+20", icon: Check, action: null },
-                                                { label: "Quick 1-Min Laugh", points: "+20", icon: Zap, action: null },
-                                                { label: "Live Session", points: "+30", icon: Mic, action: null },
-                                                { label: "Rate My Laugh", points: "+15", icon: Star, action: null },
-                                                { label: "Play Games", points: "+10", icon: Gamepad2, action: null },
-                                                { label: "Watch Video", points: "+5", icon: PlayCircle, action: null },
-                                                { label: "Share App", points: "+20", icon: Share2, action: handleShareApp, highlight: true }
+                                                { label: t('earn.login'), points: "+20", icon: Check, action: null },
+                                                { label: t('earn.quick_laugh'), points: "+20", icon: Zap, action: null },
+                                                { label: t('earn.live_session'), points: "+30", icon: Mic, action: null },
+                                                { label: t('earn.rate_laugh'), points: "+15", icon: Star, action: null },
+                                                { label: t('earn.play_games'), points: "+10", icon: Gamepad2, action: null },
+                                                { label: t('earn.watch_video'), points: "+5", icon: PlayCircle, action: null },
+                                                { label: t('earn.share_app'), points: "+20", icon: Share2, action: handleShareApp, highlight: true }
                                             ].map((item, idx) => (
                                                 <div
                                                     key={idx}
@@ -294,7 +294,7 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rew
                                                     </div>
                                                     <div className="flex items-center gap-2 relative z-10">
                                                         {item.highlight && isSharing && (
-                                                            <span className="text-[9px] text-purple-600 font-bold animate-pulse">Sharing...</span>
+                                                            <span className="text-[9px] text-purple-600 font-bold animate-pulse">{t('earn.sharing')}</span>
                                                         )}
                                                         <span className={`text-xs font-black ${item.highlight ? 'text-purple-600 dark:text-purple-300' : 'text-green-600 dark:text-green-400'}`}>
                                                             {item.points}
@@ -325,12 +325,12 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rew
 
                                 if (needsStreak) {
                                     progress = Math.min(100, (rewards.streak / (item.requiredStreak || 1)) * 100);
-                                    reqLabel = `Streak ${item.requiredStreak} Days`;
-                                    subLabel = `${(item.requiredStreak || 0) - rewards.streak} more days`;
+                                    reqLabel = `Streak ${item.requiredStreak} ${t('stats.days')}`;
+                                    subLabel = `${(item.requiredStreak || 0) - rewards.streak} ${t('shop.more_days')}`;
                                 } else if (needsPoints) {
                                     progress = Math.min(100, (rewards.points / (item.requiredPoints || 1)) * 100);
-                                    reqLabel = `${item.requiredPoints} pts`;
-                                    subLabel = `Need ${(item.requiredPoints || 0) - rewards.points} more`;
+                                    reqLabel = `${item.requiredPoints} ${t('leaderboard.pts')}`;
+                                    subLabel = t('shop.need_more_points').replace('{points}', ((item.requiredPoints || 0) - rewards.points).toString());
                                 }
 
                                 return (
@@ -381,7 +381,7 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rew
                                             {isLocked ? (
                                                 <div className="mt-1">
                                                     <div className="flex justify-between items-center text-[10px] uppercase font-bold text-gray-400 mb-1">
-                                                        <span>Locked</span>
+                                                        <span>{t('shop.locked')}</span>
                                                         <span className={needsStreak ? "text-orange-500" : ""}>{reqLabel}</span>
                                                     </div>
                                                     <div className="h-1.5 w-full bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden">
@@ -400,7 +400,7 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rew
                                                     <button
                                                         onClick={() => handleMerchClick(item)}
                                                         className={`text-white p-1.5 rounded-lg active:scale-95 transition-transform bg-orange-500 shadow-lg shadow-orange-500/20`}
-                                                        title="Get Coupon"
+                                                        title={t('shop.get_coupon')}
                                                     >
                                                         <ExternalLink size={12} />
                                                     </button>
