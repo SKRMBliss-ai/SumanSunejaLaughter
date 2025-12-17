@@ -155,10 +155,10 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ isOpen, onCl
 
                 {/* Self Rank Footer */}
                 <div className="p-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-t border-white/50 dark:border-slate-700 z-20">
-                    <div className="flex justify-between items-center text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">
-                        <span>{t('leaderboard.your_rank')}</span>
-                        <span className="flex items-center gap-1 text-green-500">
-                            <TrendingUp size={12} />
+                    <div className="flex justify-between items-center mb-1">
+                        <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{t('leaderboard.your_rank')}</span>
+                        <span className="flex items-center gap-1 text-green-600 dark:text-green-400 text-sm font-black">
+                            <TrendingUp size={16} />
                             {loading ? '...' : (
                                 leaderboardData.find(u => u.isCurrentUser)
                                     ? `#${leaderboardData.find(u => u.isCurrentUser)?.rank}`
