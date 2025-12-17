@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, ShoppingBag, ExternalLink, Flame, Target, Trophy, Award, Check, Infinity, Lock, Share2, Zap, Mic, Star, Gamepad2, PlayCircle } from 'lucide-react';
 import { useSettings } from '../contexts/SettingsContext';
 import { RewardState } from '../types';
-import { getLevelTitle, calculateLongestStreak, addPoints } from '../services/rewardService';
+import { getLevelTitle, calculateLongestStreak, addPoints, checkShareLimit } from '../services/rewardService';
 
 interface RewardsModalProps {
     isOpen: boolean;
@@ -73,26 +73,55 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ isOpen, onClose, rew
     };
 
     const handleShareApp = async (e?: React.MouseEvent) => {
-        if (e) e.stopPropagation();
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
         if (isSharing) return;
         setIsSharing(true);
+
+        const shareData = {
+            title: 'Suman Suneja Laughter Hub',
+            text: '✨ I\'m finding joy and earning badges on Suman Suneja Laughter Hub! Come join the fun! 🧘‍♀️😂',
+            url: window.location.href,
+        };
+
         try {
-            if (navigator.share) {
-                await navigator.share({
-                    title: 'Ignite Your Inner Smile!',
-                    text: 'Join me on a journey to wellness with this Laughter Yoga app. It is amazing!',
-                    url: window.location.href,
-                });
-                // Reward user
-                await addPoints(20, 'Shared App', 'BONUS');
+            // Rate Limit Check
+            const canEarn = await checkShareLimit();
+
+            if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+                await navigator.share(shareData);
+                if (canEarn) {
+                    await addPoints(20, 'Shared App', 'BONUS');
+                } else {
+                    // Still allow sharing, just don't give points
+                    // Optional: Toast "Thanks for sharing again!"
+                }
             } else {
-                // Fallback for desktop/unsupported
-                await navigator.clipboard.writeText(window.location.href);
-                await addPoints(20, 'Shared Link (Copied)', 'BONUS');
-                alert(t('reward.link_copied'));
+                // Fallback for desktop/unsupported browsers
+                await navigator.clipboard.writeText(shareData.url + '\n' + shareData.text);
+
+                if (canEarn) {
+                    await addPoints(20, 'Shared Link (Copied)', 'BONUS');
+                    alert(t('reward.link_copied') || 'Link copied to clipboard!');
+                } else {
+                    alert('Link copied! (Daily reward limit reached)');
+                }
             }
         } catch (error) {
-            console.error("Share failed", error);
+            console.error("Share failed:", error);
+            // If user cancels share, we usually don't want to alert, but we catch it here.
+            // If it's a real error, fallback to clipboard
+            if ((error as Error).name !== 'AbortError') {
+                try {
+                    await navigator.clipboard.writeText(shareData.url);
+                    alert(t('reward.link_copied') || 'Link copied to clipboard!');
+                } catch (clipboardError) {
+                    console.error("Clipboard fallback failed:", clipboardError);
+                }
+            }
         } finally {
             setIsSharing(false);
         }

@@ -1,4 +1,4 @@
-# User Login & Reward Calculation Test Suite
+craee a # User Login & Reward Calculation Test Suite
 
 This document defines specific test cases to verify User Isolation, Reward Logic, and Streak Calculations.
 
@@ -31,6 +31,17 @@ This document defines specific test cases to verify User Isolation, Reward Logic
     *   Streak resets to 1.
     *   Points increase by +20 (Login bonus).
     *   Pop-up notification: "Daily Login Bonus!".
+
+### Test Case 2.3: Monthly Share Limit
+1.  **Pre-condition:** User has NOT shared the app this month.
+2.  **Action:** User clicks "Share App" (and completes share/copy).
+3.  **Expected Result:**
+    *   Points increase by +20.
+    *   `lastSharedDate` updates to today.
+4.  **Follow-up Action:** User clicks "Share App" again immediately (or any day same month).
+5.  **Expected Result:**
+    *   Points do NOT increase.
+    *   User notified: "Daily reward limit reached" (or similar monthly message).
 
 ## 3. Leveling System
 **Objective:** Verify level progression thresholds.
