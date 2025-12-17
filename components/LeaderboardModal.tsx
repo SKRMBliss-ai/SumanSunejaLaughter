@@ -154,17 +154,20 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ isOpen, onCl
                 </div>
 
                 {/* Self Rank Footer */}
-                <div className="p-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-t border-white/50 dark:border-slate-700 z-20">
-                    <div className="flex justify-between items-center text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">
-                        <span>{t('leaderboard.your_rank')}</span>
-                        <span className="flex items-center gap-1 text-green-500">
-                            <TrendingUp size={12} />
-                            {loading ? '...' : (
-                                leaderboardData.find(u => u.isCurrentUser)
-                                    ? `#${leaderboardData.find(u => u.isCurrentUser)?.rank}`
-                                    : t('leaderboard.unranked')
-                            )}
-                        </span>
+                {/* Self Rank Footer */}
+                <div className="p-5 bg-yellow-50/90 dark:bg-slate-800/90 backdrop-blur-xl border-t-2 border-yellow-200 dark:border-slate-700 z-20 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
+                    <div className="flex justify-between items-center">
+                        <span className="text-lg font-black text-slate-800 dark:text-white tracking-tight">{t('leaderboard.your_rank')}</span>
+                        <div className="flex items-center gap-2">
+                            <TrendingUp size={22} className="text-green-500" />
+                            <span className="text-2xl font-black text-yellow-600 dark:text-yellow-400 drop-shadow-sm">
+                                {loading ? '...' : (
+                                    leaderboardData.find(u => u.isCurrentUser)
+                                        ? `#${leaderboardData.find(u => u.isCurrentUser)?.rank}`
+                                        : <span className="text-base text-slate-400 font-bold">{t('leaderboard.unranked')}</span>
+                                )}
+                            </span>
+                        </div>
                     </div>
                 </div>
 
