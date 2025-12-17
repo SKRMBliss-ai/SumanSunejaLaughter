@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Video, ArrowRight, Star, Bell, X, Sparkles, Smile, Globe, Calendar, Lock, Check, Clock, Trophy, Flame, Moon, Sun, Type, Palette, ChevronDown, Info, Mic } from 'lucide-react';
+import { Video, ArrowRight, Star, Bell, X, Sparkles, Smile, Globe, Calendar, Lock, Check, Clock, Trophy, Flame, Moon, Sun, Type, Palette, ChevronDown, Info, Mic, Gift } from 'lucide-react';
 import { ViewState, RewardState } from '../types';
 import { getRewardState } from '../services/rewardService';
+import { RewardsModal } from './RewardsModal';
+import { LeaderboardModal } from './LeaderboardModal';
 import { useSettings, SUPPORTED_LANGUAGES, FontSize } from '../contexts/SettingsContext';
 import { useLiveWidget } from '../contexts/LiveWidgetContext';
 
@@ -22,6 +24,8 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
   const [rewards, setRewards] = useState<RewardState>(getRewardState());
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
+  const [isRewardsOpen, setIsRewardsOpen] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   // --- NEW: Tour State (0 = off, 1 = Dark Mode, 2 = Theme, 3 = Font, 4 = Lang) ---
   const [tourStep, setTourStep] = useState(0);
@@ -137,8 +141,8 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
 
   // THEME CONFIGURATION
   const THEME_OPTIONS = [
-    { value: 'pastel' as const, label: 'Brand (Default)' },
-    { value: 'red_brick' as const, label: 'Red Brick' }
+    { value: 'pastel' as const, label: 'Pastel' },
+    { value: 'red_brick' as const, label: 'Brand' }
   ];
 
   // --- Helper Component for Tooltip ---
@@ -323,25 +327,67 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         </div>
       )}
 
-      {/* Stats Cards - Pop In */}
-      <div className="flex flex-wrap gap-3 animate-pop-in delay-100">
-        <div className={`flex-1 min-w-[140px] ${currentTheme.STAT_BG_1} dark:bg-slate-800 p-3 rounded-2xl flex items-center gap-3 shadow-sm`}>
-          <div className={`${currentTheme.STAT_ICON_BG_1} dark:bg-orange-900 p-2 rounded-xl shadow-sm shrink-0`}>
-            <Flame size={20} fill="currentColor" className="animate-pulse" />
+      {/* Stats Cards - Redesigned to match new aesthetic */}
+      <div className="grid grid-cols-2 gap-4 animate-pop-in delay-100">
+
+        {/* Streak / Leaderboard Card */}
+        <div className={`rounded-[2rem] p-4 relative overflow-hidden flex flex-col justify-between shadow-xl border min-h-[160px] group ${currentTheme.LEADERBOARD_CARD_BG} ${currentTheme.LEADERBOARD_CARD_BORDER}`}>
+          {/* Subtle Background Glow */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+
+          {/* Top Section */}
+          <div className="flex justify-between items-start mb-4 relative z-10">
+            {/* Icon Circle - Glassmorphism & Gradient */}
+            <div className={`w-12 h-12 rounded-2xl ${currentTheme.LEADERBOARD_ICON_BG_GRADIENT} backdrop-blur-md border border-white/10 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500`}>
+              <Flame size={24} className={`${currentTheme.LEADERBOARD_ICON_COLOR} drop-shadow-sm`} />
+            </div>
+
+            {/* Text Content */}
+            <div className="text-right">
+              <div className={`text-4xl font-black leading-none tracking-tight drop-shadow-sm ${currentTheme.LEADERBOARD_CARD_TEXT}`}>{rewards.streak}</div>
+              <div className={`text-[0.65rem] font-bold uppercase tracking-widest mt-1 ${currentTheme.LEADERBOARD_CARD_TEXT} opacity-80`}>{t('streak')}</div>
+            </div>
           </div>
-          <div className="min-w-0">
-            <div className="text-xl font-black text-gray-800 dark:text-gray-100 leading-none truncate">{rewards.streak}</div>
-            <div className="text-[0.65rem] font-bold text-orange-400 uppercase truncate">{t('streak')}</div>
-          </div>
+
+          {/* Bottom Action Button - Glowing */}
+          <button
+            onClick={() => setShowLeaderboard(true)}
+            className={`w-full relative overflow-hidden ${currentTheme.LEADERBOARD_BTN_GRADIENT} ${currentTheme.LEADERBOARD_BTN_TEXT} font-bold py-3 rounded-2xl flex items-center justify-center gap-2 text-sm ${currentTheme.LEADERBOARD_BTN_BORDER} border transition-all active:scale-95 group/btn shadow-md hover:shadow-lg`}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover/btn:animate-shimmer pointer-events-none"></div>
+            <Trophy size={16} className="text-yellow-400 fill-yellow-400" />
+            Leaderboard
+          </button>
         </div>
-        <div className={`flex-1 min-w-[140px] ${currentTheme.STAT_BG_2} dark:bg-slate-800 p-3 rounded-2xl flex items-center gap-3 shadow-sm`}>
-          <div className={`${currentTheme.STAT_ICON_BG_2} dark:bg-purple-900 p-2 rounded-xl shadow-sm shrink-0`}>
-            <Trophy size={20} fill="currentColor" className="animate-wiggle" />
+
+        {/* Points / Rewards Card */}
+        <div className={`rounded-[2rem] p-4 relative overflow-hidden flex flex-col justify-between shadow-xl border min-h-[160px] group ${currentTheme.REWARD_CARD_BG} ${currentTheme.REWARD_CARD_BORDER}`}>
+          {/* Subtle Background Glow */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+
+          {/* Top Section */}
+          <div className="flex justify-between items-start mb-4 relative z-10">
+            {/* Icon Circle - Glassmorphism & Gradient */}
+            <div className={`w-12 h-12 rounded-2xl ${currentTheme.REWARD_ICON_BG_GRADIENT} backdrop-blur-md border border-white/10 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500`}>
+              <Trophy size={24} className={`${currentTheme.REWARD_ICON_COLOR} drop-shadow-sm`} />
+            </div>
+
+            {/* Text Content */}
+            <div className="text-right">
+              <div className={`text-4xl font-black leading-none tracking-tight drop-shadow-sm ${currentTheme.REWARD_CARD_TEXT}`}>{rewards.points}</div>
+              <div className={`text-[0.65rem] font-bold uppercase tracking-widest mt-1 ${currentTheme.REWARD_CARD_TEXT} opacity-80`}>{t('points')}</div>
+            </div>
           </div>
-          <div className="min-w-0">
-            <div className="text-xl font-black text-gray-800 dark:text-gray-100 leading-none truncate">{rewards.points}</div>
-            <div className="text-[0.65rem] font-bold text-purple-400 uppercase truncate">{t('points')} ({t('level')} {rewards.level})</div>
-          </div>
+
+          {/* Bottom Action Button - Glowing */}
+          <button
+            onClick={() => setIsRewardsOpen(true)}
+            className={`w-full relative overflow-hidden ${currentTheme.REWARD_BTN_GRADIENT} ${currentTheme.REWARD_BTN_TEXT} font-bold py-3 rounded-2xl flex items-center justify-center gap-2 text-sm ${currentTheme.REWARD_BTN_BORDER} border transition-all active:scale-95 group/btn shadow-md hover:shadow-lg`}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover/btn:animate-shimmer pointer-events-none"></div>
+            <Gift size={16} className="text-pink-500 fill-pink-500" />
+            Rewards
+          </button>
         </div>
       </div>
 
@@ -606,6 +652,17 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         </div>
       </div>
 
-    </div>
+      <RewardsModal
+        isOpen={isRewardsOpen}
+        onClose={() => setIsRewardsOpen(false)}
+        rewards={rewards}
+      />
+
+      <LeaderboardModal
+        isOpen={showLeaderboard}
+        onClose={() => setShowLeaderboard(false)}
+      />
+
+    </div >
   );
 };

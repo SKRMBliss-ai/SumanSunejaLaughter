@@ -71,7 +71,7 @@ export const SumanAI: React.FC = () => {
         {messages.map((msg, idx) => (
           <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[80%] p-3 rounded-2xl shadow-sm ${msg.role === 'user'
-              // User message bubble: Use Red Brick for brand theme, or theme button color for pastel
+              // User message bubble: Use Brand Theme for brand theme, or theme button color for pastel
               ? `${colorTheme === 'pastel' ? currentTheme.BUTTON : 'bg-[#8B3A3A]'} text-white rounded-br-none`
               : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-100 border border-gray-100 dark:border-slate-700 rounded-bl-none'
               }`}>
@@ -125,7 +125,7 @@ export const SumanAI: React.FC = () => {
           <button
             onClick={() => handleSend()}
             disabled={isLoading}
-            // Button Style: Red Brick for brand theme, standard secondary for pastel
+            // Button Style: Brand Theme for brand theme, standard secondary for pastel
             className={`p-3 ${colorTheme === 'pastel' ? currentTheme.BUTTON_SECONDARY : 'bg-[#8B3A3A] hover:bg-[#7a302a]'} text-white rounded-xl disabled:opacity-50 transition-colors shadow-md`}
           >
             <Send size={20} />

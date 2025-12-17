@@ -188,7 +188,7 @@ const translations: Record<Language, Record<string, string>> = {
         'tour.dark_mode': 'Light / Dark',
         'tour.dark_mode_desc': 'Tap to switch between day and night modes!',
         'tour.color_theme': 'Color Themes',
-        'tour.color_theme_desc': 'Switch between Brand Red and other fun themes!',
+        'tour.color_theme_desc': 'Switch between Brand and other fun themes!',
         'tour.font_size': 'Text Size',
         'tour.font_size_desc': 'Tap to make the text larger or smaller.',
         'tour.language_desc': 'Change the app language here!',
@@ -395,7 +395,7 @@ const translations: Record<Language, Record<string, string>> = {
         'tour.dark_mode': 'लाइट / डार्क',
         'tour.dark_mode_desc': 'दिन और रात मोड के बीच स्विच करने के लिए टैप करें!',
         'tour.color_theme': 'रंग थीम',
-        'tour.color_theme_desc': 'ब्रांड रेड और अन्य मजेदार थीम के बीच स्विच करें!',
+        'tour.color_theme_desc': 'ब्रांड और अन्य मजेदार थीम के बीच स्विच करें!',
         'tour.font_size': 'टेक्स्ट आकार',
         'tour.font_size_desc': 'टेक्स्ट को बड़ा या छोटा करने के लिए टैप करें।',
         'tour.language_desc': 'यहाँ ऐप की भाषा बदलें!',
@@ -602,7 +602,7 @@ const translations: Record<Language, Record<string, string>> = {
         'tour.dark_mode': 'Claro / Oscuro',
         'tour.dark_mode_desc': '¡Toca para cambiar entre modos día y noche!',
         'tour.color_theme': 'Temas de Color',
-        'tour.color_theme_desc': '¡Cambia entre Rojo Marca y otros temas divertidos!',
+        'tour.color_theme_desc': '¡Cambia entre Marca y otros temas divertidos!',
         'tour.font_size': 'Tamaño de Texto',
         'tour.font_size_desc': 'Toca para hacer el texto más grande o más pequeño.',
         'tour.language_desc': '¡Cambia el idioma de la aplicación aquí!',
@@ -809,7 +809,7 @@ const translations: Record<Language, Record<string, string>> = {
         'tour.dark_mode': 'فاتح / داكن',
         'tour.dark_mode_desc': 'انقر للتبديل بين الوضعين النهاري والليلي!',
         'tour.color_theme': 'سمات الألوان',
-        'tour.color_theme_desc': 'بدل بين أحمر العلامة التجارية وسمات ممتعة أخرى!',
+        'tour.color_theme_desc': 'بدل بين العلامة التجارية وسمات ممتعة أخرى!',
         'tour.font_size': 'حجم النص',
         'tour.font_size_desc': 'انقر لجعل النص أكبر أو أصغر.',
         'tour.language_desc': 'غير لغة التطبيق من هنا!',
@@ -1016,7 +1016,7 @@ const translations: Record<Language, Record<string, string>> = {
         'tour.dark_mode': 'Clair / Sombre',
         'tour.dark_mode_desc': 'Appuyez pour basculer entre les modes jour et nuit !',
         'tour.color_theme': 'Thèmes de couleur',
-        'tour.color_theme_desc': 'Basculez entre Rouge Marque et d\'autres thèmes amusants !',
+        'tour.color_theme_desc': 'Basculez entre Marque et d\'autres thèmes amusants !',
         'tour.font_size': 'Taille du texte',
         'tour.font_size_desc': 'Appuyez pour agrandir ou réduire le texte.',
         'tour.language_desc': "Changez la langue de l'application ici !",
@@ -1223,7 +1223,7 @@ const translations: Record<Language, Record<string, string>> = {
         'tour.dark_mode': 'Hell / Dunkel',
         'tour.dark_mode_desc': 'Tippe, um zwischen Tag- und Nachtmodus zu wechseln!',
         'tour.color_theme': 'Farbthemen',
-        'tour.color_theme_desc': 'Wechsle zwischen Markenrot und anderen lustigen Themen!',
+        'tour.color_theme_desc': 'Wechsle zwischen Marke und anderen lustigen Themen!',
         'tour.font_size': 'Textgröße',
         'tour.font_size_desc': 'Tippe, um den Text größer oder kleiner zu machen.',
         'tour.language_desc': 'Ändere hier die App-Sprache!',
@@ -1430,7 +1430,7 @@ const translations: Record<Language, Record<string, string>> = {
         'tour.dark_mode': 'ライト / ダーク',
         'tour.dark_mode_desc': 'タップして昼と夜のモードを切り替えます！',
         'tour.color_theme': 'カラーテーマ',
-        'tour.color_theme_desc': 'ブランドレッドと他の楽しいテーマを切り替えます！',
+        'tour.color_theme_desc': 'ブランドと他の楽しいテーマを切り替えます！',
         'tour.font_size': '文字サイズ',
         'tour.font_size_desc': 'タップして文字を大きくしたり小さくしたりします。',
         'tour.language_desc': 'ここでアプリの言語を変更します！',
@@ -1444,7 +1444,7 @@ const translations: Record<Language, Record<string, string>> = {
         'notification.join_now': '今すぐ参加',
         'home.wellness_partner': 'ウェルネスパートナー',
         'home.talk_ai': 'スーマンAIと話す',
-        'home.ai_desc': '世界初のリアルタイムラフターヨガAIを体験してください。会話をして、即座にフィードバックを得て、一緒に笑いましょう！',
+        'home.ai_desc': '世界初のリアルタイムラフターヨガAIを体験してください。会話を楽しみ、即座にフィードバックを受け取り、一緒に笑いましょう！',
         'home.start_live': 'ライブインタラクションを開始',
         'home.live_sessions': 'ライブセッション',
         'home.meeting_id': 'ミーティングID',
@@ -1452,25 +1452,25 @@ const translations: Record<Language, Record<string, string>> = {
         'home.dubai': 'ドバイ',
         'home.india': 'インド',
         'contact.whatsapp_msg': 'こんにちは、スーマン！ラフターヨガに興味があり、もっと知りたいです。',
-        'contact.email_subject': 'ラフターヨガのお問い合わせ',
+        'contact.email_subject': 'ラフターヨガに関するお問い合わせ',
         'contact.email_body': 'こんにちは、スーマン。セッションを予約したいです。',
-        'coach.live_session_start': 'ライブ笑いセッション',
-        'coach.quick_session_start': '1分間の笑いブーストを開始します。準備してください！',
-        'coach.quick_session_start_2': 'クイック笑いセッションを開始します。笑顔の準備をしてください！',
-        'coach.offline_feedback': '私のAI脳（クォータ制限/オフライン）がなくても、それが楽しかったことはわかります！笑い続けてください！',
+        'coach.live_session_start': 'ライブラフターセッション',
+        'coach.quick_session_start': '1分間のラフターブーストを開始します。準備してください！',
+        'coach.quick_session_start_2': 'クイックラフターセッションを開始します。笑顔になる準備をしてください！',
+        'coach.offline_feedback': '私のAI脳（クォータ制限/オフライン）がなくても、これは楽しかったと言えます！笑い続けてください！',
         'coach.stop_session': 'セッションを停止',
-        'coach.live_session_btn': 'ライブ笑いセッション',
-        'coach.offline_voice_saver': 'オフライン音声を使用中（データ節約）',
-        'games.thinking_joke': '面白いジョークを考えています...',
+        'coach.live_session_btn': 'ライブラフターセッション',
+        'coach.offline_voice_saver': 'オフライン音声を使用（データ節約モード）',
+        'games.thinking_joke': '面白いことを考えています...',
         'games.thinking_story': '喜びを醸造中...',
-        'games.mood_change': '{mood}気分ですか？変えましょう！',
-        'games.offline_error': 'オフラインモードを使用中（APIキーなし）',
-        'games.offline_story': '今はコメディ脳にアクセスできませんが、それでも笑うことはできます！ハハハ！',
+        'games.mood_change': '{mood}な気分ですか？変えましょう！',
+        'games.offline_error': 'オフラインモードを使用中（APIキーがありません）',
+        'games.offline_story': '今、私のコメディ脳にアクセスできませんが、それでも笑うことはできます！ハハハ！',
         'games.connection_error': '接続の問題。もう一度試してください！',
-        'games.generic_error': 'おっと！何かがうまくいきませんでした。でも笑顔でいてください！',
+        'games.generic_error': 'おっと！何か問題が発生しました。でも笑顔でいてください！',
         'games.offline_mood': 'ハハハ！ヒヒヒ！笑いは最高の薬です、オフラインでも！',
-        'games.mood_error': '気分の笑いを生成できませんでした。',
-        'games.pick_a': 'または選ぶ',
+        'games.mood_error': '気分による笑いを生成できませんでした。',
+        'games.pick_a': 'または選択',
         'games.theme': 'テーマ',
         'games.topic': 'トピック',
         'games.mood_1': 'クスクス笑い 🤭',
@@ -1518,8 +1518,28 @@ export interface ThemeColors {
     APP_BG: string;
     SESSION_1_BG: string;
     SESSION_1_ACCENT: string;
+
+    // New additions for generic styling support across themes
+    LEADERBOARD_ICON_BG_GRADIENT: string;
+    LEADERBOARD_ICON_COLOR: string;
+    LEADERBOARD_BTN_GRADIENT: string;
+    LEADERBOARD_BTN_TEXT: string;
+    LEADERBOARD_BTN_BORDER: string;
+    LEADERBOARD_CARD_BG: string;
+    LEADERBOARD_CARD_BORDER: string;
+    LEADERBOARD_CARD_TEXT: string;
+
+    REWARD_ICON_BG_GRADIENT: string;
+    REWARD_ICON_COLOR: string;
+    REWARD_BTN_GRADIENT: string;
+    REWARD_BTN_TEXT: string;
+    REWARD_BTN_BORDER: string;
+    REWARD_CARD_BG: string;
+    REWARD_CARD_BORDER: string;
+    REWARD_CARD_TEXT: string;
     SESSION_2_BG: string;
     SESSION_2_ACCENT: string;
+    TEXT_SECONDARY: string;
 }
 
 export const THEMES: Record<ColorTheme, ThemeColors> = {
@@ -1541,14 +1561,10 @@ export const THEMES: Record<ColorTheme, ThemeColors> = {
         STAT_ICON_BG_2: "bg-white text-purple-400",
         LIVE_CARD_BG: "bg-white border-2 border-purple-100",
         LIVE_BTN: "bg-[#A8C8C0] text-white hover:brightness-105 shadow-md",
-
         HEADER_BG: "bg-[#F7F9FC]",
         HEADER_TEXT: "text-[#5B5166]",
         HEADER_BORDER: "border-[#B8B8D0]/20",
-
-        // Pastel: Default is purple/grey button with white text
         SUBSCRIBE_BTN: "bg-[#C0B8D0] hover:bg-[#B0A8C0] text-white",
-
         MUSIC_BTN: "bg-white border-[#EDE8F8] text-[#C3B8D5] hover:border-[#A8C8C0] hover:text-[#A8C8C0]",
         MUSIC_BTN_ACTIVE: "bg-[#A8C8C0] border-white text-white",
         MUSIC_ICON: "text-[#A8C8C0]",
@@ -1562,10 +1578,31 @@ export const THEMES: Record<ColorTheme, ThemeColors> = {
         VIDEO_RING_2: "bg-[#C0B8D0]/40",
         VIDEO_BORDER: "border-[#C0B8D0]/50",
         APP_BG: "bg-[#F7F9FC]",
-        SESSION_1_BG: "bg-[#E0F7FA]",
-        SESSION_1_ACCENT: "text-[#006064]",
-        SESSION_2_BG: "bg-[#F3E5F5]",
-        SESSION_2_ACCENT: "text-[#4A148C]"
+        SESSION_1_BG: "bg-pink-50",
+        SESSION_1_ACCENT: "text-pink-500",
+        SESSION_2_BG: "bg-violet-50",
+        SESSION_2_ACCENT: "text-violet-500",
+        TEXT_SECONDARY: "text-[#5D4037]",
+
+        // Pastel Theme - Leaderboard (Warm/Orange tones to match flame)
+        LEADERBOARD_ICON_BG_GRADIENT: "bg-gradient-to-br from-orange-400/20 to-amber-600/20",
+        LEADERBOARD_ICON_COLOR: "text-orange-500 fill-orange-500",
+        LEADERBOARD_BTN_GRADIENT: "bg-gradient-to-r from-orange-100 to-amber-100 dark:from-slate-800 dark:to-slate-900",
+        LEADERBOARD_BTN_TEXT: "text-orange-700 dark:text-orange-400",
+        LEADERBOARD_BTN_BORDER: "border-orange-200 dark:border-slate-700",
+        LEADERBOARD_CARD_BG: "bg-[#E0F2F1] dark:bg-[#002A25]",
+        LEADERBOARD_CARD_BORDER: "border-[#E0F2F1] dark:border-teal-900/50",
+        LEADERBOARD_CARD_TEXT: "text-[#00695C] dark:text-teal-200",
+
+        // Pastel Theme - Rewards (Purple/Pink tones to match trophy)
+        REWARD_ICON_BG_GRADIENT: "bg-gradient-to-br from-purple-400/20 to-fuchsia-600/20",
+        REWARD_ICON_COLOR: "text-purple-500 fill-purple-500",
+        REWARD_BTN_GRADIENT: "bg-gradient-to-r from-purple-100 to-fuchsia-100 dark:from-slate-800 dark:to-slate-900",
+        REWARD_BTN_TEXT: "text-purple-700 dark:text-purple-400",
+        REWARD_BTN_BORDER: "border-purple-200 dark:border-slate-700",
+        REWARD_CARD_BG: "bg-[#F3E5F5] dark:bg-[#1E102A]",
+        REWARD_CARD_BORDER: "border-[#F3E5F5] dark:border-purple-900/50",
+        REWARD_CARD_TEXT: "text-[#5B5166] dark:text-purple-200",
     },
     red_brick: {
         HERO: "bg-[linear-gradient(110deg,#592E2E_0%,#8C4A4A_50%,#592E2E_100%)]",
@@ -1585,14 +1622,10 @@ export const THEMES: Record<ColorTheme, ThemeColors> = {
         STAT_ICON_BG_2: "bg-white text-purple-500",
         LIVE_CARD_BG: "bg-white/70 backdrop-blur-xl border-2 border-purple-300/50",
         LIVE_BTN: "bg-[#FFF8F0] text-[#8B3A3A] border-2 border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-[#FFF8F0] hover:border-[#FFF8F0] shadow-lg transition-colors",
-
         HEADER_BG: "bg-[#FEF4E6]",
         HEADER_TEXT: "text-[#783766]",
         HEADER_BORDER: "border-[#783766]/10",
-
-        // UPDATED: Text is Brick Red by default, White on Hover
         SUBSCRIBE_BTN: "bg-[#FFF8F0] text-[#8B3A3A] border-2 border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-[#FFF8F0] hover:border-[#FFF8F0] transition-colors",
-
         MUSIC_BTN: "bg-white border-[#EDE8F8] text-[#C3B8D5] hover:border-[#8B3A3A] hover:text-[#8B3A3A]",
         MUSIC_BTN_ACTIVE: "bg-[#8B3A3A] border-white text-white",
         MUSIC_ICON: "text-[#8B3A3A]",
@@ -1609,7 +1642,27 @@ export const THEMES: Record<ColorTheme, ThemeColors> = {
         SESSION_1_BG: "bg-pink-50",
         SESSION_1_ACCENT: "text-pink-500",
         SESSION_2_BG: "bg-violet-50",
-        SESSION_2_ACCENT: "text-violet-500"
+        SESSION_2_ACCENT: "text-violet-500",
+        TEXT_SECONDARY: "text-[#5D4037]",
+
+        // Red Brick Theme - darker, richer tones
+        LEADERBOARD_ICON_BG_GRADIENT: "bg-gradient-to-br from-orange-400/20 to-orange-600/20",
+        LEADERBOARD_ICON_COLOR: "text-[#8B3A3A] fill-orange-500",
+        LEADERBOARD_BTN_GRADIENT: "bg-[#FFF8F0] shadow-lg transition-colors",
+        LEADERBOARD_BTN_TEXT: "text-[#8B3A3A]",
+        LEADERBOARD_BTN_BORDER: "border-2 border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-[#FFF8F0] hover:border-[#FFF8F0]",
+        LEADERBOARD_CARD_BG: "bg-gradient-to-br from-[#FFF8F0] to-[#FFE8E0] dark:bg-none dark:bg-[#2C1A1A] transition-colors duration-300",
+        LEADERBOARD_CARD_BORDER: "border-[#8B3A3A] border-2 dark:border-[#8B3A3A]/40",
+        LEADERBOARD_CARD_TEXT: "text-[#8B3A3A] dark:text-[#FFE0E0]",
+
+        REWARD_ICON_BG_GRADIENT: "bg-gradient-to-br from-purple-400/20 to-pink-600/20",
+        REWARD_ICON_COLOR: "text-[#8B3A3A] fill-pink-500",
+        REWARD_BTN_GRADIENT: "bg-[#FFF8F0] shadow-lg transition-colors",
+        REWARD_BTN_TEXT: "text-[#8B3A3A]",
+        REWARD_BTN_BORDER: "border-2 border-[#8B3A3A] hover:bg-[#8B3A3A] hover:text-[#FFF8F0] hover:border-[#FFF8F0]",
+        REWARD_CARD_BG: "bg-gradient-to-br from-[#FFF8F0] to-[#FCE8F0] dark:bg-none dark:bg-[#2C1A1A] transition-colors duration-300",
+        REWARD_CARD_BORDER: "border-[#8B3A3A] border-2 dark:border-[#8B3A3A]/40",
+        REWARD_CARD_TEXT: "text-[#8B3A3A] dark:text-[#FFE0E0]",
     }
 };
 

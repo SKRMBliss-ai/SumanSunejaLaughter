@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { User, Camera, Save, Phone, LogOut, Sparkles, Check, X, Flame, Trophy, Zap, Calendar, TrendingUp, Moon, Sun, Globe, Type, Star, Award, Edit2 } from 'lucide-react';
+import { User, Camera, Save, Phone, LogOut, Sparkles, Check, X, Flame, Trophy, Zap, Calendar, TrendingUp, Moon, Sun, Globe, Type, Star, Award, Edit2, Infinity, History } from 'lucide-react';
 import { updateProfile } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import { ViewState, RewardState } from '../types';
-import { getRewardState } from '../services/rewardService';
+import { getRewardState, getLevelTitle, resetLocalRewards } from '../services/rewardService';
 import { useSettings, SUPPORTED_LANGUAGES, FontSize } from '../contexts/SettingsContext';
 
 interface ProfileProps {
@@ -95,9 +95,15 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
     }
   };
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
     if (window.confirm("Are you sure you want to sign out?")) {
-      auth.signOut();
+      try {
+        resetLocalRewards(); // Clear local storage immediately
+        await auth.signOut();
+      } catch (error) {
+        console.error("Error signing out:", error);
+        alert("Failed to sign out. Please try again.");
+      }
     }
   };
 
@@ -115,6 +121,8 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
     }
     setIsEditingName(false);
   };
+
+
 
   const fontSizes: { id: FontSize; label: string; px: string }[] = [
     { id: 'small', label: 'S', px: '14px' },
@@ -187,7 +195,19 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
             <div className="relative group">
               <div className={`w-32 h-32 rounded-full border-4 border-white dark:border-slate-700 shadow-lg ${currentTheme.HEADER_BG} dark:bg-slate-700 flex items-center justify-center overflow-hidden`}>
                 {photoURL ? (
-                  <img src={photoURL} alt="Profile" className="w-full h-full object-cover" />
+                  <img
+                    src={photoURL}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      if (!target.src.includes('ui-avatars.com')) {
+                        // Use local state update to ensure UI reflects the change immediately
+                        setPhotoURL(`https://ui-avatars.com/api/?name=${encodeURIComponent(displayName || 'User')}&background=random`);
+                      }
+                    }}
+                  />
                 ) : (
                   <User size={48} className={`${currentTheme.ICON_COLOR}`} />
                 )}
@@ -231,9 +251,6 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
                 <Edit2 size={16} className={`text-gray-300 group-hover:${currentTheme.TEXT_ACCENT} transition-colors`} />
               </div>
             )}
-            <div className="text-sm text-gray-500 font-medium bg-gray-100 dark:bg-slate-700 px-3 py-1 rounded-full inline-block">
-              {t('level')} {rewards.level} • {t('points')}: {rewards.points}
-            </div>
           </div>
 
           <div className="mb-6 bg-gradient-to-r from-orange-50 via-white to-orange-50 dark:from-slate-800 dark:via-slate-700 dark:to-slate-800 border border-orange-200 dark:border-slate-600 rounded-3xl p-4 shadow-sm relative overflow-hidden group">
@@ -254,19 +271,19 @@ export const Profile: React.FC<ProfileProps> = ({ onNavigate }) => {
                 </div>
               </div>
               <div className="text-end">
-                <div className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500">
-                  {rewards.streak * 50}
-                </div>
+                {rewards.streak * 20}
                 <div className="text-[0.65rem] font-bold text-gray-400 uppercase">{t('profile.bonus')}</div>
               </div>
             </div>
           </div>
 
+
+
           <div className="grid grid-cols-3 gap-3 mb-6">
             <div className={`${currentTheme.STAT_BG_1} dark:bg-slate-700/50 p-3 rounded-2xl flex flex-col items-center justify-center shadow-sm relative overflow-hidden group hover:brightness-95 transition-all min-h-[5rem]`}>
-              <TrendingUp className={`${currentTheme.TEXT_ACCENT} mb-1 z-10`} size={20} />
-              <span className="text-xl font-black text-gray-700 dark:text-gray-100 leading-none z-10 break-all">{rewards.level}</span>
-              <span className="text-[0.65rem] font-bold text-gray-400 uppercase tracking-tight z-10 text-center leading-tight break-words w-full">{t('level')}</span>
+              <Award className="text-purple-500 mb-1 z-10" size={20} />
+              <span className="text-xs font-black text-purple-700 dark:text-purple-300 leading-tight z-10 break-words text-center px-1">{getLevelTitle(rewards.points)}</span>
+              <span className="text-[0.65rem] font-bold text-gray-400 uppercase tracking-tight z-10 text-center leading-tight break-words w-full mt-1">Rank</span>
             </div>
             <div className={`${currentTheme.STAT_BG_2} dark:bg-slate-700/50 p-3 rounded-2xl flex flex-col items-center justify-center shadow-sm relative overflow-hidden hover:brightness-95 transition-all min-h-[5rem]`}>
               <Zap className={`${currentTheme.TEXT_ACCENT} mb-1 z-10`} size={20} fill="currentColor" />

@@ -31,10 +31,15 @@ export interface RewardState {
   streak: number;
   lastActiveDate: string;
   level: number;
+  activityHistory: string[];
+  dailyPoints?: number;
+  lastDailyReset?: string;
+  dailyTarget?: number;
+  userId?: string;
 }
 
 export interface RewardEvent {
   pointsAdded: number;
   message: string;
-  type: 'STREAK' | 'GAME' | 'COACH' | 'VIDEO';
+  type: 'STREAK' | 'GAME' | 'COACH' | 'VIDEO' | 'BONUS';
 }

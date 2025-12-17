@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../services/firebase';
+import { resetLocalRewards } from '../services/rewardService';
 import { Phone, Check, Loader2, AlertCircle, Sparkles, Music, Zap, Key, ExternalLink, Wrench, Globe, Copy, CreditCard, ChevronDown, Mail } from 'lucide-react';
 
 declare global {
@@ -43,6 +44,9 @@ export const Login: React.FC = () => {
   const recaptchaContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Ensure any stale data is cleared when the login screen loads
+    resetLocalRewards();
+
     // Cleanup on unmount
     return () => {
       if (window.recaptchaVerifier) {

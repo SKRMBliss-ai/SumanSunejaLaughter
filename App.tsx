@@ -15,7 +15,7 @@ import { PhoneLinker } from './components/PhoneLinker';
 import { RewardPopup } from './components/RewardPopup';
 import { AmbientMusic } from './components/AmbientMusic';
 import { HomeLiveWidget } from './components/HomeLiveWidget';
-import { checkDailyStreak, syncRewardsWithFirestore } from './services/rewardService';
+import { checkDailyStreak, syncRewardsWithFirestore, resetLocalRewards } from './services/rewardService';
 
 import { ViewState } from './types';
 import { Loader2 } from 'lucide-react';
@@ -65,6 +65,14 @@ const AppContent: React.FC = () => {
 
       setUser(currentUser);
       setLoading(false);
+
+      if (currentUser) {
+        // Initialize Rewards (Sync will also check streak internally once loaded)
+        syncRewardsWithFirestore();
+      } else {
+        // User logged out: clear local rewards so next user doesn't see them
+        resetLocalRewards();
+      }
     });
     return () => unsubscribe();
   }, []);
