@@ -137,13 +137,13 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ isOpen, onCl
                                                         {user.name} {user.isCurrentUser && '(You)'}
                                                     </h4>
                                                     <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
-                                                        <span className="flex items-center gap-0.5"><Flame size={10} className="text-orange-500" /> {user.streak}</span>
+                                                        <span className={`flex items-center gap-0.5 ${user.isCurrentUser ? 'text-slate-700' : ''}`}><Flame size={10} className="text-orange-500" /> {user.streak}</span>
                                                     </div>
                                                 </div>
 
                                                 <div className="text-right">
-                                                    <div className="text-sm font-black text-slate-900 dark:text-white">{user.points}</div>
-                                                    <div className="text-[10px] font-bold text-slate-400 uppercase">Pts</div>
+                                                    <div className={`text-sm font-black ${user.isCurrentUser ? 'text-slate-900' : 'text-slate-900 dark:text-white'}`}>{user.points}</div>
+                                                    <div className={`text-[10px] font-bold uppercase ${user.isCurrentUser ? 'text-slate-500' : 'text-slate-400'}`}>Pts</div>
                                                 </div>
                                             </div>
                                         ))}
